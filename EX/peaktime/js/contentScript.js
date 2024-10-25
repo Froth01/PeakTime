@@ -5,7 +5,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         document.head.innerHTML = 'Block WebSite';
 
         // 이미지 설정
-        const imageUrl = chrome.runtime.getURL('static/image/image.png');
+        const imageUrl = chrome.runtime.getURL('../image/image.png');
 
         // body에 직접 스타일 적용
         document.body.style.backgroundImage = `url('${imageUrl}')`; // 이미지 URL 설정

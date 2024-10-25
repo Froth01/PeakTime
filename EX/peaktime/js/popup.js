@@ -1,4 +1,30 @@
 // popup.js
+document.getElementById("shutdown").onclick = function () {
+  console.log("차단")
+  // content script에서 온 응답을 처리
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      // 명시적으로 content script를 실행
+      chrome.scripting.executeScript(
+          {
+              target: { tabId: tabs[0].id },
+              files: ['/js/contentScript.js']  // content script 파일 경로
+          },
+          () => {
+              // content script가 실행된 후에 메시지 전송
+              chrome.tabs.sendMessage(tabs[0].id, { action: "START" }, function (response) {
+                  if (response) {
+                      console.log('Response from content script:', response.message); 
+                  } else {
+                      console.log('No response or error');
+                  }
+              });
+          }
+      );
+  });
+
+};
+
+// popup.js
 document.getElementById("reset").onclick = function() {
     chrome.storage.local.clear(function() {
         const textarea = document.getElementById("savedText");
