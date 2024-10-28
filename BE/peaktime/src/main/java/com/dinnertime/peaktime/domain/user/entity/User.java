@@ -26,7 +26,7 @@ public class User {
     @Column(name = "nickname", nullable = false, length = 20)
     private String nickname; // 닉네임
 
-    @Column(name = "email", nullable = false, unique = true, length = 64)
+    @Column(name = "email", unique = true, length = 64)
     private String email; // 이메일
 
     @Column(name = "is_root", nullable = false)
@@ -45,13 +45,24 @@ public class User {
         this.isDelete = isDelete;
     }
 
-    public static User createUser(String userLoginId, String password, String nickname, String email, Boolean isRoot, Boolean isDelete) {
+    public static User createRootUser(String userLoginId, String password, String nickname, String email) {
         return User.builder()
                 .userLoginId(userLoginId)
                 .password(password)
                 .nickname(nickname)
                 .email(email)
-                .isRoot(isRoot)
+                .isRoot(true)
+                .isDelete(false) // Default value
+                .build();
+    }
+
+    public static User createChildUser(String userLoginId, String password, String nickname) {
+        return User.builder()
+                .userLoginId(userLoginId)
+                .password(password)
+                .nickname(nickname)
+                .email(null)
+                .isRoot(false)
                 .isDelete(false) // Default value
                 .build();
     }
