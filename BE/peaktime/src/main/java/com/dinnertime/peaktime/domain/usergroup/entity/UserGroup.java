@@ -19,11 +19,11 @@ public class UserGroup {
     private Long UserGroupId;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @Column(name="child_user_id")
+    @JoinColumn(name="child_user_id")
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name="group_id")
+    @JoinColumn(name="group_id")
     private Group group;
 
     @Builder
