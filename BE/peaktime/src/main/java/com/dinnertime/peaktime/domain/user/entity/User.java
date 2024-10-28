@@ -15,16 +15,45 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="user_id")
-    private Long userId;
+    private Long userId; // PK
 
-    @Column(name="user_login_id")
-    private String userLoginId;
+    @Column(name="user_login_id", nullable = false, unique = true, length = 15)
+    private String userLoginId; // 유저 로그인 아이디
 
-    // 이하 생략
+    @Column(name = "password", nullable = false, length = 64)
+    private String password; // 비밀번호
+
+    @Column(name = "nickname", nullable = false, length = 20)
+    private String nickname; // 닉네임
+
+    @Column(name = "email", nullable = false, unique = true, length = 64)
+    private String email; // 이메일
+
+    @Column(name = "is_root", nullable = false)
+    private Boolean isRoot; // 루트 유저 여부
+
+    @Column(name = "is_delete", nullable = false)
+    private Boolean isDelete; // 삭제 여부
 
     @Builder
-    private User(String userLoginId) {
+    public User(String userLoginId, String password, String nickname, String email, Boolean isRoot, Boolean isDelete) {
         this.userLoginId = userLoginId;
+        this.password = password;
+        this.nickname = nickname;
+        this.email = email;
+        this.isRoot = isRoot;
+        this.isDelete = isDelete;
+    }
+
+    public static User createUser(String userLoginId, String password, String nickname, String email, Boolean isRoot, Boolean isDelete) {
+        return User.builder()
+                .userLoginId(userLoginId)
+                .password(password)
+                .nickname(nickname)
+                .email(email)
+                .isRoot(isRoot)
+                .isDelete(false) // Default value
+                .build();
     }
 
 }
