@@ -2,7 +2,9 @@ package com.dinnertime.peaktime.domain.group.entity;
 
 import com.dinnertime.peaktime.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
