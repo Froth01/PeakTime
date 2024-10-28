@@ -1,7 +1,10 @@
 package com.dinnertime.peaktime.domain.group.entity;
 
+import com.dinnertime.peaktime.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -26,8 +29,8 @@ public class Group {
 //    @ManyToOne
 //    @JoinColumn(name = "preset_id", nullable = false)
 //    private Preset preset;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "root_user_id", nullable = false, unique = true)
-//    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "root_user_id", nullable = false, unique = true)
+    private User user;
 }

@@ -1,13 +1,12 @@
 package com.dinnertime.peaktime.domain.group.controller;
 
-import com.dinnertime.peaktime.domain.group.service.dto.GroupService;
-import com.dinnertime.peaktime.domain.group.service.dto.response.GroupResponseDTO;
-import org.springframework.http.ResponseEntity;
+import com.dinnertime.peaktime.domain.group.service.GroupService;
+import com.dinnertime.peaktime.domain.group.service.dto.response.GroupListResponseDto;
+import com.dinnertime.peaktime.global.util.ResultDto;
 import org.springframework.web.bind.annotation.*;
 
-import com.dinnertime.peaktime.domain.group.entity.Group;
-
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class GroupController {
@@ -18,11 +17,12 @@ public class GroupController {
         this.groupService = groupService;
     }
 
-    //    그룹 전체 조회
+//    그룹 전체 조회
     @GetMapping("/groups")
-    public ResponseEntity<List<GroupResponseDTO>> getGroupList() {
-        List<GroupResponseDTO> groups = groupService.getAllGroups();
-        return ResponseEntity.ok(groups);
+    public ResultDto<Map<String, List<GroupListResponseDto>>> getAllGroups() {
+        List<GroupListResponseDto> groupList = groupService.getAllGroups();
+        Map<String, List<GroupListResponseDto>> groupListAsMap = groupService.getGroupListAsMap(groupList);
+        return ResultDto.res(200, "그룹 및 서브유저 전체 조회 성공하였습니다.", groupListAsMap);
     }
 
 //    그룹 생성

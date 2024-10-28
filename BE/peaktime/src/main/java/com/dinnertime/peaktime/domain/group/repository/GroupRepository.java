@@ -1,7 +1,18 @@
 package com.dinnertime.peaktime.domain.group.repository;
 
+import com.dinnertime.peaktime.domain.user.entity.User;
+import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.dinnertime.peaktime.domain.group.entity.Group;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
 
 public interface GroupRepository extends JpaRepository<Group,Long> {
+    // 삭제되지 않은 group만 전체 조회
+    List<Group> findByIsDeleteFalse();
+
+    @Query(value = "SELECT u.* FROM users u JOIN users_groups ug ON u.user_id = ug.sub_user_id WHERE ug.group_id = :groupId", nativeQuery = true)
+    List<Object[]> findSubUser(@Param("groupId") int groupId);
+//    List<User> findSubUser(@Param("groupId") int groupId);
 }
