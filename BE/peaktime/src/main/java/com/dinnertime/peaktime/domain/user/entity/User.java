@@ -36,7 +36,7 @@ public class User {
     private Boolean isDelete; // 삭제 여부
 
     @Builder
-    public User(String userLoginId, String password, String nickname, String email, Boolean isRoot, Boolean isDelete) {
+    private User(String userLoginId, String password, String nickname, String email, Boolean isRoot, Boolean isDelete) {
         this.userLoginId = userLoginId;
         this.password = password;
         this.nickname = nickname;
