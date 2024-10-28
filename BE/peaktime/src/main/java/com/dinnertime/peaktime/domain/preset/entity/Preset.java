@@ -46,11 +46,13 @@ public class Preset {
         this.user = user;
     }
 
+    // 프리셋 생성
     public static Preset createPreset(String title, List<String> blockWebsiteArray, List<String> blockProgramArray, User user) {
         return Preset.builder()
                 .title(title)
                 .blockWebsiteArray(blockWebsiteArray)
                 .blockProgramArray(blockProgramArray)
+                .user(user)
                 .build();
     }
 
