@@ -30,11 +30,12 @@ public class GroupService {
         return groupRepository.findByIsDeleteFalse().stream()
                 .sorted(Comparator.comparing(Group::getTitle)) // title에 따라 ASC 정렬
                 .map(group -> {
-                    List<Object[]> subUserData = groupRepository.findSubUser(group.getGroupId().intValue());
+                    List<Map<String, Object>> subUserData = groupRepository.findSubUser(group.getGroupId().intValue());
                     List<SubUserResponseDto> subUserList = subUserData.stream()
                             .map(data -> new SubUserResponseDto(
-                                    ((Long) data[0]),  // user_id
-                                    (String) data[1]                     // user_login_id
+                                    ((Long) data.get("userId")).longValue(),
+                                    (String) data.get("userLoginId"),
+                                    (String) data.get("nickname")
                             ))
                             .collect(Collectors.toList());
 
