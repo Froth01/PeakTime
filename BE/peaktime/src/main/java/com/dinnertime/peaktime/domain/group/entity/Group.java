@@ -4,14 +4,9 @@ import com.dinnertime.peaktime.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Setter
 @Table(name = "groups")
 public class Group {
 
@@ -24,13 +19,13 @@ public class Group {
     private String title;
 
     @Column(name = "is_delete", nullable = false)
-    private boolean isDelete;
+    private Boolean isDelete;
 
-//    @ManyToOne
+//    @OneToOne
 //    @JoinColumn(name = "preset_id", nullable = false)
 //    private Preset preset;
 
     @ManyToOne
-    @JoinColumn(name = "root_user_id", nullable = false, unique = true)
+    @JoinColumn(name = "root_user_id", nullable = false)
     private User user;
 }

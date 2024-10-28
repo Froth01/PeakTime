@@ -1,23 +1,23 @@
 package com.dinnertime.peaktime.domain.group.service.dto.response;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.List;
 
 @Getter
-@Setter
 @NoArgsConstructor
 public class GroupListResponseDto {
 
     private Long groupId;
     private String groupName;
-    private List<SubUserResponseDto> subUserList;
+    private List<ChildUserResponseDto> childList;
 
-    public GroupListResponseDto(Long groupId, String groupName, List<SubUserResponseDto> subUserList) {
+    @Builder
+    public GroupListResponseDto(Long groupId, String groupName, List<ChildUserResponseDto> childList) {
         this.groupId = groupId;
         this.groupName = groupName;
-        this.subUserList = subUserList;
+        this.childList = childList;
     }
 }
