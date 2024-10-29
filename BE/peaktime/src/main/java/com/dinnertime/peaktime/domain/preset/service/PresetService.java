@@ -37,8 +37,6 @@ public class PresetService {
     @Transactional
     public void createPreset(UserPrincipal userPrincipal, SavePresetRequestDto requestDto) {
 
-        // 프리셋 타이틀 2~6자
-        validatePresetTitleLength(requestDto.getTitle());
 
         //임시로 1로 고정시키기 추후 수정 userPrincipal.getUserId());
         User user = userService.getUserById(1); //userPrincipal.getUserId());
@@ -51,13 +49,5 @@ public class PresetService {
         savePreset(requestDto.getTitle(), blockWebsiteList, blockProgramList, user);
 
     }
-
-    // 타이틀 유효성 메소드
-    private void validatePresetTitleLength(String title) {
-        if(title.length() < 2 || title.length() > 6){
-            throw new CustomException(ErrorCode.INVALID_PRESET_TITLE_LENGTH);
-        }
-    }
-
 
 }
