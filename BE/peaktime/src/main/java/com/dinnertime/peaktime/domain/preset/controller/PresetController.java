@@ -3,6 +3,7 @@ package com.dinnertime.peaktime.domain.preset.controller;
 import com.dinnertime.peaktime.domain.preset.entity.Preset;
 import com.dinnertime.peaktime.domain.preset.service.PresetService;
 import com.dinnertime.peaktime.domain.preset.service.dto.request.SavePresetRequestDto;
+import com.dinnertime.peaktime.domain.preset.service.dto.response.PresetResponseWrapperDto;
 import com.dinnertime.peaktime.global.util.CommonSwaggerResponse;
 import com.dinnertime.peaktime.global.util.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -71,9 +72,9 @@ public class PresetController {
     public ResponseEntity<?> getPreset(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         log.info("getPreset 메서드가 호출되었습니다.");
 
-        presetService.getPresets(userPrincipal);
+        PresetResponseWrapperDto responseDto = presetService.getPresets(userPrincipal);
 
-        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(),"프리셋 전체 조회에 성공했습니다."));
+        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(),"프리셋 전체 조회에 성공했습니다.", responseDto));
     }
 
 }
