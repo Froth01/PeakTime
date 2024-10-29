@@ -7,6 +7,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class PresetResponseWrapperDto {
 
     private List<PresetResponseDto> presetList;
