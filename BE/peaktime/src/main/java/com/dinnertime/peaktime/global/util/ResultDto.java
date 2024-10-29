@@ -3,7 +3,7 @@ package com.dinnertime.peaktime.global.util;
 import lombok.*;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class ResultDto<T> {

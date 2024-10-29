@@ -4,11 +4,8 @@ import com.dinnertime.peaktime.domain.preset.service.dto.request.SavePresetReque
 import com.dinnertime.peaktime.domain.user.entity.User;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
+import lombok.*;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 
 import java.util.Arrays;
@@ -18,12 +15,13 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Table(name = "presets")
+@ToString
 public class Preset {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
-    private Long id; // bigint wrapper class Long과 연결시키기
+    @Column(name="preset_id")
+    private Long presetId; // bigint wrapper class Long과 연결시키기
 
     @Column(name ="title",nullable=false)
     private String title;
@@ -57,7 +55,5 @@ public class Preset {
                 .user(user)
                 .build();
     }
-
-
 
 }
