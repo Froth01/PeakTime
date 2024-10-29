@@ -56,4 +56,34 @@ public class PresetService {
         return responseDto;
     }
 
+    // preset 업데이트
+    @Transactional
+    public void updatePreset(UserPrincipal userPrincipal, SavePresetRequestDto requestDto, Long presetId) {
+
+        //임시로 1로 고정시키기 추후 수정 userPrincipal.getUserId());
+        User user = userRepository.findByUserId(1).
+                orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        // userId = 1로 임의 설정
+        Preset preset = presetRepository.findByPresetId(presetId)
+                .orElseThrow(() -> new CustomException(ErrorCode.PRESET_NOT_FOUND));
+
+        presetRepository.save(preset);
+    }
+
+    // 프리셋 삭제
+    @Transactional
+    public void deletePreset(UserPrincipal userPrincipal, Long presetId) {
+
+        //임시로 1로 고정시키기 추후 수정 userPrincipal.getUserId());
+        User user = userRepository.findByUserId(1).
+                orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Preset preset = presetRepository.findByPresetId(presetId)
+                .orElseThrow(() -> new CustomException(ErrorCode.PRESET_NOT_FOUND));
+
+        presetRepository.delete(preset);
+
+    }
+
 }
