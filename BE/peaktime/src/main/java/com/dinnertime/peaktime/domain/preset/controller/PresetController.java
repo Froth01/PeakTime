@@ -49,7 +49,7 @@ public class PresetController {
         log.info("프리셋 생성 : " + requestDto.toString());
 
         presetService.createPreset(userPrincipal, requestDto);
-        // 임시 세팅
+
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(),"프리셋 생성에 성공했습니다."));
     }
 
@@ -70,7 +70,9 @@ public class PresetController {
     @GetMapping
     public ResponseEntity<?> getPreset(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         log.info("getPreset 메서드가 호출되었습니다.");
-        // 임시 세팅
+
+        presetService.getPresets(userPrincipal);
+
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(),"프리셋 전체 조회에 성공했습니다."));
     }
 
