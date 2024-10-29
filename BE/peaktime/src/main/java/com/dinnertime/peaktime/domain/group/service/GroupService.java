@@ -2,10 +2,10 @@ package com.dinnertime.peaktime.domain.group.service;
 
 import com.dinnertime.peaktime.domain.group.entity.Group;
 import com.dinnertime.peaktime.domain.group.repository.GroupRepository;
-import com.dinnertime.peaktime.domain.group.service.dto.response.GroupListResponseDto;
-import com.dinnertime.peaktime.domain.group.service.dto.response.ChildResponseDto;
+import com.dinnertime.peaktime.domain.group.service.dto.response.GroupItemResponseDto;
+import com.dinnertime.peaktime.domain.group.service.dto.response.ChildItemResponseDto;
+import com.dinnertime.peaktime.domain.usergroup.entity.UserGroup;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -15,31 +15,33 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class GroupService {
 
-    @Autowired
-    private GroupRepository groupRepository;
+    private final GroupRepository groupRepository;
 
-    // 조회 자료를 HashMap으로 변환
-    public Map<String, List<GroupListResponseDto>> getGroupListAsMap(List<GroupListResponseDto> groupList) {
-        Map<String, List<GroupListResponseDto>> data = new HashMap<>();
-        data.put("groupList", groupList);
-        return data;
-    }
+    public List<GroupItemResponseDto> getGroupList() {
+        List<Group> groupList = groupRepository.findByIsDeleteFalseOrderByTitleAsc();
 
-    // 전체 그룹 조회
-    public List<GroupListResponseDto> getAllGroups() {
-        return groupRepository.findByIsDeleteFalse().stream()
-                .sorted(Comparator.comparing(Group::getTitle)) // title에 따라 ASC 정렬
-                .map(group -> {
-                    List<Map<String, Object>> subUserData = groupRepository.findChildUsers(group.getGroupId().intValue());
-                    List<ChildUserResponseDto> childUserList = subUserData.stream()
-                            .map(data -> new ChildUserResponseDto(
-                                    ((Long) data.get("userId")).longValue(),
-                                    (String) data.get("userLoginId"),
-                                    (String) data.get("nickname")
-                            ))
-                            .collect(Collectors.toList());
+        return groupList.stream()
+                .map(groupItem -> {
+                    return GroupItemResponseDto.builder()
+                            .groupId(groupItem.getGroupId())
+                            .groupTitle(groupItem.getTitle())
+                            .childList(getChildList(groupItem.getGroupId()))
+                            .build();
+                })
+                .collect(Collectors.toList());
+        }
 
-                    return new GroupListResponseDto(group.getGroupId(), group.getTitle(), childUserList);
+    public List<ChildItemResponseDto> getChildList(Long groupId) {
+        List<UserGroup> userGroups = groupRepository.findByGroupId(groupId);
+
+        return userGroups.stream()
+                .sorted(Comparator.comparing(userGroup -> userGroup.getUser().getNickname())) // nickname 오름차순 정렬
+                .map(userGroup -> {
+                    return ChildItemResponseDto.builder()
+                            .userId(userGroup.getUser().getUserId())
+                            .userLoginId(userGroup.getUser().getUserLoginId())
+                            .nickname(userGroup.getUser().getNickname())
+                            .build();
                 })
                 .collect(Collectors.toList());
     }

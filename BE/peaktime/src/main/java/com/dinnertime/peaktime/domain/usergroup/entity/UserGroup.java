@@ -16,14 +16,14 @@ public class UserGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="user_group_id")
-    private Long UserGroupId;
+    private Long userGroupId;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @Column(name="child_user_id")
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "child_user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name="group_id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "group_id", nullable = false)
     private Group group;
 
     @Builder

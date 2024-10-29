@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
 
     INVALID_PRESET_TITLE_LENGTH("프리셋 타이틀이 6자를 초과하거나 2자 미만일 수 없습니다.",HttpStatus.BAD_REQUEST),
+    GROUP_LIST_FETCH_FAILED("그룹 전체 조회에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     ;
 
     private final String message;

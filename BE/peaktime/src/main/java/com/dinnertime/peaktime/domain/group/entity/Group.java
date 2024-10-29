@@ -1,8 +1,10 @@
 package com.dinnertime.peaktime.domain.group.entity;
 
+import com.dinnertime.peaktime.domain.preset.entity.Preset;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,11 +25,28 @@ public class Group {
     @Column(name = "is_delete", nullable = false)
     private Boolean isDelete;
 
-//    @OneToOne
-//    @JoinColumn(name = "preset_id", nullable = false)
-//    private Preset preset;
+    @OneToOne
+    @JoinColumn(name = "preset_id", nullable = false)
+    private Preset preset;
 
     @ManyToOne
     @JoinColumn(name = "root_user_id", nullable = false)
     private User user;
+
+    @Builder
+    private Group(String title, Boolean isDelete, Preset preset, User user) {
+        this.title = title;
+        this.isDelete = isDelete;
+        this.preset = preset;
+        this.user = user;
+    }
+
+    public static Group createGroup(String title, Boolean isDelete, Preset preset, User user) {
+        return Group.builder()
+                .title(title)
+                .isDelete(isDelete)
+                .preset(preset)
+                .user(user)
+                .build();
+    }
 }
