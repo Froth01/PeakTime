@@ -22,8 +22,8 @@ public class Preset {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
-    private Long id; // bigint wrapper class Long과 연결시키기
+    @Column(name="preset_id")
+    private Long presetId; // bigint wrapper class Long과 연결시키기
 
     @Column(name ="title",nullable=false)
     private String title;
@@ -58,6 +58,16 @@ public class Preset {
                 .build();
     }
 
+    @Override
+    public String toString() {
+
+        return "Preset{" +
+                "id=" + presetId +
+                ", title='" + title + '\'' +
+                ", blockWebsiteArray=" + blockWebsiteArray +
+                ", blockProgramArray=" + blockProgramArray +
+                ", user=" + user.getUserId();
+    }
 
 
 }
