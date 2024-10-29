@@ -17,4 +17,10 @@ public class GroupListResponseDto {
     private GroupListResponseDto(List<GroupItemResponseDto> groupList) {
         this.groupList = groupList;
     }
+
+    public static GroupListResponseDto createGroupListResponseDto(List<GroupItemResponseDto> groupList) {
+        return GroupListResponseDto.builder()
+                .groupList(groupList)
+                .build();
+    }
 }

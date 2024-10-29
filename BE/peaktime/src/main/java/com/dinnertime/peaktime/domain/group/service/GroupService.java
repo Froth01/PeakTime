@@ -28,9 +28,7 @@ public class GroupService {
     public GroupListResponseDto getGroupListResponseDto() {
         List<GroupItemResponseDto> groupList = getGroupList();
 
-        return GroupListResponseDto.builder()
-                .groupList(groupList)
-                .build();
+        return GroupListResponseDto.createGroupListResponseDto(groupList);
     }
 
     @Transactional
