@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,9 +33,7 @@ public class GroupController {
     @CommonSwaggerResponse.CommonResponses
     @GetMapping("")
     public ResponseEntity<?> getGroupList() {
-        GroupListResponseDto groupListResponseDto = GroupListResponseDto.builder()
-                            .groupList(groupService.getGroupList())
-                            .build();
+        GroupListResponseDto groupListResponseDto = groupService.getGroupListResponseDto();
 
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "그룹 및 서브유저 전체 조회 성공하였습니다.", groupListResponseDto));
     }
@@ -42,28 +41,24 @@ public class GroupController {
 //    그룹 생성
     @PostMapping("")
     public void postGroup() {
-        System.out.println("postGroup");
         return;
     }
 
 //    그룹 조회
     @GetMapping("/{groupId}")
     public void getGroup() {
-        System.out.println("getGroup");
         return;
     }
 
 //    그룹 수정
     @PutMapping("/{groupId}")
     public void putGroup() {
-        System.out.println("putGroup");
         return;
     }
 
 //    그룹 삭제
     @DeleteMapping("/{groupId}")
     public void deleteGroup() {
-        System.out.println("deleteGroup");
         return;
     }
 

@@ -16,9 +16,17 @@ public class GroupItemResponseDto {
     private List<ChildItemResponseDto> childList;
 
     @Builder
-    public GroupItemResponseDto(Long groupId, String groupTitle, List<ChildItemResponseDto> childList) {
+    private GroupItemResponseDto(Long groupId, String groupTitle, List<ChildItemResponseDto> childList) {
         this.groupId = groupId;
         this.groupTitle = groupTitle;
         this.childList = childList;
+    }
+
+    public static GroupItemResponseDto createGroupItemResponseDto(Long groupId, String groupTitle, List<ChildItemResponseDto> childList) {
+        return GroupItemResponseDto.builder()
+                .groupId(groupId)
+                .groupTitle(groupTitle)
+                .childList(childList)
+                .build();
     }
 }

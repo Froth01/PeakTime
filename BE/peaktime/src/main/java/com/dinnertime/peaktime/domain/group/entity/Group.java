@@ -23,7 +23,7 @@ public class Group {
     private String title;
 
     @Column(name = "is_delete", nullable = false)
-    private Boolean isDelete;
+    private Boolean isDelete = false;
 
     @OneToOne
     @JoinColumn(name = "preset_id", nullable = false)
@@ -34,17 +34,16 @@ public class Group {
     private User user;
 
     @Builder
-    private Group(String title, Boolean isDelete, Preset preset, User user) {
+    private Group(String title, Preset preset, User user) {
         this.title = title;
-        this.isDelete = isDelete;
+        this.isDelete = false;
         this.preset = preset;
         this.user = user;
     }
 
-    public static Group createGroup(String title, Boolean isDelete, Preset preset, User user) {
+    public static Group createGroup(String title, Preset preset, User user) {
         return Group.builder()
                 .title(title)
-                .isDelete(isDelete)
                 .preset(preset)
                 .user(user)
                 .build();

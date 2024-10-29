@@ -13,9 +13,17 @@ public class ChildItemResponseDto {
     private String nickname;
 
     @Builder
-    public ChildItemResponseDto(Long userId, String userLoginId, String nickname) {
+    private ChildItemResponseDto(Long userId, String userLoginId, String nickname) {
         this.userId = userId;
         this.userLoginId = userLoginId;
         this.nickname = nickname;
+    }
+
+    public static ChildItemResponseDto createChildItemResponseDto(Long userId, String userLoginId, String nickname) {
+        return ChildItemResponseDto.builder()
+                .userId(userId)
+                .userLoginId(userLoginId)
+                .nickname(nickname)
+                .build();
     }
 }
