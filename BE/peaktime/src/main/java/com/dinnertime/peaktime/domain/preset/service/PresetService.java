@@ -4,6 +4,7 @@ import com.dinnertime.peaktime.domain.preset.entity.Preset;
 import com.dinnertime.peaktime.domain.preset.repository.PresetRepository;
 import com.dinnertime.peaktime.domain.preset.service.dto.request.SavePresetRequestDto;
 import com.dinnertime.peaktime.domain.user.entity.User;
+import com.dinnertime.peaktime.domain.user.repository.UserRepository;
 import com.dinnertime.peaktime.domain.user.service.UserService;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
@@ -24,30 +25,19 @@ public class PresetService {
 
     // preset CRUD 처리
     private final PresetRepository presetRepository;
-    private final UserService userService;
-
-    @Transactional
-    // 프리셋 생성된 것을 sql에 저장
-    public Preset savePreset(String title, List<String> blockWebsiteArray, List<String> blockProgramArray, User user){
-        Preset preset = Preset.createPreset(title, blockWebsiteArray, blockProgramArray, user);
-        presetRepository.save(preset);
-        return preset;
-    }
+    private final UserRepository userRepository;
 
     @Transactional
     public void createPreset(UserPrincipal userPrincipal, SavePresetRequestDto requestDto) {
 
-
         //임시로 1로 고정시키기 추후 수정 userPrincipal.getUserId());
-        User user = userService.getUserById(1); //userPrincipal.getUserId());
+        User user = userRepository.findByUserId(1).
+                orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         // userId = 1로 임의 설정
+        Preset preset = Preset.createPreset(requestDto, user);
 
-        List<String> blockWebsiteList = Arrays.asList(requestDto.getBlockSiteList());
-        List<String> blockProgramList = Arrays.asList(requestDto.getBlockProgramList());
-
-        savePreset(requestDto.getTitle(), blockWebsiteList, blockProgramList, user);
-
+        presetRepository.save(preset);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.dinnertime.peaktime.domain.preset.entity;
 
+import com.dinnertime.peaktime.domain.preset.service.dto.request.SavePresetRequestDto;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
@@ -10,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Entity
@@ -47,11 +49,11 @@ public class Preset {
     }
 
     // 프리셋 생성
-    public static Preset createPreset(String title, List<String> blockWebsiteArray, List<String> blockProgramArray, User user) {
+    public static Preset createPreset(SavePresetRequestDto requestDto, User user) {
         return Preset.builder()
-                .title(title)
-                .blockWebsiteArray(blockWebsiteArray)
-                .blockProgramArray(blockProgramArray)
+                .title(requestDto.getTitle())
+                .blockWebsiteArray(Arrays.asList(requestDto.getBlockSiteList()))
+                .blockProgramArray(Arrays.asList(requestDto.getBlockProgramList()))
                 .user(user)
                 .build();
     }
