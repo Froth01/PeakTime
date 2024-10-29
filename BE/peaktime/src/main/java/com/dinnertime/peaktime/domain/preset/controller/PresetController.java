@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -42,7 +43,8 @@ public class PresetController {
     @PostMapping
     public ResponseEntity<?> createPreset(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
-            @RequestBody SavePresetRequestDto requestDto) {
+            @Valid @RequestBody SavePresetRequestDto requestDto) {
+        //단순한 데이터 형식과 길이에 대한 유효성 검증은 컨트롤러에서 처리 @Valid
         log.info("createPreset 메서드가 호출되었습니다.");
         log.info("프리셋 생성 : " + requestDto.toString());
 
