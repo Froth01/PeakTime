@@ -13,6 +13,6 @@ public class SavePresetRequestDto {
     @Size(min = 2, max = 8, message = "제목은 2글자 이상 8글자 이하로 입력해주세요.")
     private String title;
 
-    private String[] blockSiteList;
+    private String[] blockWebsiteList;
     private String[] blockProgramList;
 }
