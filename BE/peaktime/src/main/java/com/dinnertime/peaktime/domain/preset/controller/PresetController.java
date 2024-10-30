@@ -77,4 +77,55 @@ public class PresetController {
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(),"프리셋 전체 조회에 성공했습니다.", responseDto));
     }
 
+    // 프리셋 수정
+    @Operation(summary = "특정 프리셋 수정하기", description = "프리셋 수정하기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "해당 프리셋 수정에 성공했습니다.",
+                    content = @Content(schema= @Schema(implementation = ResultDto.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "프리셋 수정에 실패했습니다.",
+                    content= @Content(schema= @Schema(implementation = ResultDto.class))
+            )
+
+    })
+    @CommonSwaggerResponse.CommonResponses
+    @PutMapping("/{presetId}")
+    public ResponseEntity<?> updatePreset(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @PathVariable Long presetId,
+            @Valid @RequestBody SavePresetRequestDto requestDto) {
+
+
+        log.info("updatePreset  메서드가 호출되었습니다.");
+
+        presetService.updatePreset(userPrincipal, requestDto, presetId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(),"프리셋 수정에 성공했습니다."));
+    }
+
+    // 프리셋 삭제
+    @Operation(summary = "특정 프리셋 삭제하기", description = "프리셋 삭제하기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "해당 프리셋 삭제에 성공했습니다.",
+                    content = @Content(schema= @Schema(implementation = ResultDto.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "프리셋 수정에 삭제했습니다.",
+                    content= @Content(schema= @Schema(implementation = ResultDto.class))
+            )
+
+    })
+    @CommonSwaggerResponse.CommonResponses
+    @DeleteMapping("/{presetId}")
+    public ResponseEntity<?> deletePreset(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @PathVariable Long presetId) {
+
+
+        log.info("deletePreset  메서드가 호출되었습니다.");
+
+        presetService.deletePreset(userPrincipal, presetId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(),"프리셋 삭제에 성공했습니다."));
+    }
+
 }
