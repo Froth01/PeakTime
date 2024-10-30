@@ -11,6 +11,7 @@ import com.dinnertime.peaktime.global.exception.ErrorCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.attribute.UserPrincipal;
@@ -68,6 +69,8 @@ public class PresetService {
         Preset preset = presetRepository.findByPresetId(presetId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PRESET_NOT_FOUND));
 
+        preset.updatePreset(requestDto);
+
         presetRepository.save(preset);
     }
 
@@ -82,7 +85,14 @@ public class PresetService {
         Preset preset = presetRepository.findByPresetId(presetId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PRESET_NOT_FOUND));
 
-        presetRepository.delete(preset);
+        // 그룹에 있을 때 presetId가 존재하는 경우 데이터 무결성 위반 에러 발생함 -> 예외처리 진행
+
+        try{
+            presetRepository.delete(preset);
+        } catch(DataIntegrityViolationException e){ // 데이터 무결성 위반 exception
+            throw new CustomException(ErrorCode.FAILED_DELETE_PRESET_IN_GROUP);
+        }
+
 
     }
 
