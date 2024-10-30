@@ -2,12 +2,17 @@ package com.dinnertime.peaktime.domain.group.service;
 
 import com.dinnertime.peaktime.domain.group.entity.Group;
 import com.dinnertime.peaktime.domain.group.repository.GroupRepository;
+import com.dinnertime.peaktime.domain.group.service.dto.response.GroupDetailResponseDto;
 import com.dinnertime.peaktime.domain.group.service.dto.response.GroupItemResponseDto;
 import com.dinnertime.peaktime.domain.group.service.dto.response.ChildItemResponseDto;
 import com.dinnertime.peaktime.domain.group.service.dto.response.GroupListResponseDto;
+import com.dinnertime.peaktime.domain.timer.repository.TimerRepository;
+import com.dinnertime.peaktime.domain.timer.service.dto.response.TimerItemResponseDto;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.usergroup.entity.UserGroup;
 import com.dinnertime.peaktime.domain.usergroup.repository.UserGroupRepository;
+import com.dinnertime.peaktime.global.exception.CustomException;
+import com.dinnertime.peaktime.global.exception.ErrorCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +28,7 @@ public class GroupService {
 
     private final GroupRepository groupRepository;
     private final UserGroupRepository userGroupRepository;
+    private final TimerRepository timerRepository;
 
     @Transactional
     public GroupListResponseDto getGroupListResponseDto() {
@@ -64,7 +70,17 @@ public class GroupService {
 
 
 // 개별 그룹 조회
-    public Optional<Group> getGroupById(Long groupId) {
-        return groupRepository.findById(groupId);
-    }
-}
+@Transactional
+public GroupDetailResponseDto getGroupDetail(Long groupId) {
+    // 그룹 조회
+    Group group = groupRepository.findByGroupIdAndIsDelete(groupId, false)
+            .orElseThrow(() -> new CustomException(ErrorCode.GROUP_NOT_FOUND));
+
+    // 타이머 리스트 조회
+    List<TimerItemResponseDto> timerList = timerRepository.findByGroup_GroupId(groupId)
+            .stream()
+            .map(TimerItemResponseDto::createTimeItemResponseDto)
+            .collect(Collectors.toList());
+
+    return GroupDetailResponseDto.createGroupDetailResponseDto(group, timerList);
+}}
