@@ -1,6 +1,5 @@
 package com.dinnertime.peaktime.domain.group.controller;
 
-import com.dinnertime.peaktime.domain.group.service.GroupDetailService;
 import com.dinnertime.peaktime.domain.group.service.GroupService;
 import com.dinnertime.peaktime.domain.group.service.dto.response.GroupDetailResponseDto;
 import com.dinnertime.peaktime.domain.group.service.dto.response.GroupListResponseDto;
@@ -12,7 +11,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 public class GroupController {
 
     private final GroupService groupService;
-    private final GroupDetailService groupDetailService;
 
 //    그룹 전체 조회
     @Operation(summary = "그룹 전체 정보 조회", description = "루트 유저의 전체 그룹 정보 조회하기")
@@ -60,7 +57,7 @@ public class GroupController {
     @GetMapping("/{groupId}")
     public ResponseEntity<?> getGroupDetail(@PathVariable Long groupId) {
         // 계정 설정 업데이트 시 접속한 ID로 조회하는 부분 추가 
-        GroupDetailResponseDto groupDetailResponseDto = groupDetailService.getGroupDetail(groupId);
+        GroupDetailResponseDto groupDetailResponseDto = groupService.getGroupDetail(groupId);
 
         return ResponseEntity.status(HttpStatus.OK).body((ResultDto.res(HttpStatus.OK.value(), "그룹을 조회하는 데 성공했습니다.", groupDetailResponseDto)));
     }
