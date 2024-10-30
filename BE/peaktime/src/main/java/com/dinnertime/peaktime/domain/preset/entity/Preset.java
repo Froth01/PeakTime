@@ -50,10 +50,17 @@ public class Preset {
     public static Preset createPreset(SavePresetRequestDto requestDto, User user) {
         return Preset.builder()
                 .title(requestDto.getTitle())
-                .blockWebsiteArray(Arrays.asList(requestDto.getBlockSiteList()))
+                .blockWebsiteArray(Arrays.asList(requestDto.getBlockWebsiteList()))
                 .blockProgramArray(Arrays.asList(requestDto.getBlockProgramList()))
                 .user(user)
                 .build();
+    }
+
+    // 프리셋 수정
+    public void updatePreset(SavePresetRequestDto requestDto) {
+        this.title = requestDto.getTitle();
+        this.blockWebsiteArray = Arrays.asList(requestDto.getBlockWebsiteList());
+        this.blockProgramArray = Arrays.asList(requestDto.getBlockProgramList());
     }
 
 }
