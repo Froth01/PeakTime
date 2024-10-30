@@ -79,19 +79,8 @@ public GroupDetailResponseDto getGroupDetail(Long groupId) {
     // 타이머 리스트 조회
     List<TimerItemResponseDto> timerList = timerRepository.findByGroup_GroupId(groupId)
             .stream()
-            .map(timer -> TimerItemResponseDto.createTimeItemResponseDto(
-                    timer.getTimerId(),
-                    timer.getStartTime(),
-                    timer.getEndTime(),
-                    timer.getIsRepeat(),
-                    timer.getRepeatDay()
-            ))
+            .map(TimerItemResponseDto::createTimeItemResponseDto)
             .collect(Collectors.toList());
 
-    return GroupDetailResponseDto.createGroupDetailResponseDto(
-            group.getTitle(),
-            group.getPreset().getPresetId(),
-            group.getPreset().getTitle(),
-            timerList
-    );
+    return GroupDetailResponseDto.createGroupDetailResponseDto(group, timerList);
 }}

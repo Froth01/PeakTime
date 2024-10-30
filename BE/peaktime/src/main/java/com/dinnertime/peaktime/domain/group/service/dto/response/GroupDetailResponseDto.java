@@ -1,5 +1,6 @@
 package com.dinnertime.peaktime.domain.group.service.dto.response;
 
+import com.dinnertime.peaktime.domain.group.entity.Group;
 import com.dinnertime.peaktime.domain.timer.service.dto.response.TimerItemResponseDto;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -25,11 +26,11 @@ public class GroupDetailResponseDto {
         this.timerList = timerList;
     }
 
-    public static GroupDetailResponseDto createGroupDetailResponseDto(String title, Long presetId, String presetTitle, List<TimerItemResponseDto> timerList) {
+    public static GroupDetailResponseDto createGroupDetailResponseDto(Group group, List<TimerItemResponseDto> timerList) {
         return GroupDetailResponseDto.builder()
-                .title(title)
-                .presetId(presetId)
-                .presetTitle(presetTitle)
+                .title(group.getTitle())
+                .presetId(group.getPreset().getPresetId())
+                .presetTitle(group.getPreset().getTitle())
                 .timerList(timerList)
                 .build();
     }
