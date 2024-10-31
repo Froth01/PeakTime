@@ -24,7 +24,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
     @Override
     public Long updateIsDeleteByGroupId(Long groupId, Boolean isDelete) {
-        Long count =  queryFactory
+        return queryFactory
                 .update(QUser.user)
                 .set(QUser.user.isDelete, isDelete)
                 .where(QUser.user.userId.in(
@@ -34,9 +34,5 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
                                 .where(QUserGroup.userGroup.group.groupId.eq(groupId))
                 ))
                 .execute();
-
-        entityManager.flush();
-        entityManager.clear();
-        return count;
     }
 }
