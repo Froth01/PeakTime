@@ -3,6 +3,7 @@ package com.dinnertime.peaktime.domain.group.service;
 import com.dinnertime.peaktime.domain.group.entity.Group;
 import com.dinnertime.peaktime.domain.group.repository.GroupRepository;
 import com.dinnertime.peaktime.domain.group.service.dto.request.GroupCreateRequestDto;
+import com.dinnertime.peaktime.domain.group.service.dto.request.GroupPutRequestDto;
 import com.dinnertime.peaktime.domain.group.service.dto.response.GroupDetailResponseDto;
 import com.dinnertime.peaktime.domain.group.service.dto.response.GroupItemResponseDto;
 import com.dinnertime.peaktime.domain.group.service.dto.response.ChildItemResponseDto;
@@ -91,6 +92,7 @@ public class GroupService {
         return GroupDetailResponseDto.createGroupDetailResponseDto(group, timerList);
     }
 
+    // 그룹 생성
     @Transactional
     public void postGroup(Long userId, GroupCreateRequestDto requestDto) {
         User user = userRepository.findByUserId(userId)
@@ -115,5 +117,36 @@ public class GroupService {
         Group group = Group.createGroup(requestDto.getTitle(), preset, user);
 
         groupRepository.save(group);
+    }
+
+    // 그룹 수정
+    @Transactional
+    public void putGroup(Long userId, Long groupId, GroupPutRequestDto requestDto) {
+        List<Group> groupListByUserId = groupRepository.findByUser_UserIdAndIsDelete(userId, false);
+
+        // 그룹 목록에서 해당 그룹 찾기
+        Group groupSelected = groupListByUserId.stream()
+                .filter(g -> g.getGroupId().equals(groupId))
+                .findFirst()
+                .orElseThrow(() -> new CustomException(ErrorCode.GROUP_NOT_FOUND));
+
+        // 그룹 목록에서 그룹명 중복 조회
+        String title = groupSelected.getTitle();
+        if (!title.equals(requestDto.getTitle())) {
+            if (groupListByUserId.stream()
+                    .anyMatch(g -> !g.getGroupId().equals(groupSelected.getGroupId()) && g.getTitle().equals(requestDto.getTitle()))) {
+                throw new CustomException(ErrorCode.GROUP_NAME_ALREADY_EXISTS);
+            }
+            title = requestDto.getTitle();
+        }
+
+        // 프리셋 조회
+        Preset preset = groupSelected.getPreset().getPresetId().equals(requestDto.getPresetId())
+                ? groupSelected.getPreset()
+                : presetRepository.findByPresetId(requestDto.getPresetId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.PRESET_NOT_FOUND));
+
+        // 그룹 정보 업데이트
+        groupSelected.updateGroup(title, preset);
     }
 }

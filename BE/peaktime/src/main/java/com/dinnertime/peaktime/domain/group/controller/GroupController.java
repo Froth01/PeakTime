@@ -2,6 +2,7 @@ package com.dinnertime.peaktime.domain.group.controller;
 
 import com.dinnertime.peaktime.domain.group.service.GroupService;
 import com.dinnertime.peaktime.domain.group.service.dto.request.GroupCreateRequestDto;
+import com.dinnertime.peaktime.domain.group.service.dto.request.GroupPutRequestDto;
 import com.dinnertime.peaktime.domain.group.service.dto.response.GroupDetailResponseDto;
 import com.dinnertime.peaktime.domain.group.service.dto.response.GroupListResponseDto;
 import com.dinnertime.peaktime.global.util.CommonSwaggerResponse;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -78,8 +80,10 @@ public class GroupController {
 
 //    그룹 수정
     @PutMapping("/{groupId}")
-    public void putGroup() {
-        return;
+    public ResponseEntity<?> putGroup(@RequestParam Long userId, @PathVariable Long groupId, @RequestBody GroupPutRequestDto requestDto) {
+        groupService.putGroup(userId, groupId, requestDto);
+
+        return ResponseEntity.status(HttpStatus.OK).body((ResultDto.res(HttpStatus.OK.value(), "그룹 정보를 수정하는 데 성공했습니다.")));
     }
 
 //    그룹 삭제
