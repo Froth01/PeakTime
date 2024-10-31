@@ -4,7 +4,7 @@ import com.dinnertime.peaktime.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -22,7 +22,7 @@ public class Memo {
     private String title;
 
     @Column(name="create_at", nullable = false)
-    private Date createAt;
+    private LocalDateTime createAt;
 
     @Column(name = "content", nullable = false)
     private String content;
@@ -32,11 +32,10 @@ public class Memo {
     private User user;
 
     @Builder
-    private Memo(String title, Date createAt, String content, boolean isSummaried, User user) {
+    private Memo(String title, LocalDateTime createAt, String content, boolean isSummaried, User user) {
         this.title = title;
         this.createAt = createAt;
         this.content = content;
-        this.isSummaried = isSummaried;
         this.user = user;
     }
 
