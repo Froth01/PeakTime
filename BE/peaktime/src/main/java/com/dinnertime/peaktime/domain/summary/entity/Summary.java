@@ -29,7 +29,7 @@ public class Summary {
     private Memo memo;
 
     @Builder
-    public Summary(Date updateAt, String content, Memo memo) {
+    private Summary(Date updateAt, String content, Memo memo) {
         this.updateAt = updateAt;
         this.content = content;
         this.memo = memo;
