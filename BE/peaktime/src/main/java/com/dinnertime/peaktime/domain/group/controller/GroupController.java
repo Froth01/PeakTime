@@ -107,6 +107,8 @@ public class GroupController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "그룹 정보를 삭제하는 데 성공했습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 그룹입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "500", description = "그룹을 삭제하는 데 실패했습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
