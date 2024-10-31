@@ -54,8 +54,8 @@ public class GroupController {
     })
     @CommonSwaggerResponse.CommonResponses
     @PostMapping("")
-    public ResponseEntity<?> createGroup(@RequestParam Long userId, @RequestBody GroupCreateRequestDto requestDto) {
-        groupService.createGroup(userId, requestDto);
+    public ResponseEntity<?> postGroup(@RequestParam Long userId, @RequestBody GroupCreateRequestDto requestDto) {
+        groupService.postGroup(userId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(ResultDto.res(HttpStatus.CREATED.value(), "그룹을 생성하는 데 성공했습니다."));
     }
 

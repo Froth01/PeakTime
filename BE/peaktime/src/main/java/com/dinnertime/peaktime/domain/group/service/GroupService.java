@@ -92,7 +92,7 @@ public class GroupService {
     }
 
     @Transactional
-    public void createGroup(Long userId, GroupCreateRequestDto requestDto) {
+    public void postGroup(Long userId, GroupCreateRequestDto requestDto) {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
