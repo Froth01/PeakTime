@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
@@ -56,17 +57,17 @@ public class GroupController {
     })
     @CommonSwaggerResponse.CommonResponses
     @PostMapping("")
-    public ResponseEntity<?> postGroup(@RequestParam Long userId, @RequestBody GroupCreateRequestDto requestDto) {
+    public ResponseEntity<?> postGroup(@RequestParam Long userId, @RequestBody @Valid GroupCreateRequestDto requestDto) {
         groupService.postGroup(userId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(ResultDto.res(HttpStatus.CREATED.value(), "그룹을 생성하는 데 성공했습니다."));
     }
 
 //    그룹 조회
-    @Operation(summary = "그룹 단일 상세 조회", description = "루트 유저의 그룹 단일 상세 정보 조회하기")
+    @Operation(summary = "그룹 단일 조회", description = "루트 유저의 그룹 단일 상세 정보 조회하기")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "그룹을 조회하는 데 성공하였습니다.",
+            @ApiResponse(responseCode = "200", description = "그룹을 조회하는 데 성공했습니다.",
                     content = @Content(schema = @Schema(implementation = GroupDetailResponseDto.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 그룹입니다",
+            @ApiResponse(responseCode = "422", description = "존재하지 않는 그룹입니다",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "500", description = "그룹을 조회하는 데 실패하였습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
@@ -85,18 +86,16 @@ public class GroupController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "그룹 정보를 수정하는 데 성공했습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 그룹입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 프리셋에 대한 작업입니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "409", description = "중복된 그룹 이름입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "422", description = "존재하지 않는 그룹입니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "500", description = "그룹 정보를 수정하는 데 실패했습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
     @CommonSwaggerResponse.CommonResponses
     @PutMapping("/{groupId}")
-    public ResponseEntity<?> putGroup(@RequestParam Long userId, @PathVariable Long groupId, @RequestBody GroupPutRequestDto requestDto) {
+    public ResponseEntity<?> putGroup(@RequestParam Long userId, @PathVariable Long groupId, @RequestBody @Valid GroupPutRequestDto requestDto) {
         groupService.putGroup(userId, groupId, requestDto);
 
         return ResponseEntity.status(HttpStatus.OK).body((ResultDto.res(HttpStatus.OK.value(), "그룹 정보를 수정하는 데 성공했습니다.")));

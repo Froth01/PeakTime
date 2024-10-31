@@ -55,7 +55,7 @@ public class GroupService {
                         getChildList(groupItem)
                 ))
                 .collect(Collectors.toList());
-        }
+    }
 
     @Transactional
     public List<ChildItemResponseDto> getChildList(Group group) {
@@ -122,32 +122,32 @@ public class GroupService {
     // 그룹 수정
     @Transactional
     public void putGroup(Long userId, Long groupId, GroupPutRequestDto requestDto) {
-        List<Group> groupListByUserId = groupRepository.findByUser_UserIdAndIsDelete(userId, false);
 
-        // 그룹 목록에서 해당 그룹 찾기
-        Group groupSelected = groupListByUserId.stream()
-                .filter(g -> g.getGroupId().equals(groupId))
-                .findFirst()
+        // 그룹 조회
+        Group groupSelected = groupRepository.findByGroupIdAndIsDelete(groupId, false)
                 .orElseThrow(() -> new CustomException(ErrorCode.GROUP_NOT_FOUND));
 
-        // 그룹 목록에서 그룹명 중복 조회
-        String title = groupSelected.getTitle();
-        if (!title.equals(requestDto.getTitle())) {
-            if (groupListByUserId.stream()
-                    .anyMatch(g -> !g.getGroupId().equals(groupSelected.getGroupId()) && g.getTitle().equals(requestDto.getTitle()))) {
-                throw new CustomException(ErrorCode.GROUP_NAME_ALREADY_EXISTS);
-            }
-            title = requestDto.getTitle();
+        // 그룹명 중복 검사
+        Long countTitle = groupRepository.countByUser_UserIdAndIsDeleteAndTitleAndGroupIdNot(userId, false, requestDto.getTitle(), groupId);
+        if (countTitle > 0) {
+            throw new CustomException(ErrorCode.GROUP_NAME_ALREADY_EXISTS);
         }
 
-        // 프리셋 조회
-        Preset preset = groupSelected.getPreset().getPresetId().equals(requestDto.getPresetId())
-                ? groupSelected.getPreset()
-                : presetRepository.findByPresetId(requestDto.getPresetId())
-                    .orElseThrow(() -> new CustomException(ErrorCode.PRESET_NOT_FOUND));
-
         // 그룹 정보 업데이트
-        groupSelected.updateGroup(title, preset);
+        if (!groupSelected.getTitle().equals(requestDto.getTitle()) || !groupSelected.getPreset().getPresetId().equals(requestDto.getPresetId())) {
+
+            Preset preset;
+
+            if (!groupSelected.getPreset().getPresetId().equals(requestDto.getPresetId())) {
+                preset = presetRepository.findByPresetId(requestDto.getPresetId())
+                                .orElseThrow(() -> new CustomException(ErrorCode.PRESET_NOT_FOUND));
+            } else {
+                preset = groupSelected.getPreset();
+            }
+
+            groupSelected.updateGroup(requestDto.getTitle(), preset);
+            groupRepository.save(groupSelected);
+        }
     }
 
     // 그룹 삭제
@@ -157,9 +157,9 @@ public class GroupService {
                 .orElseThrow(() -> new CustomException(ErrorCode.GROUP_NOT_FOUND));
 
         // 그룹에 속해있는 child_user를 검색해서 삭제하기
-        List<User> childUserList = userRepository.findAllByGroupIdAndIsDelete(groupId, false);
-        childUserList.forEach(User::deleteChildUser);
+        userRepository.updateIsDeleteByGroupId(groupId, false);
         
         groupSelected.deleteGroup();
+        groupRepository.save(groupSelected);
     }
 }
