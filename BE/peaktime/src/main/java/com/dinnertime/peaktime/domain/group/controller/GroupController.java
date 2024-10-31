@@ -1,6 +1,7 @@
 package com.dinnertime.peaktime.domain.group.controller;
 
 import com.dinnertime.peaktime.domain.group.service.GroupService;
+import com.dinnertime.peaktime.domain.group.service.dto.request.GroupCreateRequestDto;
 import com.dinnertime.peaktime.domain.group.service.dto.response.GroupDetailResponseDto;
 import com.dinnertime.peaktime.domain.group.service.dto.response.GroupListResponseDto;
 import com.dinnertime.peaktime.global.util.CommonSwaggerResponse;
@@ -40,9 +41,22 @@ public class GroupController {
     }
 
 //    그룹 생성
+    @Operation(summary = "그룹 생성", description = "유저가 가진 그룹 수와 그룹명 중복을 체크 후 그룹 생성")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "그룹을 생성하는 데 성공했습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "409", description = "중복된 그룹 이름입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "422", description = "최대 5개까지 그룹을 생성할 수 있습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "500", description = "그룹을 생성하는 데 실패했습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+    })
+    @CommonSwaggerResponse.CommonResponses
     @PostMapping("")
-    public void postGroup() {
-        return;
+    public ResponseEntity<?> postGroup(@RequestParam Long userId, @RequestBody GroupCreateRequestDto requestDto) {
+        groupService.postGroup(userId, requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ResultDto.res(HttpStatus.CREATED.value(), "그룹을 생성하는 데 성공했습니다."));
     }
 
 //    그룹 조회
