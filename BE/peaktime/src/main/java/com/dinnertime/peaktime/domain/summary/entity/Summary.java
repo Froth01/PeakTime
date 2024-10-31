@@ -4,7 +4,7 @@ import com.dinnertime.peaktime.domain.memo.entity.Memo;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -19,7 +19,7 @@ public class Summary {
     private Long summaryId;
 
     @Column(name="update_at", nullable = false)
-    private Date updateAt;
+    private LocalDateTime updateAt;
 
     @Column(name = "content", nullable = false)
     private String content;
@@ -29,7 +29,7 @@ public class Summary {
     private Memo memo;
 
     @Builder
-    private Summary(Date updateAt, String content, Memo memo) {
+    private Summary(LocalDateTime updateAt, String content, Memo memo) {
         this.updateAt = updateAt;
         this.content = content;
         this.memo = memo;
