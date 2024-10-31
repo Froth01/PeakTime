@@ -134,20 +134,15 @@ public class GroupService {
         }
 
         // 그룹 정보 업데이트
-        if (!groupSelected.getTitle().equals(requestDto.getTitle()) || !groupSelected.getPreset().getPresetId().equals(requestDto.getPresetId())) {
+        // 아무것도 바뀌지 않았다면 return
+        if (groupSelected.getTitle().equals(requestDto.getTitle()) && groupSelected.getPreset().getPresetId().equals(requestDto.getPresetId())) return;
 
-            Preset preset;
+        // title, preset 중 하나 이상 바뀌었다면 실행
+        Preset preset = presetRepository.findByPresetId(requestDto.getPresetId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.PRESET_NOT_FOUND));
 
-            if (!groupSelected.getPreset().getPresetId().equals(requestDto.getPresetId())) {
-                preset = presetRepository.findByPresetId(requestDto.getPresetId())
-                                .orElseThrow(() -> new CustomException(ErrorCode.PRESET_NOT_FOUND));
-            } else {
-                preset = groupSelected.getPreset();
-            }
-
-            groupSelected.updateGroup(requestDto.getTitle(), preset);
-            groupRepository.save(groupSelected);
-        }
+        groupSelected.updateGroup(requestDto.getTitle(), preset);
+        groupRepository.save(groupSelected);
     }
 
     // 그룹 삭제
