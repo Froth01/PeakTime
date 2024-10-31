@@ -96,20 +96,20 @@ public class GroupService {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        List<Group> groupCount = groupRepository.findByUser_UserIdAndIsDelete(userId, false);
+        List<Group> groupListByUserId = groupRepository.findByUser_UserIdAndIsDelete(userId, false);
 
         // 그룹 수 확인
-        if (groupCount.size() >= 5) {
+        if (groupListByUserId.size() >= 5) {
             throw new CustomException(ErrorCode.FAILED_CREATE_GROUP);
         }
 
         // 그룹명 중복 확인
-        if (groupCount.stream().anyMatch(group -> group.getTitle().equals(requestDto.getTitle()))) {
+        if (groupListByUserId.stream().anyMatch(group -> group.getTitle().equals(requestDto.getTitle()))) {
             throw new CustomException(ErrorCode.GROUP_NAME_ALREADY_EXISTS);
         }
 
-        Preset preset = presetRepository.findByPresetId(requestDto.getPresetId())
-                .orElseThrow(() -> new CustomException(ErrorCode.PRESET_NOT_FOUND));
+        // Preset 프록시 객체로 가져오기
+        Preset preset = presetRepository.getReferenceById(requestDto.getPresetId());
 
         // 생성
         Group group = Group.createGroup(requestDto.getTitle(), preset, user);

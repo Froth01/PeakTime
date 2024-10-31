@@ -12,9 +12,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class GroupController {
 
-    private static final Logger log = LoggerFactory.getLogger(GroupController.class);
     private final GroupService groupService;
 
 //    그룹 전체 조회
@@ -56,6 +52,7 @@ public class GroupController {
             @ApiResponse(responseCode = "500", description = "그룹을 생성하는 데 실패했습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
+    @CommonSwaggerResponse.CommonResponses
     @PostMapping("")
     public ResponseEntity<?> createGroup(@RequestParam Long userId, @RequestBody GroupCreateRequestDto requestDto) {
         groupService.createGroup(userId, requestDto);
