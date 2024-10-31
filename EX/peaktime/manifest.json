@@ -3,12 +3,16 @@
   "description": "피크타임",
   "version": "1.0",
   "manifest_version": 3,
+  "host_permissions": [
+    "<all_urls>" 
+  ],
   "background": {
-    "service_worker": "/js/background.js"
+    "service_worker": "/js/background.js",
+    "type": "module"
   },
-  "permissions": ["storage", "activeTab", "scripting", "nativeMessaging", "tabs"],
+  "permissions": ["storage", "activeTab", "scripting", "alarms", "tabs"],
   "action": {
-    "default_popup": "/html/popup.html"
+    "default_popup": "/html/index.html"
   },
   "web_accessible_resources": [
     {
@@ -18,7 +22,7 @@
   ],
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": ["<all_urls>"], 
       "js": ["./js/contentScript.js"]
     }
   ],
