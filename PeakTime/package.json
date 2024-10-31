@@ -1,0 +1,43 @@
+{
+  "name": "peaktime",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "public/Main.js",
+  "homepage": "./",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "vite-start": "set BROWSER=none && npm run dev",
+    "electron-start": "set ELECTRON_START_URL=http://localhost:5173 && electron .",
+    "electron-pack": "npm run build && electron-builder build -c.extraMetadata.main=build/Main.js"
+  },
+  "dependencies": {
+    "autoprefixer": "^10.4.20",
+    "flowbite-react": "^0.10.2",
+    "postcss": "^8.4.47",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.27.0",
+    "sweetalert2": "^11.14.4",
+    "zustand": "^5.0.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.13.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "electron": "^33.0.2",
+    "electron-builder": "^25.1.8",
+    "eslint": "^9.13.0",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.14",
+    "globals": "^15.11.0",
+    "postcss-loader": "^8.1.1",
+    "tailwindcss": "^3.4.14",
+    "vite": "^5.4.10"
+  }
+}
