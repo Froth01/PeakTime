@@ -103,9 +103,18 @@ public class GroupController {
     }
 
 //    그룹 삭제
+    @Operation(summary = "그룹 삭제", description = "그룹 및 그룹에 속한 모든 child 계정 삭제")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "그룹 정보를 삭제하는 데 성공했습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "500", description = "그룹을 삭제하는 데 실패했습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+    })
+    @CommonSwaggerResponse.CommonResponses
     @DeleteMapping("/{groupId}")
-    public void deleteGroup() {
-        return;
-    }
+    public ResponseEntity<?> deleteGroup(@RequestParam Long userId, @PathVariable Long groupId) {
+        groupService.deleteGroup(userId, groupId);
 
+        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "그룹 정보를 삭제하는 데 성공했습니다."));
+    }
 }

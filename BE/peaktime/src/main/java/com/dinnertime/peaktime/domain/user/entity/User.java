@@ -67,4 +67,7 @@ public class User {
                 .build();
     }
 
+    public void deleteChildUser() {
+        this.isDelete = true;
+    }
 }

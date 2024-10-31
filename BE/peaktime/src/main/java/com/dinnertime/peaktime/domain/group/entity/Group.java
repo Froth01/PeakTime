@@ -53,4 +53,8 @@ public class Group {
         this.title = newTitle;
         this.preset = newPreset;
     }
+
+    public void deleteGroup() {
+        this.isDelete = true;
+    }
 }

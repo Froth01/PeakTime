@@ -149,4 +149,17 @@ public class GroupService {
         // 그룹 정보 업데이트
         groupSelected.updateGroup(title, preset);
     }
+
+    // 그룹 삭제
+    @Transactional
+    public void deleteGroup(Long userId, Long groupId) {
+        Group groupSelected = groupRepository.findByGroupIdAndIsDelete(groupId, false)
+                .orElseThrow(() -> new CustomException(ErrorCode.GROUP_NOT_FOUND));
+
+        // 그룹에 속해있는 child_user를 검색해서 삭제하기
+        List<User> childUserList = userRepository.findAllByGroupIdAndIsDelete(groupId, false);
+        childUserList.forEach(User::deleteChildUser);
+        
+        groupSelected.deleteGroup();
+    }
 }
