@@ -66,6 +66,8 @@ public class GroupController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "그룹을 조회하는 데 성공하였습니다.",
                     content = @Content(schema = @Schema(implementation = GroupDetailResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 그룹입니다",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "500", description = "그룹을 조회하는 데 실패하였습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
@@ -79,6 +81,20 @@ public class GroupController {
     }
 
 //    그룹 수정
+    @Operation(summary = "그룹 수정", description = "그룹의 title 혹은 preset 수정")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "그룹 정보를 수정하는 데 성공했습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 그룹입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 프리셋에 대한 작업입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "409", description = "중복된 그룹 이름입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "500", description = "그룹 정보를 수정하는 데 실패했습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+    })
+    @CommonSwaggerResponse.CommonResponses
     @PutMapping("/{groupId}")
     public ResponseEntity<?> putGroup(@RequestParam Long userId, @PathVariable Long groupId, @RequestBody GroupPutRequestDto requestDto) {
         groupService.putGroup(userId, groupId, requestDto);
