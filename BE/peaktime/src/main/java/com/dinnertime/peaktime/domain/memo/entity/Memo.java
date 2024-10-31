@@ -32,7 +32,7 @@ public class Memo {
     private User user;
 
     @Builder
-    private Memo(String title, LocalDateTime createAt, String content, boolean isSummaried, User user) {
+    private Memo(String title, LocalDateTime createAt, String content, User user) {
         this.title = title;
         this.createAt = createAt;
         this.content = content;
