@@ -27,10 +27,6 @@ public class Memo {
     @Column(name = "content", nullable = false)
     private String content;
 
-    // null 존재 x, true/false primitive 값만 필요해서 boolean으로 설정
-    @Column(name = "is_summaried", nullable = false)
-    private boolean isSummaried;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id", nullable = false)
     private User user;
