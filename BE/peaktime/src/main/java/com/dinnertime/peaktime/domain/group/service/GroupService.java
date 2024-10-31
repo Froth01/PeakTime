@@ -108,8 +108,8 @@ public class GroupService {
             throw new CustomException(ErrorCode.GROUP_NAME_ALREADY_EXISTS);
         }
 
-        // Preset 프록시 객체로 가져오기
-        Preset preset = presetRepository.getReferenceById(requestDto.getPresetId());
+        Preset preset = presetRepository.findByPresetId(requestDto.getPresetId())
+                .orElseThrow(() -> new CustomException(ErrorCode.PRESET_NOT_FOUND));
 
         // 생성
         Group group = Group.createGroup(requestDto.getTitle(), preset, user);
