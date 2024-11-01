@@ -7,11 +7,19 @@
     <link rel="stylesheet" href="/css/popup.css" type="text/css" />
 </head>
 <body>
-    <button id="shutdown">차단</button>
-    <button id="reset">초기화</button>
-    <textarea placeholder="내용을 입력해 주세요." id="savedText"></textarea>
-    <script type="text/javascript" src="/js/popup.js"></script>
-    <select id="url">
-    </select>
+    <input id="title" maxlength="8">
+    <span class="length">
+        <span class="title_length">0</span>
+        / 8
+    </span>
+    <textarea placeholder="내용을 입력해 주세요." id="savedText" maxlength="1000"></textarea>
+    <span class="length">
+        <span class="comment_length">0</span>
+        / 1000
+    </span>
+    <script type="text/javascript"  src="/js/popup.js"></script>
+    <button id="save">메모 내용 저장하기</button>
+    <button id="reset">메모 내용 초기화</button>
+    <button id="addUrl">현재 url 추가</button>
 </body>
 </html>

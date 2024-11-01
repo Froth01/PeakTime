@@ -1,36 +1,45 @@
 // background.js (Service Worker)
+import "./webSocket.js";
+import "./saveText.js";
+import "./tracking.js";
+import { receivedSocketMessage, getConnectStatus, sendSocketMessage } from "./webSocket.js";
 
 // 설치할때 실행
 chrome.runtime.onInstalled.addListener(() => {
   console.log('extension installed');
 });
 
-chrome.commands.onCommand.addListener((command) => {
-  if (command === "save_selected_text") {
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      // Content script가 활성 탭에 로드되었는지 확인하고, 없으면 로드
-      chrome.scripting.executeScript({
-        target: { tabId: tabs[0].id },
-        func: () => {
-          const selectedText = window.getSelection().toString();
-          chrome.runtime.sendMessage({ action: "GET_SELECTED_TEXT", text: selectedText });
-        }
-      }, () => {
-        //컨텐츠스크립트에 메시지를 보내 드래그한 문장을 가져옴
-        //가져온 메시지를 크롬 스토리지에 저장
-        chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-          if (msg.action === "GET_SELECTED_TEXT") {
-            chrome.storage.local.get({ savedTexts: [] }, function (data) {
-              const updatedTexts = [...data.savedTexts, msg.text];
-              chrome.storage.local.set({ savedTexts: updatedTexts }, function () {
-                console.log("save : ", msg.text);
-              });
-            });
-          } else {
-            console.log("error");
-          }
-        });
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if(msg.action==="quit") {
+    receivedSocketMessage({action:"end"})
+  }
+  if(msg.action==="checkSocketStatus") {
+    const status = getConnectStatus();
+    console.log(status)
+    sendResponse({ connected: status });
+  }
+  if(msg.action==="addUrl") {
+    //크롬 저장소에 현재 url저장하기
+    chrome.storage.local.get({ websiteList: [] }, function (data) {
+      const websiteList = data.websiteList; // 기존 리스트 가져오기
+      websiteList.push(msg.url); // 새로운 URL 추가
+      // 업데이트된 리스트를 다시 저장
+      chrome.storage.local.set({ websiteList: websiteList }, function () {
       });
     });
+
+    // 비동기적으로 presetId 값을 가져온 후에 sendSocketMessage 호출
+    chrome.storage.local.get("presetId", function (data) {
+      const presetId = data.presetId; // 가져온 presetId 값
+
+      // 일렉트론으로 현재 url 보내기
+      sendSocketMessage({ action: "addUrl", url: msg.url, presetId: presetId});
+    });
+
   }
-});
+
+  if(msg.action==="saveMemo") {
+    sendSocketMessage({ action: "saveMemo", title: msg.title, content: msg.content })
+  }
+
+})
