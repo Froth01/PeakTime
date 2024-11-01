@@ -73,4 +73,16 @@ public class HikingController {
 
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "하이킹을 종료하는데 성공하였습니다."));
     }
+
+//    @GetMapping("/calender")
+//    public ResponseEntity<?> getCalendar(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+//        hikingService.getCalendar(/*userPrincipal.getUserId()*/);
+//
+//    }
+
+//    @GetMapping(value = "/calender", params = "date")
+//    public ResponseEntity<?> getCalendarByDate(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam("date") String date) {
+//        hikingService.getCalendarByDate(/*userPrincipal.getUserId()*/, date);
+//
+//    }
 }

@@ -4,9 +4,11 @@ import com.dinnertime.peaktime.domain.content.entity.Content;
 import com.dinnertime.peaktime.domain.content.repository.ContentRepository;
 import com.dinnertime.peaktime.domain.hiking.entity.Hiking;
 import com.dinnertime.peaktime.domain.hiking.repository.HikingRepository;
+import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingCalendarQueryDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.request.ContentListRequestDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.request.EndHikingRequestDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.request.StartHikingRequestDto;
+import com.dinnertime.peaktime.domain.hiking.service.dto.response.HikingCalenderResponseDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.response.StartHikingResponseDto;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
@@ -68,8 +70,17 @@ public class HikingService {
                 .map(contentListRequestDto -> Content.createContent(hiking, contentListRequestDto))
                 .toList();
         contentRepository.saveAll(contentList);
+    }
 
+    public HikingCalenderResponseDto getCalendar(/*Long userId*/) {
+        //유저 조회
+        User user = userRepository.findByUserId(1L).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        List<HikingCalendarQueryDto> calendarList = hikingRepository.getCalendar();
 
 
     }
+
 }
