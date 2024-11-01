@@ -1,11 +1,13 @@
 package com.dinnertime.peaktime.domain.timer.entity;
 
 import com.dinnertime.peaktime.domain.group.entity.Group;
+import io.hypersistence.utils.hibernate.type.array.IntArrayType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 
 import java.time.LocalDateTime;
 
@@ -27,29 +29,30 @@ public class Timer {
     @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;
 
-    @Column(name = "end_time", nullable = false)
-    private LocalDateTime endTime;
+    @Column(name = "attention_time", nullable = false)
+    private int attentionTime;
 
     @Column(name = "is_repeat", nullable = false)
     private Boolean isRepeat;
 
-    @Column(name = "repeat_day", nullable = false)
+    @Type(IntArrayType.class)
+    @Column(name = "repeat_day", nullable = false, columnDefinition = "Integer[]")
     private int[] repeatDay;
 
     @Builder
-    private Timer(Group group, LocalDateTime startTime, LocalDateTime endTime, Boolean isRepeat, int[] repeatDay) {
+    private Timer(Group group, LocalDateTime startTime, int attentionTime, Boolean isRepeat, int[] repeatDay) {
         this.group = group;
         this.startTime = startTime;
-        this.endTime = endTime;
+        this.attentionTime = attentionTime;
         this.isRepeat = isRepeat;
         this.repeatDay = repeatDay;
     }
 
-    public static Timer createTimer(Group group, LocalDateTime startTime, LocalDateTime endTime, Boolean isRepeat, int[] repeatDay) {
+    public static Timer createTimer(Group group, LocalDateTime startTime, int attentionTime, Boolean isRepeat, int[] repeatDay) {
         return Timer.builder()
                 .group(group)
                 .startTime(startTime)
-                .endTime(endTime)
+                .attentionTime(attentionTime)
                 .isRepeat(isRepeat)
                 .repeatDay(repeatDay)
                 .build();
