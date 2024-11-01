@@ -55,6 +55,9 @@ public class HikingController {
             @ApiResponse(responseCode = "200", description = "하이킹을 종료하는데 성공했습니다.",
                     content = @Content(schema= @Schema(implementation = ResultDto.class))
             ),
+            @ApiResponse(responseCode = "400", description = "컨텐츠 타입은 'program' 또는 'site' 여야 합니다.",
+                    content = @Content(schema= @Schema(implementation = ResultDto.class))
+            ),
             @ApiResponse(responseCode = "403", description = "자식 계정은 하이킹 중 종료 할 수 없습니다.",
                     content = @Content(schema= @Schema(implementation = ResultDto.class))
             ),
