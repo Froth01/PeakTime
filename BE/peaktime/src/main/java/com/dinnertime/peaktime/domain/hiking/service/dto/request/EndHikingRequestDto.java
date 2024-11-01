@@ -1,6 +1,7 @@
 package com.dinnertime.peaktime.domain.hiking.service.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -17,5 +18,6 @@ public class EndHikingRequestDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime realEndTime;
 
+    @Valid
     private List<ContentListRequestDto> contentList;
 }

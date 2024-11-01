@@ -1,6 +1,7 @@
 package com.dinnertime.peaktime.domain.hiking.service.dto.request;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ public class ContentListRequestDto {
     private String contentName;
 
     @NotNull
+    @Pattern(regexp = "program|site", message = "contentType은 'program' 또는 'site'여야 합니다.")
     private String contentType;
 
     @NotNull
