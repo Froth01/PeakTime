@@ -48,4 +48,13 @@ public class Group {
                 .user(user)
                 .build();
     }
+
+    public void updateGroup(String newTitle, Preset newPreset) {
+        this.title = newTitle;
+        this.preset = newPreset;
+    }
+
+    public void deleteGroup() {
+        this.isDelete = true;
+    }
 }
