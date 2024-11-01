@@ -27,7 +27,7 @@ public class TimerController {
     public ResponseEntity<?> deleteTimer(@PathVariable Long timerId) {
         timerService.deleteTimer(timerId);
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ResultDto.res(HttpStatus.NO_CONTENT.value(), "타이머 삭제를 성공했습니다."));
+        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "타이머 삭제를 성공했습니다."));
     }
 
 }

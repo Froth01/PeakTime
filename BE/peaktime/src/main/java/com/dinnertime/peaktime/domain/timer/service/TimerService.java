@@ -10,6 +10,7 @@ import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TimerService {
@@ -88,6 +90,7 @@ public class TimerService {
 
         // 현재 그룹의 타이머 모두 조회
         List<Timer> timerList = timerRepository.findByGroup_GroupId(requestDto.getGroupId());
+        log.info(timerList.toString());
 
         // requestDto의 타이머와 시간 비교해 에러 처리
         if (isTimeOverlapping(requestDto, timerList)) {
@@ -106,10 +109,9 @@ public class TimerService {
 
     @Transactional
     public void deleteTimer(Long timerId) {
-        Timer timerSelected = timerRepository.findByTimer_TimerId(timerId)
+        Timer timerSelected = timerRepository.findByTimerId(timerId)
                 .orElseThrow(() -> new CustomException(ErrorCode.TIMER_NOT_FOUND));
 
-
+        timerRepository.delete(timerSelected);
     }
-
 }
