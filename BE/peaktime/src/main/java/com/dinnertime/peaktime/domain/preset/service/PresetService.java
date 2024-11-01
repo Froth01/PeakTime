@@ -3,7 +3,7 @@ package com.dinnertime.peaktime.domain.preset.service;
 import com.dinnertime.peaktime.domain.preset.entity.Preset;
 import com.dinnertime.peaktime.domain.preset.repository.PresetRepository;
 import com.dinnertime.peaktime.domain.preset.service.dto.request.SavePresetRequestDto;
-import com.dinnertime.peaktime.domain.preset.service.dto.response.PresetResponseWrapperDto;
+import com.dinnertime.peaktime.domain.preset.service.dto.response.PresetWrapperResponseDto;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
 import com.dinnertime.peaktime.global.exception.CustomException;
@@ -42,7 +42,7 @@ public class PresetService {
 
     // preset 조회
     @Transactional
-    public PresetResponseWrapperDto getPresets(UserPrincipal userPrincipal) {
+    public PresetWrapperResponseDto getPresets(UserPrincipal userPrincipal) {
 
         // userPrincipal.getUserId()
         User user = userRepository.findByUserId(1)
@@ -50,7 +50,7 @@ public class PresetService {
 
         List<Preset> presets = presetRepository.findAllByUser(user);
 
-        PresetResponseWrapperDto responseDto = PresetResponseWrapperDto.buildPresetResponseDto(presets);
+        PresetWrapperResponseDto responseDto = PresetWrapperResponseDto.buildPresetResponseDto(presets);
 
 
         // userId를 뺀 나머지 데이터 Wrapper해서 적용
