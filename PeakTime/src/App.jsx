@@ -13,6 +13,10 @@ import UserSettingPage from "./pages/UserSettingPage"; // 유저정보 수정
 import PasswordChangePage from "./pages/PasswordChangePage"; // 비밀번호 변경
 import EmailChangePage from "./pages/EmailChangePage"; // 이메일 변경
 import StatisticPage from "./pages/StatisticPage"; // 통계 페이지
+import PresetSettingPage from "./pages/PresetSettingPage"; // 프리셋 설정
+import ReportPage from "./pages/ReportPage"; // 내역 페이지
+import ChildrunPage from "./pages/ChildrunPage"; // 차일드 관리
+import MemoPage from "./pages/MemoPage"; // 메모 페이지
 
 // 로그인 필요한 페이지
 const protectedRoutes = [
@@ -21,6 +25,10 @@ const protectedRoutes = [
   { path: "/passwordchange", element: <PasswordChangePage /> },
   { path: "/emailchange", element: <EmailChangePage /> },
   { path: "/statistic", element: <StatisticPage /> },
+  { path: "/preset", element: <PresetSettingPage /> },
+  { path: "/report", element: <ReportPage /> },
+  { path: "/children", element: <ChildrunPage /> },
+  { path: "/memo", element: <MemoPage /> },
 ];
 
 function App() {

@@ -26,6 +26,13 @@ function Toolbar() {
       </button>
       <button
         onClick={() => {
+          handleMenu("/memo");
+        }}
+      >
+        메모
+      </button>
+      <button
+        onClick={() => {
           handleMenu("/preset");
         }}
       >
@@ -33,7 +40,7 @@ function Toolbar() {
       </button>
       <button
         onClick={() => {
-          handleMenu("/child");
+          handleMenu("/children");
         }}
       >
         차일드관리
