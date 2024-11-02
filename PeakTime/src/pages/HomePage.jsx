@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useUserStore } from "../stores/UserStore";
+import Timer from "../components/Timer/Timer";
 
 function HomePage() {
   // 테스트용 유저스토어
@@ -15,9 +16,10 @@ function HomePage() {
   }, [user]);
 
   return (
-    <div className="relative z-[2]">
+    <div className="h-[100vh]">
       <h1>Home</h1>
       <button onClick={handleLogout}>로그아웃</button>
+      <Timer />
     </div>
   );
 }
