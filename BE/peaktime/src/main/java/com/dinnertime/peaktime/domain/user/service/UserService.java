@@ -17,7 +17,7 @@ public class UserService {
     private final UserRepository userRepository;
 
     public User getUserById(int userId) {
-        return userRepository.findByUserId(userId)
+        return userRepository.findByUserIdAndIsDeleteFalse(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 

@@ -8,21 +8,21 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
-public class PresetResponseWrapperDto {
+public class PresetWrapperResponseDto {
 
     private List<PresetResponseDto> presetList;
 
     @Builder
-    private PresetResponseWrapperDto(List<PresetResponseDto> presetList){
+    private PresetWrapperResponseDto(List<PresetResponseDto> presetList){
         this.presetList = presetList;
     }
 
-    public static PresetResponseWrapperDto buildPresetResponseDto(List<Preset> presets) {
+    public static PresetWrapperResponseDto buildPresetResponseDto(List<Preset> presets) {
         List<PresetResponseDto> responseDto = presets.stream()
                 .map(PresetResponseDto::createPresetResponse)
                 .toList();
 
-        return PresetResponseWrapperDto.builder()
+        return PresetWrapperResponseDto.builder()
                 .presetList(responseDto)
                 .build();
     }
