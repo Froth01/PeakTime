@@ -35,7 +35,7 @@ public class MemoService {
 
         // userPrincipal.getUserId()
         // userId = 1로 임의 설정
-        User user = userRepository.findByUserId(1)
+        User user = userRepository.findByUserIdAndIsDeleteFalse(1)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         List<Memo> memos = memoRepository.findAllByUser(user);
@@ -51,7 +51,7 @@ public class MemoService {
         // summary entity에 summary id와 memoId가 매칭이 된다면(존재한다면) 요약 먼저 제거 후 메모 제거 처리 진행
 
         //임시로 1로 고정시키기 추후 수정 userPrincipal.getUserId());
-        User user = userRepository.findByUserId(1).
+        User user = userRepository.findByUserIdAndIsDeleteFalse(1).
                 orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Memo memo = memoRepository.findByMemoId(memoId)
@@ -66,7 +66,7 @@ public class MemoService {
 
         // userPrincipal.getUserId()
         // userId = 1로 임의 설정
-        User user = userRepository.findByUserId(1)
+        User user = userRepository.findByUserIdAndIsDeleteFalse(1)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Memo memo = memoRepository.findByMemoId(memoId)

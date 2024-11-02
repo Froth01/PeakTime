@@ -31,7 +31,7 @@ public class PresetService {
     public void createPreset(UserPrincipal userPrincipal, SavePresetRequestDto requestDto) {
 
         //임시로 1로 고정시키기 추후 수정 userPrincipal.getUserId());
-        User user = userRepository.findByUserId(1).
+        User user = userRepository.findByUserIdAndIsDeleteFalse(1).
                 orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         // userId = 1로 임의 설정
@@ -45,7 +45,7 @@ public class PresetService {
     public PresetWrapperResponseDto getPresets(UserPrincipal userPrincipal) {
 
         // userPrincipal.getUserId()
-        User user = userRepository.findByUserId(1)
+        User user = userRepository.findByUserIdAndIsDeleteFalse(1)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         List<Preset> presets = presetRepository.findAllByUser(user);
@@ -62,7 +62,7 @@ public class PresetService {
     public void updatePreset(UserPrincipal userPrincipal, SavePresetRequestDto requestDto, Long presetId) {
 
         //임시로 1로 고정시키기 추후 수정 userPrincipal.getUserId());
-        User user = userRepository.findByUserId(1).
+        User user = userRepository.findByUserIdAndIsDeleteFalse(1).
                 orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         // userId = 1로 임의 설정
@@ -79,7 +79,7 @@ public class PresetService {
     public void deletePreset(UserPrincipal userPrincipal, Long presetId) {
 
         //임시로 1로 고정시키기 추후 수정 userPrincipal.getUserId());
-        User user = userRepository.findByUserId(1).
+        User user = userRepository.findByUserIdAndIsDeleteFalse(1).
                 orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Preset preset = presetRepository.findByPresetId(presetId)

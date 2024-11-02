@@ -2,6 +2,7 @@ package com.dinnertime.peaktime.domain.summary.service;
 
 import com.dinnertime.peaktime.domain.summary.entity.Summary;
 import com.dinnertime.peaktime.domain.summary.repository.SummaryRepository;
+import com.dinnertime.peaktime.domain.summary.service.dto.request.SaveSummaryRequestDto;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
 import com.dinnertime.peaktime.global.exception.CustomException;
@@ -11,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.attribute.UserPrincipal;
+import java.nio.file.attribute.UserPrincipal; // 추후 수정
 
 @Slf4j
 @RequiredArgsConstructor
@@ -23,9 +24,21 @@ public class SummaryService {
     private final UserRepository userRepository;
 
     @Transactional
+    public void createSummary(UserPrincipal userPrincipal, SaveSummaryRequestDto requestDto) {
+
+        User user = userRepository.findByUserIdAndIsDeleteFalse(1).
+                orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+
+
+
+    }
+
+
+    @Transactional
     public void deleteSummary(UserPrincipal userPrincipal, Long summaryId) {
 
-        User user = userRepository.findByUserId(1).
+        User user = userRepository.findByUserIdAndIsDeleteFalse(1).
                 orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Summary summary = summaryRepository.findBySummaryId(summaryId)

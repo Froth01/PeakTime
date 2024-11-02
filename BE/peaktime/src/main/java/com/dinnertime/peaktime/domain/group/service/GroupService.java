@@ -95,7 +95,7 @@ public class GroupService {
     // 그룹 생성
     @Transactional
     public void postGroup(Long userId, GroupCreateRequestDto requestDto) {
-        User user = userRepository.findByUserId(userId)
+        User user = userRepository.findByUserIdAndIsDeleteFalse(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         List<Group> groupListByUserId = groupRepository.findByUser_UserIdAndIsDelete(userId, false);
