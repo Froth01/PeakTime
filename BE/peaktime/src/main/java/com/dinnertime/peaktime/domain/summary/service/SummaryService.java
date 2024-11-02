@@ -2,7 +2,7 @@ package com.dinnertime.peaktime.domain.summary.service;
 
 import com.dinnertime.peaktime.domain.summary.entity.Summary;
 import com.dinnertime.peaktime.domain.summary.repository.SummaryRepository;
-import com.dinnertime.peaktime.domain.summary.service.dto.request.SaveSummaryRequestDto;
+//import com.dinnertime.peaktime.domain.summary.service.dto.request.SaveSummaryRequestDto;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
 import com.dinnertime.peaktime.global.exception.CustomException;
@@ -23,16 +23,16 @@ public class SummaryService {
     private final SummaryRepository summaryRepository;
     private final UserRepository userRepository;
 
-    @Transactional
-    public void createSummary(UserPrincipal userPrincipal, SaveSummaryRequestDto requestDto) {
-
-        User user = userRepository.findByUserIdAndIsDeleteFalse(1).
-                orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-
-
-
-    }
+//    @Transactional
+//    public void createSummary(UserPrincipal userPrincipal, SaveSummaryRequestDto requestDto) {
+//
+//        User user = userRepository.findByUserIdAndIsDeleteFalse(1).
+//                orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+//
+//
+//
+//
+//    }
 
 
     @Transactional
