@@ -8,11 +8,11 @@ import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.attribute.UserPrincipal;
 import java.util.List;
@@ -41,7 +41,7 @@ public class PresetService {
     }
 
     // preset 조회
-    @Transactional
+    @Transactional(readOnly = true)
     public PresetWrapperResponseDto getPresets(UserPrincipal userPrincipal) {
 
         // userPrincipal.getUserId()

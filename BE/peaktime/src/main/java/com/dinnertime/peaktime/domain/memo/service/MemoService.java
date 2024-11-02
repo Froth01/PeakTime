@@ -10,7 +10,7 @@ import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ public class MemoService {
 
     // 메모 리스트 조회
     // UserPrincipal 임시 설정 -> 구현 후 일괄 수정 예정
-    @Transactional
+    @Transactional(readOnly = true)
     public MemoWrapperResponseDto getMemos(UserPrincipal userPrincipal) {
 
         // userPrincipal.getUserId()
@@ -61,7 +61,7 @@ public class MemoService {
     }
 
     // 메모 및 요약 상세 조회
-    @Transactional
+    @Transactional(readOnly = true)
     public MemoSummaryResponseDto getDetailedMemo(UserPrincipal userPrincipal, Long memoId) {
 
         // userPrincipal.getUserId()
