@@ -15,10 +15,10 @@ function HomePage() {
   }, [user]);
 
   return (
-    <>
+    <div className="relative z-[2]">
       <h1>Home</h1>
       <button onClick={handleLogout}>로그아웃</button>
-    </>
+    </div>
   );
 }
 
