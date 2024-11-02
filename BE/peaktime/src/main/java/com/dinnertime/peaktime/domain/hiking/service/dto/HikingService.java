@@ -4,7 +4,6 @@ import com.dinnertime.peaktime.domain.content.entity.Content;
 import com.dinnertime.peaktime.domain.content.repository.ContentRepository;
 import com.dinnertime.peaktime.domain.hiking.entity.Hiking;
 import com.dinnertime.peaktime.domain.hiking.repository.HikingRepository;
-import com.dinnertime.peaktime.domain.hiking.service.dto.request.ContentListRequestDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.request.EndHikingRequestDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.request.StartHikingRequestDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.response.StartHikingResponseDto;
@@ -29,7 +28,7 @@ public class HikingService {
     @Transactional
     public StartHikingResponseDto startHiking(/*Long id, */StartHikingRequestDto requestDto) {
         //유저 없으면 에러
-        User user = userRepository.findByUserId(1L).orElseThrow(
+        User user = userRepository.findByUserIdAndIsDeleteFalse(1L).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
 
@@ -44,7 +43,7 @@ public class HikingService {
 
     public void endHiking(/*Long id, */EndHikingRequestDto requestDto, Long hikingId) {
         //유저 조회
-        User user = userRepository.findByUserId(1L).orElseThrow(
+        User user = userRepository.findByUserIdAndIsDeleteFalse(1L).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
 
