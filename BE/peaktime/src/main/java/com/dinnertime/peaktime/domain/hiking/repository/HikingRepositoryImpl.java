@@ -129,13 +129,8 @@ public class HikingRepositoryImpl implements HikingRepositoryCustom {
                 .groupBy(hiking.startTime, hiking.endTime, hiking.realEndTime)
                 .fetchOne();
 
-        // 수동으로 서브쿼리 결과를 DTO에 설정
-        if (visitedSiteList != null) {
-            assert hikingDetail != null;
+        if(hikingDetail != null) {
             hikingDetail.setVisitedSiteList(visitedSiteList);
-        }
-        if (visitedProgramList != null) {
-            assert hikingDetail != null;
             hikingDetail.setVisitedProgramList(visitedProgramList);
         }
 
