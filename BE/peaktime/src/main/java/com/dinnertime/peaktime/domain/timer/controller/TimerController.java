@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,25 +33,10 @@ public class TimerController {
     })
     @CommonSwaggerResponse.CommonResponses
     @PostMapping("")
-    public ResponseEntity<?> postTimer(@RequestBody TimerCreateRequestDto requestDto) {
+    public ResponseEntity<?> postTimer(@RequestBody @Valid TimerCreateRequestDto requestDto) {
         timerService.postTimer(requestDto);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(ResultDto.res(HttpStatus.CREATED.value(), "타이머 생성을 성공했습니다."));
-    }
-
-    @Operation(summary = "그룹 타이머 수정", description = "반복하지 않으면서 요일이 지정된 타이머 실행 시 해당 요일을 수정합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "타이머 수정을 성공했습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
-            @ApiResponse(responseCode = "500", description = "타이머 수정에 실패했습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
-    })
-    @CommonSwaggerResponse.CommonResponses
-    @PutMapping("/{timerId}")
-    public ResponseEntity<?> putTimer(@PathVariable Long timerId) {
-        timerService.putTimer(timerId);
-
-        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "타이머 수정을 성공했습니다."));
+        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "타이머 생성을 성공했습니다."));
     }
 
     @Operation(summary = "그룹 타이머 삭제", description = "선택한 그룹 타이머를 삭제합니다.")

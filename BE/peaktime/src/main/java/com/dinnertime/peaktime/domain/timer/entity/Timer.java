@@ -3,6 +3,8 @@ package com.dinnertime.peaktime.domain.timer.entity;
 import com.dinnertime.peaktime.domain.group.entity.Group;
 import io.hypersistence.utils.hibernate.type.array.IntArrayType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,12 +37,13 @@ public class Timer {
     @Column(name = "is_repeat", nullable = false)
     private Boolean isRepeat;
 
-    @Type(IntArrayType.class)
-    @Column(name = "repeat_day", nullable = false, columnDefinition = "Integer[]")
-    private int[] repeatDay;
+    @Column(name = "repeat_day", nullable = false)
+    @Min(0)
+    @Max(127)
+    private int repeatDay;
 
     @Builder
-    private Timer(Group group, LocalDateTime startTime, int attentionTime, Boolean isRepeat, int[] repeatDay) {
+    private Timer(Group group, LocalDateTime startTime, int attentionTime, Boolean isRepeat, int repeatDay) {
         this.group = group;
         this.startTime = startTime;
         this.attentionTime = attentionTime;
@@ -48,7 +51,7 @@ public class Timer {
         this.repeatDay = repeatDay;
     }
 
-    public static Timer createTimer(Group group, LocalDateTime startTime, int attentionTime, Boolean isRepeat, int[] repeatDay) {
+    public static Timer createTimer(Group group, LocalDateTime startTime, int attentionTime, Boolean isRepeat, int repeatDay) {
         return Timer.builder()
                 .group(group)
                 .startTime(startTime)

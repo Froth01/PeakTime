@@ -25,16 +25,16 @@ public class TimerService {
         Long groupId = requestDto.getGroupId();
         LocalDateTime startTime = requestDto.getStartTime();
         int attentionTime = requestDto.getAttentionTime();
-        int[] repeatDay = requestDto.getRepeatDay();
+        int repeatDay = requestDto.getRepeatDay();
+
+        // 그룹 정보 확인
+        Group group = groupRepository.findByGroupIdAndIsDelete(requestDto.getGroupId(), false)
+                .orElseThrow(() -> new CustomException(ErrorCode.GROUP_NOT_FOUND));
 
         // 중복되는 타이머가 있는지 확인
         if (timerRepository.existsOverlappingTimers(groupId, startTime, attentionTime, repeatDay)) {
             throw new CustomException(ErrorCode.TIME_SLOT_OVERLAP);
         }
-
-        // 그룹 정보 확인
-        Group group = groupRepository.findByGroupIdAndIsDelete(requestDto.getGroupId(), false)
-                .orElseThrow(() -> new CustomException(ErrorCode.GROUP_NOT_FOUND));
 
         // 타이머 생성 및 저장
         Timer timer = Timer.createTimer(
@@ -45,14 +45,6 @@ public class TimerService {
                 repeatDay
         );
         timerRepository.save(timer);
-    }
-
-    @Transactional
-    public void putTimer(Long timerId) {
-        // is_repeat = false이고 repeat_day가 존재하는 경우 실행
-        // 타이머가 실행될 때마다 repeat_day를 하나씩 지워서 update
-
-        timerRepository.updateRepeatDayByTimerId(timerId);
     }
 
     @Transactional
