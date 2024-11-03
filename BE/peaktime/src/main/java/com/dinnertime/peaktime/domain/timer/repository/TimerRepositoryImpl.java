@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Repository
 @RequiredArgsConstructor
-public class TimerRepositoryCustomImpl implements TimerRepositoryCustom {
+public class TimerRepositoryImpl implements TimerRepositoryCustom {
 
     @PersistenceContext
     private final EntityManager entityManager;
@@ -25,9 +25,9 @@ public class TimerRepositoryCustomImpl implements TimerRepositoryCustom {
 
         String query = "SELECT COUNT(*) FROM timers t " +
                 "WHERE t.group_id = :groupId " +
-                "AND t.start_time <= :requestEndTime " +
-                "AND (t.start_time + INTERVAL '1 minute' * t.attention_time) >= :startTime " +
-                "AND (:isRepeatDayAllZero = true OR t.repeat_day && :repeatDay)";
+                "AND t.start_time <= :requestEndTime " + // DB data의 start_time이 request의 end_time보다 이른 것
+                "AND (t.start_time + INTERVAL '1 minute' * t.attention_time) >= :startTime " + // DB data의 end_time이 request의 start_time보다 늦는 것
+                "AND (:isRepeatDayAllZero = true OR t.repeat_day && :repeatDay)"; // is_repeat = false거나 혹은 repeat_day가 겹치는 것이 존재할 경우
 
         Long count = (Long) entityManager.createNativeQuery(query)
                 .setParameter("groupId", groupId)
@@ -36,7 +36,7 @@ public class TimerRepositoryCustomImpl implements TimerRepositoryCustom {
                 .setParameter("isRepeatDayAllZero", isRepeatDayAllZero)
                 .setParameter("repeatDay", repeatDay)
                 .getSingleResult();
-        return count > 0;
+        return count > 0; // 중복된 시간대가 존재하면 true 반환
     }
 
     private Boolean isRepeatDayAllZero(int[] repeatDay) {
