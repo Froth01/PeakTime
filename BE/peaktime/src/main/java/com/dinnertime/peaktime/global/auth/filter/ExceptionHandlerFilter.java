@@ -1,5 +1,6 @@
-package com.dinnertime.peaktime.global.exception;
+package com.dinnertime.peaktime.global.auth.filter;
 
+import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.util.ResultDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
