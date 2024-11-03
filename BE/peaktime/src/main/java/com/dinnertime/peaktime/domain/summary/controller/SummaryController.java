@@ -13,12 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class SummaryController {
 
-//    private final SummaryService summaryService;
-
-    // 요약 전체 조회
+    private final SummaryService summaryService;
 
     // 요약 저장
 
     // 요약 삭제
+
 
 }

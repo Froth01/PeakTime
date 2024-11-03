@@ -3,6 +3,7 @@ package com.dinnertime.peaktime.domain.group.service;
 import com.dinnertime.peaktime.domain.group.entity.Group;
 import com.dinnertime.peaktime.domain.group.repository.GroupRepository;
 import com.dinnertime.peaktime.domain.group.service.dto.request.GroupCreateRequestDto;
+import com.dinnertime.peaktime.domain.group.service.dto.request.GroupPutRequestDto;
 import com.dinnertime.peaktime.domain.group.service.dto.response.GroupDetailResponseDto;
 import com.dinnertime.peaktime.domain.group.service.dto.response.GroupItemResponseDto;
 import com.dinnertime.peaktime.domain.group.service.dto.response.ChildItemResponseDto;
@@ -54,7 +55,7 @@ public class GroupService {
                         getChildList(groupItem)
                 ))
                 .collect(Collectors.toList());
-        }
+    }
 
     @Transactional
     public List<ChildItemResponseDto> getChildList(Group group) {
@@ -91,9 +92,10 @@ public class GroupService {
         return GroupDetailResponseDto.createGroupDetailResponseDto(group, timerList);
     }
 
+    // 그룹 생성
     @Transactional
     public void postGroup(Long userId, GroupCreateRequestDto requestDto) {
-        User user = userRepository.findByUserId(userId)
+        User user = userRepository.findByUserIdAndIsDeleteFalse(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         List<Group> groupListByUserId = groupRepository.findByUser_UserIdAndIsDelete(userId, false);
@@ -115,5 +117,44 @@ public class GroupService {
         Group group = Group.createGroup(requestDto.getTitle(), preset, user);
 
         groupRepository.save(group);
+    }
+
+    // 그룹 수정
+    @Transactional
+    public void putGroup(Long userId, Long groupId, GroupPutRequestDto requestDto) {
+
+        // 그룹 조회
+        Group groupSelected = groupRepository.findByGroupIdAndIsDelete(groupId, false)
+                .orElseThrow(() -> new CustomException(ErrorCode.GROUP_NOT_FOUND));
+
+        // 그룹명 중복 검사
+        Long countTitle = groupRepository.countByUser_UserIdAndIsDeleteAndTitleAndGroupIdNot(userId, false, requestDto.getTitle(), groupId);
+        if (countTitle > 0) {
+            throw new CustomException(ErrorCode.GROUP_NAME_ALREADY_EXISTS);
+        }
+
+        // 그룹 정보 업데이트
+        // 아무것도 바뀌지 않았다면 return
+        if (groupSelected.getTitle().equals(requestDto.getTitle()) && groupSelected.getPreset().getPresetId().equals(requestDto.getPresetId())) return;
+
+        // title, preset 중 하나 이상 바뀌었다면 실행
+        Preset preset = presetRepository.findByPresetId(requestDto.getPresetId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.PRESET_NOT_FOUND));
+
+        groupSelected.updateGroup(requestDto.getTitle(), preset);
+        groupRepository.save(groupSelected);
+    }
+
+    // 그룹 삭제
+    @Transactional
+    public void deleteGroup(Long userId, Long groupId) {
+        Group groupSelected = groupRepository.findByGroupIdAndIsDelete(groupId, false)
+                .orElseThrow(() -> new CustomException(ErrorCode.GROUP_NOT_FOUND));
+
+        // 그룹에 속해있는 child_user를 검색해서 삭제하기
+        userRepository.updateIsDeleteByGroupId(groupId, true);
+        
+        groupSelected.deleteGroup();
+        groupRepository.save(groupSelected);
     }
 }

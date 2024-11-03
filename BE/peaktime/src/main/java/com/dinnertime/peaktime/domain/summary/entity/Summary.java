@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Table(name="summaries")
-@ToString
 public class Summary {
 
     @Id
