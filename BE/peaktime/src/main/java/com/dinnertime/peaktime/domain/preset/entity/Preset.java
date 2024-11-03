@@ -15,7 +15,6 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Table(name = "presets")
-@ToString
 public class Preset {
 
     @Id

@@ -3,16 +3,16 @@ package com.dinnertime.peaktime.domain.preset.service;
 import com.dinnertime.peaktime.domain.preset.entity.Preset;
 import com.dinnertime.peaktime.domain.preset.repository.PresetRepository;
 import com.dinnertime.peaktime.domain.preset.service.dto.request.SavePresetRequestDto;
-import com.dinnertime.peaktime.domain.preset.service.dto.response.PresetResponseWrapperDto;
+import com.dinnertime.peaktime.domain.preset.service.dto.response.PresetWrapperResponseDto;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.attribute.UserPrincipal;
 import java.util.List;
@@ -41,8 +41,8 @@ public class PresetService {
     }
 
     // preset 조회
-    @Transactional
-    public PresetResponseWrapperDto getPresets(UserPrincipal userPrincipal) {
+    @Transactional(readOnly = true)
+    public PresetWrapperResponseDto getPresets(UserPrincipal userPrincipal) {
 
         // userPrincipal.getUserId()
         User user = userRepository.findByUserIdAndIsDeleteFalse(1)
@@ -50,7 +50,7 @@ public class PresetService {
 
         List<Preset> presets = presetRepository.findAllByUser(user);
 
-        PresetResponseWrapperDto responseDto = PresetResponseWrapperDto.buildPresetResponseDto(presets);
+        PresetWrapperResponseDto responseDto = PresetWrapperResponseDto.buildPresetResponseDto(presets);
 
 
         // userId를 뺀 나머지 데이터 Wrapper해서 적용
