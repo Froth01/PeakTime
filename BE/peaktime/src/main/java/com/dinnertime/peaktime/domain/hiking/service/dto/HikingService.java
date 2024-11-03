@@ -4,23 +4,27 @@ import com.dinnertime.peaktime.domain.content.entity.Content;
 import com.dinnertime.peaktime.domain.content.repository.ContentRepository;
 import com.dinnertime.peaktime.domain.hiking.entity.Hiking;
 import com.dinnertime.peaktime.domain.hiking.repository.HikingRepository;
+import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingCalendarDetailQueryDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingCalendarQueryDto;
-import com.dinnertime.peaktime.domain.hiking.service.dto.request.ContentListRequestDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.request.EndHikingRequestDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.request.StartHikingRequestDto;
-import com.dinnertime.peaktime.domain.hiking.service.dto.response.HikingCalenderResponseDto;
+import com.dinnertime.peaktime.domain.hiking.service.dto.response.HikingCalendarDetailResponseDto;
+import com.dinnertime.peaktime.domain.hiking.service.dto.response.HikingCalendarResponseDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.response.StartHikingResponseDto;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class HikingService {
@@ -31,7 +35,7 @@ public class HikingService {
     @Transactional
     public StartHikingResponseDto startHiking(/*Long id, */StartHikingRequestDto requestDto) {
         //유저 없으면 에러
-        User user = userRepository.findByUserId(1L).orElseThrow(
+        User user = userRepository.findByUserIdAndIsDeleteFalse(1L).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
 
@@ -46,7 +50,7 @@ public class HikingService {
 
     public void endHiking(/*Long id, */EndHikingRequestDto requestDto, Long hikingId) {
         //유저 조회
-        User user = userRepository.findByUserId(1L).orElseThrow(
+        User user = userRepository.findByUserIdAndIsDeleteFalse(1L).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
 
@@ -72,15 +76,34 @@ public class HikingService {
         contentRepository.saveAll(contentList);
     }
 
-    public HikingCalenderResponseDto getCalendar(/*Long userId*/) {
+    @Transactional(readOnly = true)
+    public HikingCalendarResponseDto getCalendar(/*Long userId*/) {
         //유저 조회
-        User user = userRepository.findByUserId(1L).orElseThrow(
+        User user = userRepository.findByUserIdAndIsDeleteFalse(1L).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
 
-        List<HikingCalendarQueryDto> calendarList = hikingRepository.getCalendar();
+        //날짜별로 횟수 카운트
+        List<HikingCalendarQueryDto> calendarList = hikingRepository.getCalendar(user);
 
+        HikingCalendarResponseDto responseDto = HikingCalendarResponseDto.createHikingCalenderResponseDto(calendarList);
 
+        log.info(calendarList.toString());
+
+        return responseDto;
     }
 
+    @Transactional(readOnly = true)
+    public HikingCalendarDetailResponseDto getCalendarByDate(/*Long id, */LocalDate date) {
+        //유저 조회
+        User user = userRepository.findByUserIdAndIsDeleteFalse(1L).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        List<HikingCalendarDetailQueryDto> calendarByDateList = hikingRepository.getCalendarByDate(date, user);
+
+        log.info(calendarByDateList.toString());
+
+        return HikingCalendarDetailResponseDto.createHikingCalendarDetailResponseDto(calendarByDateList);
+    }
 }
