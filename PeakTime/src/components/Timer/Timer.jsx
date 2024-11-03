@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
+import hikingsApi from "../../api/hikingsApi";
 
 function Timer() {
   const [inputTime, setInputTime] = useState(""); // 사용자 입력 시간 (분 단위)
   const [totalTime, setTotalTime] = useState(0); // 타이머 시간 (분 단위)
   const [remainTime, setRemainTime] = useState(0); // 남은 시간 (초 단위)
   const [isRunning, setIsRunning] = useState(false); // 타이머 시작 상태
+
+  const [startedHikingId, setStartedHikingId] = useState(null); // 시작한 hikingId 정보
 
   // 시작 상태, 남은 시간 변경시마다 적용
   useEffect(() => {
@@ -44,6 +47,7 @@ function Timer() {
       });
       return;
     }
+    // 진짜로 시작하기, api요청
     Swal.fire({
       title: `${formatTime(time * 60)} 길이의 하이킹을 시작하시겠습니까?`,
       showDenyButton: true,
@@ -51,13 +55,61 @@ function Timer() {
       denyButtonColor: "gray",
       confirmButtonText: "시작하기",
       denyButtonText: "취소",
-      preConfirm: () => {
-        setTotalTime(time);
-        setRemainTime(time * 60 - 1); // 분 단위로 받은 시간을 초로 변환
-        setIsRunning(true);
+      preConfirm: async () => {
+        try {
+          // 시작 시간 포맷 생성
+          const now = new Date();
+          const year = now.getFullYear();
+          const month = now.getMonth() + 1;
+          const day = now.getDate();
+          const hour = now.getHours();
+          const minute = now.getMinutes();
+          const second = now.getSeconds();
+
+          const format = `${year}-${("00" + month.toString()).slice(-2)}-${(
+            "00" + day.toString()
+          ).slice(-2)} ${hour}:${minute}:${second}`;
+
+          const startHikingData = {
+            startTime: format,
+            attentionTime: inputTime,
+            isSelf: true,
+          };
+          console.log("보낼 바디 :", startHikingData);
+
+          // API 요청 및 응답 처리
+          const response = await hikingsApi.post("", startHikingData);
+          console.log("API 응답 데이터:", response.data); // 디버깅용
+
+          // 상태 업데이트
+          setStartedHikingId(response.data.data.hikingId);
+          setTotalTime(time);
+          setRemainTime(time * 60 - 1); // 분 단위로 받은 시간을 초로 변환
+          setIsRunning(true);
+
+          // 상태가 변경된 후에도 제대로 업데이트 되는지 확인
+          console.log("설정된 하이킹 ID:", response.data.data.hikingId);
+        } catch (err) {
+          console.error("API 요청 중 오류 발생:", err);
+
+          // SweetAlert를 사용하여 오류 메시지 표시
+          Swal.fire({
+            title: "하이킹을 시작하는 데 실패했습니다.",
+            text: `오류 내용: ${err.response?.data?.message || err.message}`,
+            icon: "error",
+            confirmButtonColor: "red",
+            confirmButtonText: "확인",
+          });
+        }
       },
     });
   };
+  // 요청해서 아이디 받으면
+  useEffect(() => {
+    if (startedHikingId !== null) {
+      console.log("시작한 하이킹 아이디:", startedHikingId);
+    }
+  }, [startedHikingId]);
 
   return (
     <>
@@ -139,14 +191,16 @@ function Timer() {
         `}
       </style>
       <div className="absolute w-[30%] h-[100%] right-0 bg-green-200 bg-opacity-50 flex flex-col items-center">
-        <div className="w-[40vh] h-[40vh] relative">
+        <div className="w-[40vh] h-[40vh] relative top-[20%]">
           <div className="timer overflow-hidden">
             <div className="mask"></div>
           </div>
-          <div className="absolute top-[50%] left-[50%] translate-x-[-50%] remain">
+          <div className="absolute top-[70%] left-[50%] translate-x-[-50%] remain">
             {isRunning
               ? formatTime(remainTime)
-              : `${new Date().getHours()}:${new Date().getMinutes()}`}
+              : `${("00" + new Date().getHours().toString()).slice(-2)}:${(
+                  "00" + new Date().getMinutes().toString()
+                ).slice(-2)}`}
           </div>
           {!isRunning && (
             <>
@@ -154,18 +208,18 @@ function Timer() {
               <div className="minute-hand"></div>
             </>
           )}
+          {!isRunning && (
+            <div className="top-[10%]">
+              <input
+                type="number"
+                value={inputTime}
+                onChange={(e) => setInputTime(e.target.value)}
+                placeholder="분 단위로 입력"
+              />
+              <button onClick={handleStart}>시작</button>
+            </div>
+          )}
         </div>
-        {!isRunning && (
-          <div>
-            <input
-              type="number"
-              value={inputTime}
-              onChange={(e) => setInputTime(e.target.value)}
-              placeholder="분 단위로 입력"
-            />
-            <button onClick={handleStart}>시작</button>
-          </div>
-        )}
       </div>
     </>
   );

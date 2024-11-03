@@ -16,8 +16,7 @@ function HomePage() {
   }, [user]);
 
   return (
-    <div className="h-[100vh]">
-      <h1>Home</h1>
+    <div className="h-[100vh] flex">
       <button onClick={handleLogout}>로그아웃</button>
       <Timer />
     </div>
