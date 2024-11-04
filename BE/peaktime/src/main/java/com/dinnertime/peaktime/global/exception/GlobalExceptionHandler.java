@@ -8,6 +8,9 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import java.time.format.DateTimeParseException;
 
 @Slf4j
 @ControllerAdvice
@@ -41,6 +44,16 @@ public class GlobalExceptionHandler {
         ResultDto<Object> response = ResultDto.res(
                 HttpStatus.BAD_REQUEST.value(),
                 ex.getBindingResult().getAllErrors().get(0).getDefaultMessage()
+        );
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({ MethodArgumentTypeMismatchException.class, DateTimeParseException.class })
+    public ResponseEntity<?> handleDateParsingException(Exception ex) {
+        log.info(ex.getMessage());
+        ResultDto<Object> response = ResultDto.res(
+                HttpStatus.BAD_REQUEST.value(),
+                "유효하지 않은 날짜 형식입니다."
         );
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
