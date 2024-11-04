@@ -43,16 +43,16 @@ public class ChildService {
     @Transactional
     public void deleteChild(Long userId, Long childId){
         // 1. 자식 계정 확인
-        User childUser = userRepository.findByUserIdAndIsDeleteFalse(userId)
+        User childUser = userRepository.findByUserIdAndIsDeleteFalseAndIsRootFalse(childId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        // 1. user_group 테이블 삭제
+        // 2. user_group 테이블 삭제
         UserGroup userGroup = userGroupRepository.findByUser_UserId(childId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         userGroupRepository.delete(userGroup);
 
-        // 2. user 테이블 수정 및 저장
+        // 3. user 테이블 수정 및 저장
         childUser.deleteUser();
         userRepository.save(childUser);
     }
