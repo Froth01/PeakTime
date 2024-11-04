@@ -65,9 +65,9 @@ public class HikingRepositoryImpl implements HikingRepositoryCustom {
                 ))
                 .from(hiking)
                 .where(
-                        hiking.user.eq(user),
-                        hiking.realEndTime.isNotNull(),
-                        Expressions.dateTemplate(LocalDate.class, "DATE({0})", hiking.startTime).eq(date)
+                        hiking.user.eq(user)
+                                .and(hiking.realEndTime.isNotNull())
+                                .and(Expressions.dateTemplate(LocalDate.class, "DATE({0})", hiking.startTime).eq(date))
                 )
                 .orderBy(hiking.startTime.asc())
                 .fetch();
