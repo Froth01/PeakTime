@@ -25,7 +25,7 @@ public class CreateChildRequestDto {
     private String childPassword;
 
     @NotBlank
-    @Length(min = 8, message = "비밀번호가 일치하지 않습니다.")
+    @Length(min = 8, message = "최소 8자 이상의 패스워드를 입력해주세요.")
     private String childConfirmPassword;
 
     @NotBlank
