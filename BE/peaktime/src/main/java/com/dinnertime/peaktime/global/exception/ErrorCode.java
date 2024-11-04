@@ -17,6 +17,7 @@ public enum ErrorCode {
     MEMO_NOT_FOUND("해당 메모 내용을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     HIKING_NOT_FOUND("존재하지 않는 하이킹입니다.", HttpStatus.NOT_FOUND),
     CHILD_ACCOUNT_HIKING_NOT_TERMINABLE("자식 계정은 하이킹 중 종료 할 수 없습니다.", HttpStatus.FORBIDDEN),
+    FAILED_CREATE_CHILD_USER("그룹에는 최대 30명의 자식 계정만 존재할 수 있습니다.", HttpStatus.UNPROCESSABLE_ENTITY),
     TIMER_NOT_FOUND("존재하지 않는 타이머입니다.", HttpStatus.NOT_FOUND),
     TIME_SLOT_OVERLAP("선택한 시간 범위가 다른 예약과 겹칩니다.", HttpStatus.CONFLICT),
     ;
