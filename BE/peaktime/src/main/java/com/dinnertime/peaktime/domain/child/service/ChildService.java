@@ -1,5 +1,6 @@
 package com.dinnertime.peaktime.domain.child.service;
 
+import com.dinnertime.peaktime.domain.child.service.dto.request.ChangeChildPasswordRequestDto;
 import com.dinnertime.peaktime.domain.child.service.dto.request.CreateChildRequestDto;
 import com.dinnertime.peaktime.domain.child.service.dto.request.UpdateChildRequestDto;
 import com.dinnertime.peaktime.domain.group.entity.Group;
@@ -128,9 +129,31 @@ public class ChildService {
             }
 
             // 9. 유저 수정 후 저장
-            childUser.updateChildUser(requestDto.getChildNickName());
+            childUser.updateNickname(requestDto.getChildNickName());
             userRepository.save(childUser);
         }
+    }
+
+    @Transactional
+    public void changeChildPassword(Long childId, ChangeChildPasswordRequestDto requestDto){
+        // 1. 자식 계정 조회
+        User childUser = this.getChildUser(childId);
+
+        // 2. 패스워드 형식 확인
+        if(!AuthUtil.checkFormatValidationPassword(requestDto.getChildPassword())){
+            throw new CustomException(ErrorCode.INVALID_PASSWORD_FORMAT);
+        }
+
+        // 3. 패스워드 일치 확인
+        if(!requestDto.getChildPassword().equals(requestDto.getChildConfirmPassword())){
+            throw new CustomException(ErrorCode.NOT_EQUAL_PASSWORD);
+        }
+        // 4. 패스워드 암호화
+        String encodedPassword = passwordEncoder.encode(requestDto.getChildPassword());
+
+        // 5. 수정 후 저장
+        childUser.updatePassword(encodedPassword);
+        userRepository.save(childUser);
     }
 
     // 아이디 중복 검사 (유저 로그인 아이디로 검사. 이미 존재하면 true 반환)
