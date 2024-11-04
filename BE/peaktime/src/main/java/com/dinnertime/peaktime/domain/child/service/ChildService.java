@@ -96,7 +96,7 @@ public class ChildService {
     @Transactional
     public void updateChild(Long childId, UpdateChildRequestDto requestDto){
 
-        // 1. 자식 테이블 조회
+        // 1. 유저 테이블 조회
         User childUser = this.getChildUser(childId);
 
         // 2. 유저그룹 테이블 조회
@@ -108,8 +108,8 @@ public class ChildService {
             Group group = groupRepository.findByGroupIdAndIsDeleteFalse(requestDto.getGroupId())
                     .orElseThrow(() -> new CustomException(ErrorCode.GROUP_NOT_FOUND));
 
-            // 5. 해당 그룹의 인원이 30명 미만인지 확인 -> 본인 제외
-            Long userCount = userGroupRepository.countAllByGroupAndUserNot(group, childUser);
+            // 5. 해당 그룹의 인원이 30명 미만인지 확인
+            Long userCount = userGroupRepository.countAllByGroup(group);
             if(userCount >= 30) {
                 throw new CustomException(ErrorCode.FAILED_CREATE_CHILD_USER);
             }
