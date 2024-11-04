@@ -31,24 +31,3 @@ public class HikingDetailQueryDto {
     @Setter
     private List<BlockInfo> visitedProgramList;
 }
-
-/*
-		    "startTime": "2024-10-19 14:30:00",
-		    "endTime": "2024-10-19 15:30:00",
-		    "realEndTime": "2024-10-19 15:30:00",
-		    "blockedSiteCount": 3,
-		    "blockedProgramCount": 1,
-		    "visitedSiteList": [
-				    "www.naver.com",
-				    "www.naver.com",
-				    "www.naver.com"
-		    ]
-		    "visitedProgram": [
-				    "계산기",
-				    "계산기",
-				    "계산기",
-				    "계산기",
-				    "계산기"
-				]
-
- */
