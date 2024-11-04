@@ -84,7 +84,7 @@ public class ChildService {
         User childUser = this.getChildUser(childId);
 
         // 2. user_group 테이블 삭제
-        UserGroup userGroup = this.getChildGroup(childId);
+        UserGroup userGroup = this.getChildUserGroup(childId);
 
         userGroupRepository.delete(userGroup);
 
@@ -100,7 +100,7 @@ public class ChildService {
         User childUser = this.getChildUser(childId);
 
         // 2. 유저그룹 테이블 조회
-        UserGroup userGroup = this.getChildGroup(childId);
+        UserGroup userGroup = this.getChildUserGroup(childId);
 
         // 3. 그룹이 변경될 경우
         if(!userGroup.getGroup().getGroupId().equals(requestDto.getGroupId())){
@@ -145,7 +145,7 @@ public class ChildService {
     }
 
     // 유저 그룹 테이블 조회
-    private UserGroup getChildGroup(Long childId){
+    private UserGroup getChildUserGroup(Long childId){
         return userGroupRepository.findByUser_UserId(childId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
