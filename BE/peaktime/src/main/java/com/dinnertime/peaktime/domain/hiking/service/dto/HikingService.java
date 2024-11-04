@@ -6,10 +6,12 @@ import com.dinnertime.peaktime.domain.hiking.entity.Hiking;
 import com.dinnertime.peaktime.domain.hiking.repository.HikingRepository;
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingCalendarDetailQueryDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingCalendarQueryDto;
+import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingDetailQueryDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.request.EndHikingRequestDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.request.StartHikingRequestDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.response.HikingCalendarDetailResponseDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.response.HikingCalendarResponseDto;
+import com.dinnertime.peaktime.domain.hiking.service.dto.response.HikingDetailResponseDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.response.StartHikingResponseDto;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
@@ -105,5 +107,20 @@ public class HikingService {
         log.info(calendarByDateList.toString());
 
         return HikingCalendarDetailResponseDto.createHikingCalendarDetailResponseDto(calendarByDateList);
+    }
+
+    @Transactional(readOnly = true)
+    public HikingDetailResponseDto getHikingDetail(/*Long id, */Long hikingId) {
+        //유저 조회
+        User user = userRepository.findByUserIdAndIsDeleteFalse(1L).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        HikingDetailQueryDto hikingDetail = hikingRepository.getHikingDetail(user, hikingId);
+
+        log.info(hikingDetail.toString());
+
+        return HikingDetailResponseDto.createHikingDetailResponseDto(hikingDetail);
+
     }
 }
