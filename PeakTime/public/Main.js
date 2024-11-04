@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain } from "electron";
 import path from "path";
 import url from "url";
-import WebSocket from "ws";
+import WebSocket, { WebSocketServer } from "ws";
 
 const __dirname = path.resolve();
 
@@ -54,7 +54,7 @@ app.whenReady().then(() => {
   console.log(__dirname);
   // WebSocket 서버 생성
   const port = 12345;
-  wss = new WebSocket.Server({ port }, () => {
+  wss = new WebSocketServer({ port }, () => {
     console.log(`WebSocket server is running on port ${port}`);
   });
 
