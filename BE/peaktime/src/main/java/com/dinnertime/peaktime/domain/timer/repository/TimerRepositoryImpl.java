@@ -2,12 +2,10 @@ package com.dinnertime.peaktime.domain.timer.repository;
 
 import com.dinnertime.peaktime.domain.timer.entity.QTimer;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Slf4j
