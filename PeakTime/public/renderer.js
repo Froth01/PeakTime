@@ -11,10 +11,6 @@ document.addEventListener("hikingStart", () => {
   );
 });
 
-document.getElementById("end").onclick = () => {
-  window.electronAPI.sendWebSocketMessage(JSON.stringify({ action: "end" }));
-};
-
 // WebSocket 메시지를 수신하고 id 요소 업데이트
 window.electronAPI.onWebSocketMessage((message) => {
   // 바이트 배열인지 확인하고 디코딩 처리

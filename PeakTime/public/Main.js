@@ -3,14 +3,17 @@ import path from "path";
 import url from "url";
 import WebSocket from "ws";
 
+const __dirname = path.resolve();
+
 function createWindow() {
   // 일렉트론 크기
   const win = new BrowserWindow({
     width: 1366,
     height: 768,
     webPreferences: {
-      preload: "./preload.js",
+      preload: path.join(__dirname, "public", "preload.js"),
       contextIsolation: true,
+      sandbox: true,
       enableRemoteModule: false,
     },
   });
@@ -48,7 +51,7 @@ ipcMain.on("websocket-message", (event, action) => {
 
 app.whenReady().then(() => {
   createWindow();
-
+  console.log(__dirname);
   // WebSocket 서버 생성
   const port = 12345;
   wss = new WebSocket.Server({ port }, () => {
