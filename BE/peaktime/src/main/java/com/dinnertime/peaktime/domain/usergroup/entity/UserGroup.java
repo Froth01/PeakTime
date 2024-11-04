@@ -36,4 +36,8 @@ public class UserGroup {
                 .group(group)
                 .build();
     }
+
+    public void changeUserGroup(Group group) {
+        this.group = group;
+    }
 }

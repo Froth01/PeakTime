@@ -1,6 +1,8 @@
 package com.dinnertime.peaktime.domain.child.service;
 
+import com.dinnertime.peaktime.domain.child.service.dto.request.ChangeChildPasswordRequestDto;
 import com.dinnertime.peaktime.domain.child.service.dto.request.CreateChildRequestDto;
+import com.dinnertime.peaktime.domain.child.service.dto.request.UpdateChildRequestDto;
 import com.dinnertime.peaktime.domain.group.entity.Group;
 import com.dinnertime.peaktime.domain.group.repository.GroupRepository;
 import com.dinnertime.peaktime.domain.user.entity.User;
@@ -80,12 +82,10 @@ public class ChildService {
     @Transactional
     public void deleteChild(Long childId){
         // 1. 자식 계정 확인
-        User childUser = userRepository.findByUserIdAndIsDeleteFalseAndIsRootFalse(childId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        User childUser = this.getChildUser(childId);
 
         // 2. user_group 테이블 삭제
-        UserGroup userGroup = userGroupRepository.findByUser_UserId(childId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        UserGroup userGroup = this.getChildUserGroup(childId);
 
         userGroupRepository.delete(userGroup);
 
@@ -94,8 +94,82 @@ public class ChildService {
         userRepository.save(childUser);
     }
 
+    @Transactional
+    public void updateChild(Long childId, UpdateChildRequestDto requestDto){
+
+        // 1. 유저 테이블 조회
+        User childUser = this.getChildUser(childId);
+
+        // 2. 유저그룹 테이블 조회
+        UserGroup userGroup = this.getChildUserGroup(childId);
+
+        // 3. 그룹이 변경될 경우
+        if(!userGroup.getGroup().getGroupId().equals(requestDto.getGroupId())){
+            // 4. 그룹 조회
+            Group group = groupRepository.findByGroupIdAndIsDeleteFalse(requestDto.getGroupId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.GROUP_NOT_FOUND));
+
+            // 5. 해당 그룹의 인원이 30명 미만인지 확인
+            Long userCount = userGroupRepository.countAllByGroup(group);
+            if(userCount >= 30) {
+                throw new CustomException(ErrorCode.FAILED_CREATE_CHILD_USER);
+            }
+
+            // 6. 유저그룹 수정 및 저장
+            userGroup.changeUserGroup(group);
+            userGroupRepository.save(userGroup);
+        }
+
+
+        // 7. 유저 닉네임이 변경될 경우
+        if(!childUser.getNickname().equals(requestDto.getChildNickName())){
+            // 8. 변경 닉네임이 형식에 맞는지 확인
+            if(!AuthUtil.checkFormatValidationNickname(requestDto.getChildNickName())){
+                throw new CustomException(ErrorCode.INVALID_NICKNAME_FORMAT);
+            }
+
+            // 9. 유저 수정 후 저장
+            childUser.updateNickname(requestDto.getChildNickName());
+            userRepository.save(childUser);
+        }
+    }
+
+    @Transactional
+    public void changeChildPassword(Long childId, ChangeChildPasswordRequestDto requestDto){
+        // 1. 자식 계정 조회
+        User childUser = this.getChildUser(childId);
+
+        // 2. 패스워드 형식 확인
+        if(!AuthUtil.checkFormatValidationPassword(requestDto.getChildPassword())){
+            throw new CustomException(ErrorCode.INVALID_PASSWORD_FORMAT);
+        }
+
+        // 3. 패스워드 일치 확인
+        if(!requestDto.getChildPassword().equals(requestDto.getChildConfirmPassword())){
+            throw new CustomException(ErrorCode.NOT_EQUAL_PASSWORD);
+        }
+        // 4. 패스워드 암호화
+        String encodedPassword = passwordEncoder.encode(requestDto.getChildPassword());
+
+        // 5. 수정 후 저장
+        childUser.updatePassword(encodedPassword);
+        userRepository.save(childUser);
+    }
+
     // 아이디 중복 검사 (유저 로그인 아이디로 검사. 이미 존재하면 true 반환)
     private boolean checkDuplicateUserLoginId(String userLoginId) {
         return userRepository.findByUserLoginId(userLoginId).isPresent();
+    }
+
+    // 자식 계정 조회
+    private User getChildUser(Long childId){
+        return userRepository.findByUserIdAndIsDeleteFalseAndIsRootFalse(childId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    // 유저 그룹 테이블 조회
+    private UserGroup getChildUserGroup(Long childId){
+        return userGroupRepository.findByUser_UserId(childId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 }
