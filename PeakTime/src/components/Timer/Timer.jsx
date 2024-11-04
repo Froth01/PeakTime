@@ -32,8 +32,9 @@ function Timer() {
       "0"
     )}`;
   };
-
   // 시작버튼
+  // 커스텀 이벤트
+  const hikingStart = new CustomEvent("hikingStart", { bubbles: true });
   const handleStart = () => {
     // 시간 정수화
     const time = parseInt(inputTime, 10);
@@ -88,6 +89,8 @@ function Timer() {
           setTotalTime(time);
           setRemainTime(time * 60 - 1); // 분 단위로 받은 시간을 초로 변환
           setIsRunning(true);
+          const startBtn = document.getElementById("start");
+          startBtn.dispatchEvent(hikingStart);
         } catch (err) {
           console.error("API 요청 중 오류 발생:", err);
 
@@ -215,7 +218,9 @@ function Timer() {
                 onChange={(e) => setInputTime(e.target.value)}
                 placeholder="분 단위로 입력"
               />
-              <button onClick={handleStart}>시작</button>
+              <button onClick={handleStart} id="start">
+                시작
+              </button>
             </div>
           )}
         </div>
