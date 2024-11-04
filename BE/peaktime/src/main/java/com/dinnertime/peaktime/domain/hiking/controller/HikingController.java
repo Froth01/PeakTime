@@ -3,10 +3,7 @@ package com.dinnertime.peaktime.domain.hiking.controller;
 import com.dinnertime.peaktime.domain.hiking.service.dto.HikingService;
 import com.dinnertime.peaktime.domain.hiking.service.dto.request.EndHikingRequestDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.request.StartHikingRequestDto;
-import com.dinnertime.peaktime.domain.hiking.service.dto.response.HikingCalendarDetailResponseDto;
-import com.dinnertime.peaktime.domain.hiking.service.dto.response.HikingCalendarResponseDto;
-import com.dinnertime.peaktime.domain.hiking.service.dto.response.HikingDetailResponseDto;
-import com.dinnertime.peaktime.domain.hiking.service.dto.response.StartHikingResponseDto;
+import com.dinnertime.peaktime.domain.hiking.service.dto.response.*;
 import com.dinnertime.peaktime.global.util.CommonSwaggerResponse;
 import com.dinnertime.peaktime.global.util.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -127,6 +124,28 @@ public class HikingController {
             /*@AuthenticationPrincipal UserPrincipal userPrincipal,*/
             @PathVariable("hiking-id") Long hikingId) {
         HikingDetailResponseDto responseDto = hikingService.getHikingDetail(/*userPrincipal.getUserId(),*/ hikingId);
+
+        log.info(responseDto.toString());
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "하이킹 내역 상세를 조회하는데 성공하였습니다.", responseDto));
+    }
+
+    @Operation(summary = "하이킹 통계 내역 조회", description = "하이킹 통계 내역 조회하기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "하이킹 통계 내역을 조회하는데 성공했습니다.",
+                    content = @Content(schema= @Schema(implementation = ResultDto.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "하이킹 통계 내역을 조회하는데 실패했습니다.",
+                    content= @Content(schema= @Schema(implementation = ResultDto.class))
+            )
+    })
+    @CommonSwaggerResponse.CommonResponses
+    @GetMapping(value = "/statistics/{user-id}")
+    public ResponseEntity<?> getHikingStatistics(
+            /*@AuthenticationPrincipal UserPrincipal userPrincipal,*/
+            @PathVariable("user-id") Long userId) {
+        log.info(userId.toString());
+        HikingStatisticResponseDto responseDto = hikingService.getHikingStatistic(/*userPrincipal.getUserId(),*/ userId);
 
         log.info(responseDto.toString());
 
