@@ -15,10 +15,7 @@ import org.apache.logging.log4j.core.Filter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,13 +27,13 @@ public class ChildController {
     @Operation(summary = "자식 계정 생성", description = "루트 유저가 자식 계정을 생성")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "자식 계정 생성에 성공하였습니다.",
-            content = {@Content(schema = @Schema(implementation = Filter.Result.class))}),
+            content = {@Content(schema = @Schema(implementation = ResultDto.class))}),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 계정입니다.",
-                    content = {@Content(schema = @Schema(implementation = Filter.Result.class))}),
+                    content = {@Content(schema = @Schema(implementation = ResultDto.class))}),
             @ApiResponse(responseCode = "422", description = "그룹에는 최대 30명의 자식 계정만 존재할 수 있습니다.",
-                    content = {@Content(schema = @Schema(implementation = Filter.Result.class))}),
+                    content = {@Content(schema = @Schema(implementation = ResultDto.class))}),
             @ApiResponse(responseCode = "500", description = "자식 계정 생성에 실패하였습니다.",
-                    content = {@Content(schema = @Schema(implementation = Filter.Result.class))})
+                    content = {@Content(schema = @Schema(implementation = ResultDto.class))})
     })
     @CommonSwaggerResponse.CommonResponses
     @PostMapping("")
@@ -46,5 +43,24 @@ public class ChildController {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ResultDto.res(HttpStatus.OK.value(), "자식 계정 생성에 성공하였습니다."));
+    }
+
+    @Operation(summary = "자식 계정 삭제", description = "루트 유저가 자식 계정을 삭제")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "자식 계정 삭제에 성공하였습니다.",
+            content = {@Content(schema = @Schema(implementation = ResultDto.class))}),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 계정입니다.",
+                    content = {@Content(schema = @Schema(implementation = ResultDto.class))}),
+            @ApiResponse(responseCode = "500", description = "자식 계정 삭제에 실패하였습니다.",
+            content = {@Content(schema = @Schema(implementation = ResultDto.class))})
+    })
+    @CommonSwaggerResponse.CommonResponses
+    @DeleteMapping("/{child-id}")
+    public ResponseEntity<?> deleteChild(@PathVariable("child-id") Long childId){
+
+        childService.deleteChild(1L, childId);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResultDto.res(HttpStatus.OK.value(), "자식 계정 삭제에 성공하였습니다."));
     }
 }
