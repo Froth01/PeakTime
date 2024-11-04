@@ -28,7 +28,6 @@ public class ChildService {
     private final UserRepository userRepository;
     private final UserGroupRepository userGroupRepository;
     private final GroupRepository groupRepository;
-    private final UserService userService;
 
     @Transactional
     public void createChild(CreateChildRequestDto requestDto){
@@ -52,35 +51,35 @@ public class ChildService {
             throw new CustomException(ErrorCode.DUPLICATED_USER_LOGIN_ID);
         };
 
-        // 3. 비밀번호 형식 확인
+        // 4. 비밀번호 형식 확인
         if(!authService.checkFormatValidationPassword(requestDto.getChildPassword())){
            throw new CustomException(ErrorCode.INVALID_PASSWORD_FORMAT);
         }
 
-        // 4. 비밀번호, 비밀번호 확인 일치 확인
+        // 5. 비밀번호, 비밀번호 확인 일치 확인
         if(!requestDto.getChildPassword().equals(requestDto.getChildConfirmPassword())){
             throw new CustomException(ErrorCode.NOT_EQUAL_PASSWORD);
         }
 
-        // 5. 닉네임 형식 확인
+        // 6. 닉네임 형식 확인
         if(!authService.checkFormatValidationNickname(requestDto.getChildNickname())){
             throw new CustomException(ErrorCode.INVALID_NICKNAME_FORMAT);
         }
 
-        // 6. 비밀번호 암호화
+        // 7. 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(requestDto.getChildPassword());
 
-        // 7. 유저 테이블 저장
+        // 8. 유저 테이블 저장
         User user = User.createChildUser(requestDto.getChildLoginId(), encodedPassword, requestDto.getChildNickname());
         userRepository.save(user);
 
-        // 8. 유저 그룹 테이블 저장
+        // 9. 유저 그룹 테이블 저장
         UserGroup userGroup = UserGroup.createUserGroup(user, group);
         userGroupRepository.save(userGroup);
     }
 
     @Transactional
-    public void deleteChild(Long userId, Long childId){
+    public void deleteChild(Long childId){
         // 1. 자식 계정 확인
         User childUser = userRepository.findByUserIdAndIsDeleteFalseAndIsRootFalse(childId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));

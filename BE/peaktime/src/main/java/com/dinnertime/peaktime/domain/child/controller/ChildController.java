@@ -60,7 +60,7 @@ public class ChildController {
     @DeleteMapping("/{child-id}")
     public ResponseEntity<?> deleteChild(@PathVariable("child-id") Long childId){
 
-        childService.deleteChild(1L, childId);
+        childService.deleteChild(childId);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ResultDto.res(HttpStatus.OK.value(), "자식 계정 삭제에 성공하였습니다."));
