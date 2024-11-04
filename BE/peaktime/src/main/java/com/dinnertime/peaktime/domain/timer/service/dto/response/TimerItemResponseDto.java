@@ -14,15 +14,19 @@ public class TimerItemResponseDto {
 
     private Long timerId;
     private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    private int attentionTime;
     private Boolean isRepeat;
     private int repeatDay;
 
     @Builder
+<<<<<<< HEAD
     private TimerItemResponseDto(Long timerId, LocalDateTime startTime, LocalDateTime endTime, Boolean isRepeat, int repeatDay) {
+=======
+    private TimerItemResponseDto(Long timerId, LocalDateTime startTime, int attentionTime, Boolean isRepeat, int repeatDay) {
+>>>>>>> 5a806db8f55419a2b19c2ff1d254ca35973cd5f0
         this.timerId = timerId;
         this.startTime = startTime;
-        this.endTime = endTime;
+        this.attentionTime = attentionTime;
         this.isRepeat = isRepeat;
         this.repeatDay = repeatDay;
     }
@@ -31,7 +35,7 @@ public class TimerItemResponseDto {
         return TimerItemResponseDto.builder()
                 .timerId(timer.getTimerId())
                 .startTime(timer.getStartTime())
-                .endTime(timer.getEndTime())
+                .attentionTime(timer.getAttentionTime())
                 .isRepeat(timer.getIsRepeat())
                 .repeatDay(timer.getRepeatDay())
                 .build();

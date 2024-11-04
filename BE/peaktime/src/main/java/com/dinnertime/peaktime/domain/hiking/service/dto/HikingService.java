@@ -4,20 +4,29 @@ import com.dinnertime.peaktime.domain.content.entity.Content;
 import com.dinnertime.peaktime.domain.content.repository.ContentRepository;
 import com.dinnertime.peaktime.domain.hiking.entity.Hiking;
 import com.dinnertime.peaktime.domain.hiking.repository.HikingRepository;
+import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingCalendarDetailQueryDto;
+import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingCalendarQueryDto;
+import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingDetailQueryDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.request.EndHikingRequestDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.request.StartHikingRequestDto;
+import com.dinnertime.peaktime.domain.hiking.service.dto.response.HikingCalendarDetailResponseDto;
+import com.dinnertime.peaktime.domain.hiking.service.dto.response.HikingCalendarResponseDto;
+import com.dinnertime.peaktime.domain.hiking.service.dto.response.HikingDetailResponseDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.response.StartHikingResponseDto;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class HikingService {
@@ -67,8 +76,51 @@ public class HikingService {
                 .map(contentListRequestDto -> Content.createContent(hiking, contentListRequestDto))
                 .toList();
         contentRepository.saveAll(contentList);
+    }
 
+    @Transactional(readOnly = true)
+    public HikingCalendarResponseDto getCalendar(/*Long userId*/) {
+        //유저 조회
+        User user = userRepository.findByUserIdAndIsDeleteFalse(1L).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
 
+        //날짜별로 누적 시간 합치기
+        List<HikingCalendarQueryDto> calendarList = hikingRepository.getCalendar(user);
+
+        HikingCalendarResponseDto responseDto = HikingCalendarResponseDto.createHikingCalenderResponseDto(calendarList);
+
+        log.info(calendarList.toString());
+
+        return responseDto;
+    }
+
+    @Transactional(readOnly = true)
+    public HikingCalendarDetailResponseDto getCalendarByDate(/*Long id, */LocalDate date) {
+        //유저 조회
+        User user = userRepository.findByUserIdAndIsDeleteFalse(1L).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        List<HikingCalendarDetailQueryDto> calendarByDateList = hikingRepository.getCalendarByDate(date, user);
+
+        log.info(calendarByDateList.toString());
+
+        return HikingCalendarDetailResponseDto.createHikingCalendarDetailResponseDto(calendarByDateList);
+    }
+
+    @Transactional(readOnly = true)
+    public HikingDetailResponseDto getHikingDetail(/*Long id, */Long hikingId) {
+        //유저 조회
+        User user = userRepository.findByUserIdAndIsDeleteFalse(1L).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        HikingDetailQueryDto hikingDetail = hikingRepository.getHikingDetail(user, hikingId);
+
+        log.info(hikingDetail.toString());
+
+        return HikingDetailResponseDto.createHikingDetailResponseDto(hikingDetail);
 
     }
 }

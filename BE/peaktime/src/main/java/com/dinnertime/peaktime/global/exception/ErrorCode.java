@@ -24,7 +24,10 @@ public enum ErrorCode {
     DUPLICATED_USER_LOGIN_ID("이미 존재하는 아이디이거나 이미 존재하는 이메일입니다.", HttpStatus.CONFLICT),
     DUPLICATED_EMAIL("이미 존재하는 아이디이거나 이미 존재하는 이메일입니다.", HttpStatus.CONFLICT),
     NOT_EQUAL_PASSWORD("잘못된 형식의 요청입니다.", HttpStatus.BAD_REQUEST),
-    FILE_NOT_FOUND("Default Block Website File을 찾을 수 없습니다.", HttpStatus.NOT_FOUND)
+    FILE_NOT_FOUND("Default Block Website File을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    FAILED_CREATE_CHILD_USER("그룹에는 최대 30명의 자식 계정만 존재할 수 있습니다.", HttpStatus.UNPROCESSABLE_ENTITY),
+    TIMER_NOT_FOUND("존재하지 않는 타이머입니다.", HttpStatus.NOT_FOUND),
+    TIME_SLOT_OVERLAP("선택한 시간 범위가 다른 예약과 겹칩니다.", HttpStatus.CONFLICT),
     ;
 
     private final String message;

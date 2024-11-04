@@ -16,7 +16,7 @@ public class ContentListRequestDto {
     private String contentName;
 
     @NotNull
-    @Pattern(regexp = "program|site", message = "contentType은 'program' 또는 'site'여야 합니다.")
+    @Pattern(regexp = "program|site", message = "컨텐츠 타입은 'program' 또는 'site' 여야 합니다.")
     private String contentType;
 
     @NotNull
