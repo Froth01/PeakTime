@@ -7,6 +7,7 @@ import com.dinnertime.peaktime.domain.user.repository.UserRepository;
 import com.dinnertime.peaktime.global.auth.service.dto.request.SignupRequest;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
+import com.dinnertime.peaktime.global.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
@@ -37,17 +38,17 @@ public class AuthService {
     @Transactional
     public void signup(SignupRequest signupRequest) {
         // 1-1. 아이디 형식 검사
-        if(!this.checkFormatValidationUserLoginId(signupRequest.getUserLoginId())) {
+        if(AuthUtil.checkFormatValidationUserLoginId(signupRequest.getUserLoginId())) {
             throw new CustomException(ErrorCode.INVALID_USER_LOGIN_ID_FORMAT);
         }
         // 1-2. 아이디 소문자로 변환
-        String userLoginId = this.convertUpperToLower(signupRequest.getUserLoginId());
+        String userLoginId = AuthUtil.convertUpperToLower(signupRequest.getUserLoginId());
         // 1-3. 아이디 중복 검사
         if(this.checkDuplicateUserLoginId(userLoginId)) {
             throw new CustomException(ErrorCode.DUPLICATED_USER_LOGIN_ID);
         }
         // 2-1. 비밀번호 형식 검사
-        if(!this.checkFormatValidationPassword(signupRequest.getPassword())) {
+        if(!AuthUtil.checkFormatValidationPassword(signupRequest.getPassword())) {
             throw new CustomException(ErrorCode.INVALID_PASSWORD_FORMAT);
         }
         // 2-2. 비밀번호 일치 검사
@@ -57,17 +58,17 @@ public class AuthService {
         // 2-3. 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(signupRequest.getPassword());
         // 3-1. 닉네임 형식 검사
-        if(!this.checkFormatValidationNickname(signupRequest.getNickname())) {
+        if(!AuthUtil.checkFormatValidationNickname(signupRequest.getNickname())) {
             throw new CustomException(ErrorCode.INVALID_NICKNAME_FORMAT);
         }
         // 3-2. 닉네임 소문자로 변환
-        String nickname = this.convertUpperToLower(signupRequest.getNickname());
+        String nickname = AuthUtil.convertUpperToLower(signupRequest.getNickname());
         // 4-1. 이메일 형식 검사
         if(!this.checkFormatValidationEmail(signupRequest.getEmail())) {
             throw new CustomException(ErrorCode.INVALID_EMAIL_FORMAT);
         }
         // 4-2. 이메일 소문자로 변환
-        String email = this.convertUpperToLower(signupRequest.getEmail());
+        String email = AuthUtil.convertUpperToLower(signupRequest.getEmail());
         // 4-3. 이메일 중복 검사
         if(this.checkDuplicateEmail(email)) {
             throw new CustomException(ErrorCode.DUPLICATED_EMAIL);
@@ -89,45 +90,15 @@ public class AuthService {
         presetRepository.save(preset);
     }
 
-    // 아이디 형식 검사 (형식에 맞으면 true, 형식에 맞지 않으면 false)
-    private boolean checkFormatValidationUserLoginId(String userLoginId) {
-        // 정규식: 영문과 숫자로 이루어진 5자 이상 15자 이하의 문자열
-        String regex = "^[a-zA-Z0-9]{5,15}$";
-        return userLoginId.matches(regex);
-    }
-
-    // 영문 대문자를 영문 소문자로 변환
-    private String convertUpperToLower(String input) {
-        return input.toLowerCase();
+    // 이메일 형식 검사 (형식에 맞으면 true, 형식에 맞지 않으면 false)
+    private boolean checkFormatValidationEmail(String email) {
+        String regex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+        return email.matches(regex);
     }
 
     // 아이디 중복 검사 (유저 로그인 아이디로 검사. 이미 존재하면 true 반환)
     private boolean checkDuplicateUserLoginId(String userLoginId) {
         return userRepository.findByUserLoginId(userLoginId).isPresent();
-    }
-
-    // 비밀번호 형식 검사 (형식에 맞으면 true, 형식에 맞지 않으면 false)
-    private boolean checkFormatValidationPassword(String password) {
-        // 정규식 : 영문 대문자, 영문 소문자, 숫자, 특수문자(모든 특수문자로 확장하여 허용)를 각각 포함하여 최소 8자 이상 -> 영문 대문자, 영문 소문자, 숫자, 특수문자를 제외한 문자는 false 처리.
-        String pattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-\\[\\]{};':\"\\\\|,.<>\\/?])[A-Za-z\\d!@#$%^&*()_+\\-\\[\\]{};':\"\\\\|,.<>\\/?]{8,}$";
-        // Pattern 및 Matcher를 사용해 정규식 검증
-        Pattern compiledPattern = Pattern.compile(pattern);
-        Matcher matcher = compiledPattern.matcher(password);
-        // 정규식 패턴에 일치하면 true 반환, 아니면 false 반환
-        return matcher.matches();
-    }
-
-    // 닉네임 형식 검사 (형식에 맞으면 true, 형식에 맞지 않으면 false)
-    private boolean checkFormatValidationNickname(String nickname) {
-        // 정규식: 한글, 영문 대소문자, 숫자로 이루어진 2자 이상 8자 이하의 문자열
-        String regex = "^[a-zA-Z0-9가-힣]{2,8}$";
-        return nickname.matches(regex);
-    }
-
-    // 이메일 형식 검사 (형식에 맞으면 true, 형식에 맞지 않으면 false)
-    private boolean checkFormatValidationEmail(String email) {
-        String regex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
-        return email.matches(regex);
     }
 
     // 이메일 중복 검사 (이메일 주소로 검사. 이미 존재하면 true 반환)
