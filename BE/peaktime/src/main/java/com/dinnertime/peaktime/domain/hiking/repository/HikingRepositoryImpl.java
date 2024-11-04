@@ -126,7 +126,7 @@ public class HikingRepositoryImpl implements HikingRepositoryCustom {
                 .join(content)
                 .on(hiking.hikingId.eq(content.hiking.hikingId))
                 .where(hiking.hikingId.eq(hikingId))
-                .groupBy(hiking.startTime, hiking.endTime, hiking.realEndTime)
+                .groupBy(hiking.hikingId)
                 .fetchOne();
 
         if(hikingDetail != null) {
