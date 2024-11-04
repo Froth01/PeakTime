@@ -90,24 +90,24 @@ public class AuthService {
     }
 
     // 아이디 형식 검사 (형식에 맞으면 true, 형식에 맞지 않으면 false)
-    private boolean checkFormatValidationUserLoginId(String userLoginId) {
+    public boolean checkFormatValidationUserLoginId(String userLoginId) {
         // 정규식: 영문과 숫자로 이루어진 5자 이상 15자 이하의 문자열
         String regex = "^[a-zA-Z0-9]{5,15}$";
         return userLoginId.matches(regex);
     }
 
     // 영문 대문자를 영문 소문자로 변환
-    private String convertUpperToLower(String input) {
+    public String convertUpperToLower(String input) {
         return input.toLowerCase();
     }
 
     // 아이디 중복 검사 (유저 로그인 아이디로 검사. 이미 존재하면 true 반환)
-    private boolean checkDuplicateUserLoginId(String userLoginId) {
+    public boolean checkDuplicateUserLoginId(String userLoginId) {
         return userRepository.findByUserLoginId(userLoginId).isPresent();
     }
 
     // 비밀번호 형식 검사 (형식에 맞으면 true, 형식에 맞지 않으면 false)
-    private boolean checkFormatValidationPassword(String password) {
+    public boolean checkFormatValidationPassword(String password) {
         // 정규식 : 영문 대문자, 영문 소문자, 숫자, 특수문자(모든 특수문자로 확장하여 허용)를 각각 포함하여 최소 8자 이상 -> 영문 대문자, 영문 소문자, 숫자, 특수문자를 제외한 문자는 false 처리.
         String pattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-\\[\\]{};':\"\\\\|,.<>\\/?])[A-Za-z\\d!@#$%^&*()_+\\-\\[\\]{};':\"\\\\|,.<>\\/?]{8,}$";
         // Pattern 및 Matcher를 사용해 정규식 검증
@@ -118,7 +118,7 @@ public class AuthService {
     }
 
     // 닉네임 형식 검사 (형식에 맞으면 true, 형식에 맞지 않으면 false)
-    private boolean checkFormatValidationNickname(String nickname) {
+    public boolean checkFormatValidationNickname(String nickname) {
         // 정규식: 한글, 영문 대소문자, 숫자로 이루어진 2자 이상 8자 이하의 문자열
         String regex = "^[a-zA-Z0-9가-힣]{2,8}$";
         return nickname.matches(regex);
