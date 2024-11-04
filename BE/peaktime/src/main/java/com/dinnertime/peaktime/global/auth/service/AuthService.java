@@ -5,6 +5,7 @@ import com.dinnertime.peaktime.domain.preset.repository.PresetRepository;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
 import com.dinnertime.peaktime.global.auth.service.dto.request.SignupRequest;
+import com.dinnertime.peaktime.global.auth.service.dto.response.IsDuplicatedResponse;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
 import com.dinnertime.peaktime.global.util.AuthUtil;
@@ -35,10 +36,11 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PresetRepository presetRepository;
 
+    // 회원가입
     @Transactional
     public void signup(SignupRequest signupRequest) {
         // 1-1. 아이디 형식 검사
-        if(AuthUtil.checkFormatValidationUserLoginId(signupRequest.getUserLoginId())) {
+        if(!AuthUtil.checkFormatValidationUserLoginId(signupRequest.getUserLoginId())) {
             throw new CustomException(ErrorCode.INVALID_USER_LOGIN_ID_FORMAT);
         }
         // 1-2. 아이디 소문자로 변환
@@ -64,7 +66,7 @@ public class AuthService {
         // 3-2. 닉네임 소문자로 변환
         String nickname = AuthUtil.convertUpperToLower(signupRequest.getNickname());
         // 4-1. 이메일 형식 검사
-        if(!this.checkFormatValidationEmail(signupRequest.getEmail())) {
+        if(!AuthUtil.checkFormatValidationEmail(signupRequest.getEmail())) {
             throw new CustomException(ErrorCode.INVALID_EMAIL_FORMAT);
         }
         // 4-2. 이메일 소문자로 변환
@@ -90,10 +92,26 @@ public class AuthService {
         presetRepository.save(preset);
     }
 
-    // 이메일 형식 검사 (형식에 맞으면 true, 형식에 맞지 않으면 false)
-    private boolean checkFormatValidationEmail(String email) {
-        String regex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
-        return email.matches(regex);
+    // 유저 로그인 아이디 중복 조회
+    public IsDuplicatedResponse isDuplicatedUserLoginId(String userLoginId) {
+        // 1. 아이디 형식 검사
+        if(!AuthUtil.checkFormatValidationUserLoginId(userLoginId)) {
+            throw new CustomException(ErrorCode.INVALID_USER_LOGIN_ID_FORMAT);
+        }
+        // 2. 아이디 중복 검사
+        boolean isDuplicated = this.checkDuplicateUserLoginId(userLoginId);
+        return IsDuplicatedResponse.createIsDuplicatedResponse(isDuplicated);
+    }
+
+    // 이메일 중복 조회
+    public IsDuplicatedResponse isDuplicatedEmail(String email) {
+        // 1. 이메일 형식 검사
+        if(!AuthUtil.checkFormatValidationEmail(email)) {
+            throw new CustomException(ErrorCode.INVALID_EMAIL_FORMAT);
+        }
+        // 2. 이메일 중복 검사
+        boolean isDuplicated = this.checkDuplicateEmail(email);
+        return IsDuplicatedResponse.createIsDuplicatedResponse(isDuplicated);
     }
 
     // 아이디 중복 검사 (유저 로그인 아이디로 검사. 이미 존재하면 true 반환)

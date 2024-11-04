@@ -31,9 +31,9 @@ public class HikingRepositoryImpl implements HikingRepositoryCustom {
     private final QContent content = QContent.content;
     private final JPAQueryFactory queryFactory;
 
-// 날짜만 가져오기
+    // 날짜만 가져오기
     @Override
-    public List<HikingCalendarQueryDto> getCalendar(User user) {
+    public List<HikingCalendarQueryDto> getCalendar(Long userId) {
         //날짜별로 하이킹 시간 조회
         return queryFactory.select(Projections.fields(
                 HikingCalendarQueryDto.class,
@@ -48,7 +48,7 @@ public class HikingRepositoryImpl implements HikingRepositoryCustom {
                 .leftJoin(hiking)
                 .on(
                             calendar.date.eq(Expressions.dateTemplate(Date.class, "DATE_TRUNC('day', {0})", hiking.startTime))
-                                .and(hiking.user.eq(user))
+                                .and(hiking.user.userId.eq(userId))
                                 .and(hiking.realEndTime.isNotNull())
                                 .and(hiking.realEndTime.after(hiking.endTime))
                 )
@@ -78,34 +78,10 @@ public class HikingRepositoryImpl implements HikingRepositoryCustom {
     }
 
     @Override
-    public HikingDetailQueryDto getHikingDetail(User user, Long hikingId) {
-
-        // "site" 타입의 상위 5개 BlockInfo 리스트 가져오기
-        List<BlockInfo> visitedSiteList = queryFactory.select(Projections.fields(
-                        BlockInfo.class,
-                        content.usingTime.as("usingTime"),
-                        content.name.as("name")
-                ))
-                .from(content)
-                .where(content.hiking.hikingId.eq(hikingId).and(content.type.eq("site")))
-                .orderBy(content.usingTime.desc())
-                .limit(5)
-                .fetch();
-
-        // "program" 타입의 상위 5개 BlockInfo 리스트 가져오기
-        List<BlockInfo> visitedProgramList = queryFactory.select(Projections.fields(
-                        BlockInfo.class,
-                        content.usingTime.as("usingTime"),
-                        content.name.as("name")
-                ))
-                .from(content)
-                .where(content.hiking.hikingId.eq(hikingId).and(content.type.eq("program")))
-                .orderBy(content.usingTime.desc())
-                .limit(5)
-                .fetch();
-
+    public HikingDetailQueryDto getHikingDetail(Long hikingId) {
         // 주요 Hiking 정보 가져오기
-        HikingDetailQueryDto hikingDetail = queryFactory.select(Projections.fields(
+
+        return queryFactory.select(Projections.fields(
                         HikingDetailQueryDto.class,
                         hiking.startTime.as("startTime"),
                         hiking.endTime.as("endTime"),
@@ -127,14 +103,8 @@ public class HikingRepositoryImpl implements HikingRepositoryCustom {
                 .where(hiking.hikingId.eq(hikingId))
                 .groupBy(hiking.hikingId)
                 .fetchOne();
-
-        if(hikingDetail != null) {
-            hikingDetail.setVisitedSiteList(visitedSiteList);
-            hikingDetail.setVisitedProgramList(visitedProgramList);
-        }
-
-        return hikingDetail;
     }
+
 
     @Override
     public HikingStatisticQueryDto getHikingStatistic(User findUser) {
