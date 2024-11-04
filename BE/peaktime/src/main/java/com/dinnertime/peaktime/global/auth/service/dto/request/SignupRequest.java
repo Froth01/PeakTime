@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class SignupRequest {
 
     // `/auth/signup` API를 호출할 때, Response Body에 빈 값이 오면 MethodArgumentNotValidException가 발생.

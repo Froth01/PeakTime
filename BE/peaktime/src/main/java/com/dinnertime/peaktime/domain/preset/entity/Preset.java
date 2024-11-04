@@ -8,6 +8,7 @@ import lombok.*;
 
 import org.hibernate.annotations.Type;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -60,7 +61,7 @@ public class Preset {
         return Preset.builder()
                 .title("기본 프리셋")
                 .blockWebsiteArray(blockWebsiteArray)
-                .blockProgramArray(null)
+                .blockProgramArray(new ArrayList<String>())
                 .user(user)
                 .build();
     }
