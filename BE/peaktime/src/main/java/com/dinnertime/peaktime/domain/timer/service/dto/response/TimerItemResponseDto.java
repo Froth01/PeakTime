@@ -19,11 +19,8 @@ public class TimerItemResponseDto {
     private int repeatDay;
 
     @Builder
-<<<<<<< HEAD
-    private TimerItemResponseDto(Long timerId, LocalDateTime startTime, LocalDateTime endTime, Boolean isRepeat, int repeatDay) {
-=======
+
     private TimerItemResponseDto(Long timerId, LocalDateTime startTime, int attentionTime, Boolean isRepeat, int repeatDay) {
->>>>>>> 5a806db8f55419a2b19c2ff1d254ca35973cd5f0
         this.timerId = timerId;
         this.startTime = startTime;
         this.attentionTime = attentionTime;
