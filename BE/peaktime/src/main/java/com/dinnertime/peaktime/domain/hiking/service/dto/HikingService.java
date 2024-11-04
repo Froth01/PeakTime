@@ -83,7 +83,7 @@ public class HikingService {
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
 
-        //날짜별로 횟수 카운트
+        //날짜별로 누적 시간 합치기
         List<HikingCalendarQueryDto> calendarList = hikingRepository.getCalendar(user);
 
         HikingCalendarResponseDto responseDto = HikingCalendarResponseDto.createHikingCalenderResponseDto(calendarList);
