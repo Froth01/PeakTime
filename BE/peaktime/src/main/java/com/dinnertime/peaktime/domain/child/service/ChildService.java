@@ -11,6 +11,7 @@ import com.dinnertime.peaktime.domain.usergroup.repository.UserGroupRepository;
 import com.dinnertime.peaktime.global.auth.service.AuthService;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
+import com.dinnertime.peaktime.global.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,8 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChildService {
 
     private final PasswordEncoder passwordEncoder;
-    private final AuthService authService;
-
     private final UserRepository userRepository;
     private final UserGroupRepository userGroupRepository;
     private final GroupRepository groupRepository;
@@ -42,17 +41,17 @@ public class ChildService {
         }
 
         // 2. 아이디 형식 확인
-        if(!authService.checkFormatValidationUserLoginId(requestDto.getChildLoginId())){
+        if(!AuthUtil.checkFormatValidationUserLoginId(requestDto.getChildLoginId())){
             throw new CustomException(ErrorCode.INVALID_USER_LOGIN_ID_FORMAT);
         }
 
         // 3. 아이디 중복 확인
-        if(authService.checkDuplicateUserLoginId(requestDto.getChildLoginId())){
+        if(this.checkDuplicateUserLoginId(requestDto.getChildLoginId())){
             throw new CustomException(ErrorCode.DUPLICATED_USER_LOGIN_ID);
         };
 
         // 4. 비밀번호 형식 확인
-        if(!authService.checkFormatValidationPassword(requestDto.getChildPassword())){
+        if(!AuthUtil.checkFormatValidationPassword(requestDto.getChildPassword())){
            throw new CustomException(ErrorCode.INVALID_PASSWORD_FORMAT);
         }
 
@@ -62,7 +61,7 @@ public class ChildService {
         }
 
         // 6. 닉네임 형식 확인
-        if(!authService.checkFormatValidationNickname(requestDto.getChildNickname())){
+        if(!AuthUtil.checkFormatValidationNickname(requestDto.getChildNickname())){
             throw new CustomException(ErrorCode.INVALID_NICKNAME_FORMAT);
         }
 
@@ -93,5 +92,10 @@ public class ChildService {
         // 3. user 테이블 수정 및 저장
         childUser.deleteUser();
         userRepository.save(childUser);
+    }
+
+    // 아이디 중복 검사 (유저 로그인 아이디로 검사. 이미 존재하면 true 반환)
+    private boolean checkDuplicateUserLoginId(String userLoginId) {
+        return userRepository.findByUserLoginId(userLoginId).isPresent();
     }
 }
