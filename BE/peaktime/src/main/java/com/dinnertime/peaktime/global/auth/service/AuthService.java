@@ -103,6 +103,17 @@ public class AuthService {
         return IsDuplicatedResponse.createIsDuplicatedResponse(isDuplicated);
     }
 
+    // 이메일 중복 조회
+    public IsDuplicatedResponse isDuplicatedEmail(String email) {
+        // 1. 이메일 형식 검사
+        if(!AuthUtil.checkFormatValidationEmail(email)) {
+            throw new CustomException(ErrorCode.INVALID_EMAIL_FORMAT);
+        }
+        // 2. 이메일 중복 검사
+        boolean isDuplicated = this.checkDuplicateEmail(email);
+        return IsDuplicatedResponse.createIsDuplicatedResponse(isDuplicated);
+    }
+
     // 아이디 중복 검사 (유저 로그인 아이디로 검사. 이미 존재하면 true 반환)
     private boolean checkDuplicateUserLoginId(String userLoginId) {
         return userRepository.findByUserLoginId(userLoginId).isPresent();

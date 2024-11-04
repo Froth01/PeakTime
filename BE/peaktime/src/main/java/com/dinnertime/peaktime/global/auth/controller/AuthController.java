@@ -66,4 +66,23 @@ public class AuthController {
                         "유저 로그인 아이디 중복 조회 요청에 성공하였습니다.", response));
     }
 
+    // 이메일 중복 조회
+    @Operation(summary = "이메일 중복 조회", description = "이메일 중복 조회하기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "이메일 중복 조회 요청에 성공하였습니다.",
+                    content = @Content(schema = @Schema(implementation = IsDuplicatedResponse.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 형식의 요청입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "500", description = "이메일 중복 조회 요청에 실패하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+    })
+    @GetMapping("/email")
+    public ResponseEntity<?> isDuplicatedEmail(@RequestParam String email) {
+        IsDuplicatedResponse response = authService.isDuplicatedEmail(email);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResultDto.res(HttpStatus.OK.value(),
+                        "이메일 중복 조회 요청에 성공하였습니다.", response));
+    }
+
 }
