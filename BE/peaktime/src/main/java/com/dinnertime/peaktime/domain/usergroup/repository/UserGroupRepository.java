@@ -18,4 +18,5 @@ public interface UserGroupRepository extends JpaRepository<UserGroup, Long> {
 
     // 자식 계정에 대한 user_group
     Optional<UserGroup> findByUser_UserId(Long userId);
+
 }

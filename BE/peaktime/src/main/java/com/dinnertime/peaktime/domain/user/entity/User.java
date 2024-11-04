@@ -67,6 +67,10 @@ public class User {
                 .build();
     }
 
+    public void updateChildUser(String nickname){
+        this.nickname = nickname;
+    }
+
     public void deleteUser(){
         this.email = null;
         this.isDelete = true;
