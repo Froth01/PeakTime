@@ -2,6 +2,7 @@ package com.dinnertime.peaktime.global.auth.controller;
 
 import com.dinnertime.peaktime.global.auth.service.AuthService;
 import com.dinnertime.peaktime.global.auth.service.dto.request.SignupRequest;
+import com.dinnertime.peaktime.global.auth.service.dto.response.IsDuplicatedResponse;
 import com.dinnertime.peaktime.global.util.CommonSwaggerResponse;
 import com.dinnertime.peaktime.global.util.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,9 +48,22 @@ public class AuthController {
     }
 
     // 유저 로그인 아이디 중복 조회
+    @Operation(summary = "유저 로그인 아이디 중복 조회", description = "유저 로그인 아이디 중복 조회하기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "유저 로그인 아이디 중복 조회 요청에 성공하였습니다.",
+                    content = @Content(schema = @Schema(implementation = IsDuplicatedResponse.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 형식의 요청입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "500", description = "유저 로그인 아이디 중복 조회 요청에 실패하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+    })
     @GetMapping("/user-login-id")
     public ResponseEntity<?> isDuplicatedUserLoginId(@RequestParam String userLoginId) {
-        //
+        IsDuplicatedResponse response = authService.isDuplicatedUserLoginId(userLoginId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResultDto.res(HttpStatus.OK.value(),
+                        "유저 로그인 아이디 중복 조회 요청에 성공하였습니다.", response));
     }
 
 }
