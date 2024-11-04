@@ -57,6 +57,7 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "유저 로그인 아이디 중복 조회 요청에 실패하였습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
+    @CommonSwaggerResponse.CommonResponses
     @GetMapping("/user-login-id")
     public ResponseEntity<?> isDuplicatedUserLoginId(@RequestParam String userLoginId) {
         IsDuplicatedResponse response = authService.isDuplicatedUserLoginId(userLoginId);
@@ -76,6 +77,7 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "이메일 중복 조회 요청에 실패하였습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
+    @CommonSwaggerResponse.CommonResponses
     @GetMapping("/email")
     public ResponseEntity<?> isDuplicatedEmail(@RequestParam String email) {
         IsDuplicatedResponse response = authService.isDuplicatedEmail(email);
