@@ -34,10 +34,10 @@ public class Timer {
     private Boolean isRepeat;
 
     @Column(name = "repeat_day", nullable = false)
-    private int[] repeatDay;
+    private int repeatDay;
 
     @Builder
-    private Timer(Group group, LocalDateTime startTime, LocalDateTime endTime, Boolean isRepeat, int[] repeatDay) {
+    private Timer(Group group, LocalDateTime startTime, LocalDateTime endTime, Boolean isRepeat, int repeatDay) {
         this.group = group;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -45,7 +45,7 @@ public class Timer {
         this.repeatDay = repeatDay;
     }
 
-    public static Timer createTimer(Group group, LocalDateTime startTime, LocalDateTime endTime, Boolean isRepeat, int[] repeatDay) {
+    public static Timer createTimer(Group group, LocalDateTime startTime, LocalDateTime endTime, Boolean isRepeat, int repeatDay) {
         return Timer.builder()
                 .group(group)
                 .startTime(startTime)

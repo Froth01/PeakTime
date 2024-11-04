@@ -16,10 +16,10 @@ public class TimerItemResponseDto {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private Boolean isRepeat;
-    private int[] repeatDay;
+    private int repeatDay;
 
     @Builder
-    private TimerItemResponseDto(Long timerId, LocalDateTime startTime, LocalDateTime endTime, Boolean isRepeat, int[] repeatDay) {
+    private TimerItemResponseDto(Long timerId, LocalDateTime startTime, LocalDateTime endTime, Boolean isRepeat, int repeatDay) {
         this.timerId = timerId;
         this.startTime = startTime;
         this.endTime = endTime;

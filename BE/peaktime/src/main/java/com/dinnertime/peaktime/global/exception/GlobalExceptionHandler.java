@@ -34,12 +34,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
-    // 400 bad request
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex) {
-
+    public ResponseEntity<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         ResultDto<Object> response = ResultDto.res(
                 HttpStatus.BAD_REQUEST.value(),
+                // Annotation에 설정된 메시지 추출 후 담기
                 ex.getBindingResult().getAllErrors().get(0).getDefaultMessage()
         );
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);

@@ -16,7 +16,15 @@ public enum ErrorCode {
     SUMMARY_NOT_FOUND("해당 요약 내용을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     MEMO_NOT_FOUND("해당 메모 내용을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     HIKING_NOT_FOUND("존재하지 않는 하이킹입니다.", HttpStatus.NOT_FOUND),
-    CHILD_ACCOUNT_HIKING_NOT_TERMINABLE("자식 계정은 하이킹 중 종료 할 수 없습니다.", HttpStatus.FORBIDDEN)
+    CHILD_ACCOUNT_HIKING_NOT_TERMINABLE("자식 계정은 하이킹 중 종료 할 수 없습니다.", HttpStatus.FORBIDDEN),
+    INVALID_USER_LOGIN_ID_FORMAT("잘못된 형식의 요청입니다.", HttpStatus.BAD_REQUEST),
+    INVALID_PASSWORD_FORMAT("잘못된 형식의 요청입니다.", HttpStatus.BAD_REQUEST),
+    INVALID_NICKNAME_FORMAT("잘못된 형식의 요청입니다.", HttpStatus.BAD_REQUEST),
+    INVALID_EMAIL_FORMAT("잘못된 형식의 요청입니다.", HttpStatus.BAD_REQUEST),
+    DUPLICATED_USER_LOGIN_ID("이미 존재하는 아이디이거나 이미 존재하는 이메일입니다.", HttpStatus.CONFLICT),
+    DUPLICATED_EMAIL("이미 존재하는 아이디이거나 이미 존재하는 이메일입니다.", HttpStatus.CONFLICT),
+    NOT_EQUAL_PASSWORD("잘못된 형식의 요청입니다.", HttpStatus.BAD_REQUEST),
+    FILE_NOT_FOUND("Default Block Website File을 찾을 수 없습니다.", HttpStatus.NOT_FOUND)
     ;
 
     private final String message;

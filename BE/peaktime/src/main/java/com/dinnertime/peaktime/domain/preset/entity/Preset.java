@@ -55,6 +55,16 @@ public class Preset {
                 .build();
     }
 
+    // 회원가입 시 자동생성되는 프리셋 생성
+    public static Preset createDefaultPreset(List<String>blockWebsiteArray, User user) {
+        return Preset.builder()
+                .title("기본 프리셋")
+                .blockWebsiteArray(blockWebsiteArray)
+                .blockProgramArray(null)
+                .user(user)
+                .build();
+    }
+
     // 프리셋 수정
     public void updatePreset(SavePresetRequestDto requestDto) {
         this.title = requestDto.getTitle();
