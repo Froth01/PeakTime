@@ -52,6 +52,7 @@ public class HikingRepositoryImpl implements HikingRepositoryCustom {
                             calendar.date.eq(Expressions.dateTemplate(Date.class, "DATE_TRUNC('day', {0})", hiking.startTime))
                                 .and(hiking.user.eq(user))
                                 .and(hiking.realEndTime.isNotNull())
+                                .and(hiking.realEndTime.after(hiking.endTime))
                 )
                 .groupBy(calendar.date)
                 .orderBy(calendar.date.asc())
@@ -70,9 +71,9 @@ public class HikingRepositoryImpl implements HikingRepositoryCustom {
                 ))
                 .from(hiking)
                 .where(
-                        hiking.user.eq(user),
-                        hiking.realEndTime.isNotNull(),
-                        Expressions.dateTemplate(LocalDate.class, "DATE({0})", hiking.startTime).eq(date)
+                        hiking.user.eq(user)
+                                .and(hiking.realEndTime.isNotNull())
+                                .and(Expressions.dateTemplate(LocalDate.class, "DATE({0})", hiking.startTime).eq(date))
                 )
                 .orderBy(hiking.startTime.asc())
                 .fetch();
