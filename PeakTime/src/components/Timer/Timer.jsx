@@ -77,18 +77,17 @@ function Timer() {
           };
           console.log("보낼 바디 :", startHikingData);
 
-          // API 요청 및 응답 처리
-          const response = await hikingsApi.post("", startHikingData);
-          console.log("API 응답 데이터:", response.data); // 디버깅용
+          // API 요청
+          const responseStartHiking = await hikingsApi.post(
+            "",
+            startHikingData
+          );
 
           // 상태 업데이트
-          setStartedHikingId(response.data.data.hikingId);
+          setStartedHikingId(responseStartHiking.data.data.hikingId);
           setTotalTime(time);
           setRemainTime(time * 60 - 1); // 분 단위로 받은 시간을 초로 변환
           setIsRunning(true);
-
-          // 상태가 변경된 후에도 제대로 업데이트 되는지 확인
-          console.log("설정된 하이킹 ID:", response.data.data.hikingId);
         } catch (err) {
           console.error("API 요청 중 오류 발생:", err);
 

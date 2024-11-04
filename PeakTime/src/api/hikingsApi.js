@@ -5,7 +5,7 @@ import axios from "axios";
 
 // axios 객체 만들기
 const hikingsApi = axios.create({
-  baseURL: `https://k11b309.p.ssafy.io/api/v1/hikings`,
+  baseURL: `/api/v1/hikings`,
 }); // BASE_URL/api/vi/directories?category={category}
 
 // axios 객체에 요청 인터셉터 추가하기 (헤더에 JWT Token 삽입하기)
