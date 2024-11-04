@@ -34,4 +34,10 @@ public class AuthUtil {
         String regex = "^[a-zA-Z0-9가-힣]{2,8}$";
         return nickname.matches(regex);
     }
+
+    // 이메일 형식 검사 (형식에 맞으면 true, 형식에 맞지 않으면 false)
+    public static boolean checkFormatValidationEmail(String email) {
+        String regex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+        return email.matches(regex);
+    }
 }
