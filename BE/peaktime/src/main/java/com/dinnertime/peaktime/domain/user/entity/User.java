@@ -67,8 +67,12 @@ public class User {
                 .build();
     }
 
-    public void updateChildUser(String nickname){
+    public void updateNickname(String nickname){
         this.nickname = nickname;
+    }
+
+    public void updatePassword(String password){
+        this.password = password;
     }
 
     public void deleteUser(){

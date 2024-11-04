@@ -1,6 +1,7 @@
 package com.dinnertime.peaktime.domain.child.controller;
 
 import com.dinnertime.peaktime.domain.child.service.ChildService;
+import com.dinnertime.peaktime.domain.child.service.dto.request.ChangeChildPasswordRequestDto;
 import com.dinnertime.peaktime.domain.child.service.dto.request.CreateChildRequestDto;
 import com.dinnertime.peaktime.domain.child.service.dto.request.UpdateChildRequestDto;
 import com.dinnertime.peaktime.global.util.CommonSwaggerResponse;
@@ -82,6 +83,26 @@ public class ChildController {
                                          @Valid @RequestBody UpdateChildRequestDto requestDto){
 
         childService.updateChild(childId, requestDto);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResultDto.res(HttpStatus.OK.value(), "자식 계정 수정에 성공하였습니다."));
+    }
+
+    @Operation(summary = "자식 계정 비밀번호 변경", description = "루트 유저가 자식 계정의 비밀번호 변경")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "자식 계정 비밀번호 변경에 성공하였습니다.",
+                    content = {@Content(schema = @Schema(implementation = ResultDto.class))}),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 계정입니다.",
+                    content = {@Content(schema = @Schema(implementation = ResultDto.class))}),
+            @ApiResponse(responseCode = "500", description = "자식 계정 비밀번호 변경에 실패하였습니다.",
+                    content = {@Content(schema = @Schema(implementation = ResultDto.class))})
+    })
+    @CommonSwaggerResponse.CommonResponses
+    @PutMapping("/{child-id}/password")
+    public ResponseEntity<?> changeChildPassword(@PathVariable("child-id") Long childId,
+                                         @Valid @RequestBody ChangeChildPasswordRequestDto requestDto){
+
+        childService.changeChildPassword(childId, requestDto);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ResultDto.res(HttpStatus.OK.value(), "자식 계정 수정에 성공하였습니다."));
