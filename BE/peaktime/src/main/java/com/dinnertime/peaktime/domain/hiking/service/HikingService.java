@@ -1,19 +1,17 @@
-package com.dinnertime.peaktime.domain.hiking.service.dto;
+package com.dinnertime.peaktime.domain.hiking.service;
 
 import com.dinnertime.peaktime.domain.content.entity.Content;
 import com.dinnertime.peaktime.domain.content.repository.ContentRepository;
 import com.dinnertime.peaktime.domain.hiking.entity.Hiking;
 import com.dinnertime.peaktime.domain.hiking.repository.HikingRepository;
-import com.dinnertime.peaktime.domain.hiking.service.dto.query.BlockInfo;
+import com.dinnertime.peaktime.domain.hiking.service.dto.query.UsingInfo;
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingCalendarDetailQueryDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingCalendarQueryDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingDetailQueryDto;
+import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingStatisticQueryDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.request.EndHikingRequestDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.request.StartHikingRequestDto;
-import com.dinnertime.peaktime.domain.hiking.service.dto.response.HikingCalendarDetailResponseDto;
-import com.dinnertime.peaktime.domain.hiking.service.dto.response.HikingCalendarResponseDto;
-import com.dinnertime.peaktime.domain.hiking.service.dto.response.HikingDetailResponseDto;
-import com.dinnertime.peaktime.domain.hiking.service.dto.response.StartHikingResponseDto;
+import com.dinnertime.peaktime.domain.hiking.service.dto.response.*;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
 import com.dinnertime.peaktime.global.exception.CustomException;
@@ -26,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -36,7 +35,7 @@ public class HikingService {
     private final ContentRepository contentRepository;
 
     @Transactional
-    public StartHikingResponseDto startHiking(/*Long id, */StartHikingRequestDto requestDto) {
+    public StartHikingResponseDto startHiking(/*Long userId, */StartHikingRequestDto requestDto) {
         //유저 없으면 에러
         User user = userRepository.findByUserIdAndIsDeleteFalse(1L).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
@@ -90,13 +89,9 @@ public class HikingService {
     }
 
     @Transactional(readOnly = true)
-    public HikingCalendarDetailResponseDto getCalendarByDate(/*Long id, */LocalDate date) {
-        //유저 조회
-        User user = userRepository.findByUserIdAndIsDeleteFalse(1L).orElseThrow(
-                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
-        );
+    public HikingCalendarDetailResponseDto getCalendarByDate(/*Long userId, */LocalDate date) {
 
-        List<HikingCalendarDetailQueryDto> calendarByDateList = hikingRepository.getCalendarByDate(date, user);
+        List<HikingCalendarDetailQueryDto> calendarByDateList = hikingRepository.getCalendarByDate(date, /*userId*/ 1L);
 
         log.info(calendarByDateList.toString());
 
@@ -104,7 +99,7 @@ public class HikingService {
     }
 
     @Transactional(readOnly = true)
-    public HikingDetailResponseDto getHikingDetail(/*Long id, */Long hikingId) {
+    public HikingDetailResponseDto getHikingDetail(/*Long userId, */Long hikingId) {
 
         //디테일 조회
         HikingDetailQueryDto hikingDetail = hikingRepository.getHikingDetail(hikingId);
@@ -112,8 +107,8 @@ public class HikingService {
         //없으면 null 반환
         if(hikingDetail==null) return null;
 
-        List<BlockInfo> visitedSiteList = contentRepository.getTopBlockInfoList("site", hikingId);
-        List<BlockInfo> visitedProgramList = contentRepository.getTopBlockInfoList("program", hikingId);
+        List<UsingInfo> visitedSiteList = contentRepository.getTopUsingInfoList("site", hikingId);
+        List<UsingInfo> visitedProgramList = contentRepository.getTopUsingInfoList("program", hikingId);
 
         hikingDetail.setVisitedSiteList(visitedSiteList);
         hikingDetail.setVisitedProgramList(visitedProgramList);
@@ -121,6 +116,33 @@ public class HikingService {
         log.info(hikingDetail.toString());
 
         return HikingDetailResponseDto.createHikingDetailResponseDto(hikingDetail);
+
+    }
+
+    @Transactional(readOnly = true)
+    public HikingStatisticResponseDto getHikingStatistic(/*Long userId,*/ Long childUserId) {
+
+        Long findUserId = Optional.ofNullable(childUserId).orElse(/*userId*/1L);
+
+        User findUser = userRepository.findById(findUserId).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+
+        HikingStatisticQueryDto hikingStatistic = hikingRepository.getHikingStatistic(findUserId);
+
+        if(hikingStatistic==null) return null;
+        //전체 차단 접근 횟수
+        Long totalBlockedCount = hikingRepository.getTotalBlockedCount(findUserId);
+        //사이트 리스트 조회
+        List<UsingInfo> siteList = contentRepository.getTopUsingInfoListByUserId("site", findUserId);
+        //프로그램 리스트 조회
+        List<UsingInfo> programList = contentRepository.getTopUsingInfoListByUserId("program", findUserId);
+        //선호 시간 조회
+        Integer preferTime = hikingRepository.getPreferTimeByUserId(findUserId);
+
+        log.info(hikingStatistic.toString());
+
+        return HikingStatisticResponseDto.createHikingStatisticResponseDto(hikingStatistic, totalBlockedCount, findUser.getNickname(), siteList, programList, preferTime);
 
     }
 }

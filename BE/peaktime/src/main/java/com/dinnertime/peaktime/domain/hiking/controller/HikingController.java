@@ -1,12 +1,9 @@
 package com.dinnertime.peaktime.domain.hiking.controller;
 
-import com.dinnertime.peaktime.domain.hiking.service.dto.HikingService;
+import com.dinnertime.peaktime.domain.hiking.service.HikingService;
 import com.dinnertime.peaktime.domain.hiking.service.dto.request.EndHikingRequestDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.request.StartHikingRequestDto;
-import com.dinnertime.peaktime.domain.hiking.service.dto.response.HikingCalendarDetailResponseDto;
-import com.dinnertime.peaktime.domain.hiking.service.dto.response.HikingCalendarResponseDto;
-import com.dinnertime.peaktime.domain.hiking.service.dto.response.HikingDetailResponseDto;
-import com.dinnertime.peaktime.domain.hiking.service.dto.response.StartHikingResponseDto;
+import com.dinnertime.peaktime.domain.hiking.service.dto.response.*;
 import com.dinnertime.peaktime.global.util.CommonSwaggerResponse;
 import com.dinnertime.peaktime.global.util.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,10 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.file.attribute.UserPrincipal;
 import java.time.LocalDate;
 
 @Slf4j
@@ -126,6 +121,28 @@ public class HikingController {
     public ResponseEntity<?> getHikingDetail(@PathVariable("hiking-id") Long hikingId) {
 
         HikingDetailResponseDto responseDto = hikingService.getHikingDetail(hikingId);
+
+        log.info(responseDto.toString());
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "하이킹 내역 상세를 조회하는데 성공하였습니다.", responseDto));
+    }
+
+    @Operation(summary = "하이킹 통계 내역 조회", description = "하이킹 통계 내역 조회하기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "하이킹 통계 내역을 조회하는데 성공했습니다.",
+                    content = @Content(schema= @Schema(implementation = ResultDto.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "하이킹 통계 내역을 조회하는데 실패했습니다.",
+                    content= @Content(schema= @Schema(implementation = ResultDto.class))
+            )
+    })
+    @CommonSwaggerResponse.CommonResponses
+    @GetMapping(value = "/statistics")
+    public ResponseEntity<?> getHikingStatistics(
+            /*@AuthenticationPrincipal UserPrincipal userPrincipal,*/
+            @RequestParam(value = "user-id", required = false) Long childUserId) {
+
+        HikingStatisticResponseDto responseDto = hikingService.getHikingStatistic(/*userPrincipal.getUserId(),*/childUserId);
 
         log.info(responseDto.toString());
 

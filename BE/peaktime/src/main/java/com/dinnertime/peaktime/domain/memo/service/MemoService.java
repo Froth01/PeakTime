@@ -2,6 +2,7 @@ package com.dinnertime.peaktime.domain.memo.service;
 
 import com.dinnertime.peaktime.domain.memo.entity.Memo;
 import com.dinnertime.peaktime.domain.memo.repository.MemoRepository;
+import com.dinnertime.peaktime.domain.memo.service.dto.request.SaveMemoRequestDto;
 import com.dinnertime.peaktime.domain.memo.service.dto.response.MemoSummaryResponseDto;
 import com.dinnertime.peaktime.domain.memo.service.dto.response.MemoWrapperResponseDto;
 import com.dinnertime.peaktime.domain.summary.entity.Summary;
@@ -79,6 +80,19 @@ public class MemoService {
 
         return responseDto;
 
+    }
+
+    // ex에서 받은 메모 정보 저장
+    @Transactional
+    public void createMemo(UserPrincipal userPrincipal, SaveMemoRequestDto requestDto) {
+
+        // userPrincipal.getUserId()
+        // userId = 1로 임의 설정
+        User user = userRepository.findByUserIdAndIsDeleteFalse(1)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Memo memo = Memo.createMemo(requestDto, user);
+        memoRepository.save(memo);
     }
 
 

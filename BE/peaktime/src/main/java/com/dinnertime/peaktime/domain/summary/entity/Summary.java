@@ -30,7 +30,23 @@ public class Summary {
     @Builder
     private Summary(LocalDateTime updateAt, String content, Memo memo) {
         this.updateAt = updateAt;
-        this.content = content;
+        this.content = content; // gpt 내용이 담겨야 함
         this.memo = memo;
     }
+
+    // 요약 내용 저장
+    public static Summary createSummary(String GPTContent, Memo memo) {
+        return Summary.builder()
+                .updateAt(LocalDateTime.now())
+                .content(GPTContent) // gpt 내용이 담겨야 함
+                .memo(memo)
+                .build();
+    }
+
+    // 요약 내용 수정
+    public void updateSummary(String GPTContent) {
+        this.updateAt = LocalDateTime.now();
+        this.content = GPTContent; // gpt 내용이 담겨야 함
+    }
+
 }
