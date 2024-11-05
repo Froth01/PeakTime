@@ -8,6 +8,7 @@ import lombok.*;
 
 import org.hibernate.annotations.Type;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -51,6 +52,16 @@ public class Preset {
                 .title(requestDto.getTitle())
                 .blockWebsiteArray(Arrays.asList(requestDto.getBlockWebsiteList()))
                 .blockProgramArray(Arrays.asList(requestDto.getBlockProgramList()))
+                .user(user)
+                .build();
+    }
+
+    // 회원가입 시 자동생성되는 프리셋 생성
+    public static Preset createDefaultPreset(List<String>blockWebsiteArray, User user) {
+        return Preset.builder()
+                .title("기본 프리셋")
+                .blockWebsiteArray(blockWebsiteArray)
+                .blockProgramArray(new ArrayList<String>())
                 .user(user)
                 .build();
     }
