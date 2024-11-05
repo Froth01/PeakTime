@@ -3,7 +3,7 @@ document.addEventListener("hikingStart", () => {
   window.electronAPI.sendWebSocketMessage(
     JSON.stringify({
       action: "start",
-      websiteList: ["www.naver.com", "www.youtube.com"],
+      websiteList: ["www.naver.com"],
       role: "root",
       presetId: 1,
       hikingId: 1,

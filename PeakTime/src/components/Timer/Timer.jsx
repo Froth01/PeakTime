@@ -69,7 +69,9 @@ function Timer() {
 
           const format = `${year}-${("00" + month.toString()).slice(-2)}-${(
             "00" + day.toString()
-          ).slice(-2)} ${hour}:${minute}:${second}`;
+          ).slice(-2)} ${("00" + hour.toString()).slice(-2)}:${(
+            "00" + minute.toString()
+          ).slice(-2)}:${("00" + second.toString()).slice(-2)}`;
 
           const startHikingData = {
             startTime: format,
@@ -155,12 +157,27 @@ function Timer() {
             width: 4px;
             height: 30%;
             transform: rotate(${(new Date().getHours() % 12) * 30}deg);
+            border-radius: 50px;
+            background: linear-gradient(180deg, #86C8E3 0%, #263439 100%);
+            box-shadow: 0px 0px 15px 3px #7FBFDA;
           }
           .minute-hand {
             width: 2px;
             height: 45%;
             transform: rotate(${new Date().getMinutes() * 6}deg);
             transfrom: translateY(-50%);
+            border-radius: 50px;
+            background: linear-gradient(180deg, #86C8E3 0%, #263439 100%);
+            box-shadow: 0px 0px 15px 3px #7FBFDA;
+          }
+          .middle {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 15px;
+            height: 15px;
+            border-radius: 100%;
+            transform: translate(-50%, -50%);
           }
           input[type="number"]::-webkit-outer-spin-button,
           input[type="number"]::-webkit-inner-spin-button {
@@ -192,12 +209,12 @@ function Timer() {
           }
         `}
       </style>
-      <div className="absolute w-[30%] h-[100%] right-0 bg-green-200 bg-opacity-50 flex flex-col items-center">
-        <div className="w-[40vh] h-[40vh] relative top-[20%]">
+      <div className="absolute w-[28%] h-[96%] right-0 bg-[#333333] bg-opacity-60 flex flex-col items-center rounded-lg my-[2vh] mx-[2vw]">
+        <div className="w-[40vh] h-[40vh] relative top-[15%]">
           <div className="timer overflow-hidden">
             <div className="mask"></div>
           </div>
-          <div className="absolute top-[70%] left-[50%] translate-x-[-50%] remain">
+          <div className="absolute top-[70%] left-[50%] translate-x-[-50%] remain text-3xl">
             {isRunning
               ? formatTime(remainTime)
               : `${("00" + new Date().getHours().toString()).slice(-2)}:${(
@@ -208,17 +225,28 @@ function Timer() {
             <>
               <div className="hour-hand"></div>
               <div className="minute-hand"></div>
+              <div className="middle z-10 bg-[#66AADF]"></div>
             </>
           )}
           {!isRunning && (
-            <div className="top-[10%]">
+            <div className="flex flex-col mt-[15%] items-center">
               <input
+                id="hikingStart"
                 type="number"
                 value={inputTime}
                 onChange={(e) => setInputTime(e.target.value)}
-                placeholder="분 단위로 입력"
+                className="hover:border-[#66AADF] rounded-xl"
+                placeholder="하이킹 시간을 입력해주세요"
               />
-              <button onClick={handleStart} id="start">
+              <label htmlFor="hikingStart" className="text-sm text-white">
+                *분 단위로 입력해주세요.<br></br>최소 30분부터 240분까지
+                가능합니다.
+              </label>
+              <button
+                className="w-[10vw] h-[6vh] mt-[10%] rounded-xl text-white bg-[#03c777]"
+                onClick={handleStart}
+                id="start"
+              >
                 시작
               </button>
             </div>
