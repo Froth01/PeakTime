@@ -4,6 +4,7 @@ import com.dinnertime.peaktime.domain.content.entity.Content;
 import com.dinnertime.peaktime.domain.content.repository.ContentRepository;
 import com.dinnertime.peaktime.domain.hiking.entity.Hiking;
 import com.dinnertime.peaktime.domain.hiking.repository.HikingRepository;
+import com.dinnertime.peaktime.domain.hiking.service.dto.query.BlockInfo;
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingCalendarDetailQueryDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingCalendarQueryDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingDetailQueryDto;
@@ -50,11 +51,8 @@ public class HikingService {
         return StartHikingResponseDto.createStartHikingResponseDto(hiking.getHikingId());
     }
 
-    public void endHiking(/*Long id, */EndHikingRequestDto requestDto, Long hikingId) {
-        //유저 조회
-        User user = userRepository.findByUserIdAndIsDeleteFalse(1L).orElseThrow(
-                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
-        );
+    @Transactional
+    public void endHiking(EndHikingRequestDto requestDto, Long hikingId) {
 
         //하이킹 조회
         Hiking hiking = hikingRepository.findById(hikingId).orElseThrow(
@@ -80,13 +78,9 @@ public class HikingService {
 
     @Transactional(readOnly = true)
     public HikingCalendarResponseDto getCalendar(/*Long userId*/) {
-        //유저 조회
-        User user = userRepository.findByUserIdAndIsDeleteFalse(1L).orElseThrow(
-                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
-        );
 
         //날짜별로 누적 시간 합치기
-        List<HikingCalendarQueryDto> calendarList = hikingRepository.getCalendar(user);
+        List<HikingCalendarQueryDto> calendarList = hikingRepository.getCalendar(/*userId*/1L);
 
         HikingCalendarResponseDto responseDto = HikingCalendarResponseDto.createHikingCalenderResponseDto(calendarList);
 
@@ -111,12 +105,18 @@ public class HikingService {
 
     @Transactional(readOnly = true)
     public HikingDetailResponseDto getHikingDetail(/*Long id, */Long hikingId) {
-        //유저 조회
-        User user = userRepository.findByUserIdAndIsDeleteFalse(1L).orElseThrow(
-                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
-        );
 
-        HikingDetailQueryDto hikingDetail = hikingRepository.getHikingDetail(user, hikingId);
+        //디테일 조회
+        HikingDetailQueryDto hikingDetail = hikingRepository.getHikingDetail(hikingId);
+
+        //없으면 null 반환
+        if(hikingDetail==null) return null;
+
+        List<BlockInfo> visitedSiteList = contentRepository.getTopBlockInfoList("site", hikingId);
+        List<BlockInfo> visitedProgramList = contentRepository.getTopBlockInfoList("program", hikingId);
+
+        hikingDetail.setVisitedSiteList(visitedSiteList);
+        hikingDetail.setVisitedProgramList(visitedProgramList);
 
         log.info(hikingDetail.toString());
 

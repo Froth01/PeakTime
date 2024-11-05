@@ -71,8 +71,8 @@ public class HikingController {
     })
     @CommonSwaggerResponse.CommonResponses
     @PutMapping("/{hiking-id}")
-    public ResponseEntity<?> endHiking(/*@AuthenticationPrincipal UserPrincipal userPrincipal, */@RequestBody @Valid EndHikingRequestDto requestDto, @PathVariable("hiking-id") Long hikingId) {
-        hikingService.endHiking(/*userPrincipal.getUserId(), */ requestDto, hikingId);
+    public ResponseEntity<?> endHiking(@RequestBody @Valid EndHikingRequestDto requestDto, @PathVariable("hiking-id") Long hikingId) {
+        hikingService.endHiking(requestDto, hikingId);
 
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "하이킹을 종료하는데 성공하였습니다."));
     }
@@ -123,10 +123,9 @@ public class HikingController {
     })
     @CommonSwaggerResponse.CommonResponses
     @GetMapping(value = "/{hiking-id}")
-    public ResponseEntity<?> getHikingDetail(
-            /*@AuthenticationPrincipal UserPrincipal userPrincipal,*/
-            @PathVariable("hiking-id") Long hikingId) {
-        HikingDetailResponseDto responseDto = hikingService.getHikingDetail(/*userPrincipal.getUserId(),*/ hikingId);
+    public ResponseEntity<?> getHikingDetail(@PathVariable("hiking-id") Long hikingId) {
+
+        HikingDetailResponseDto responseDto = hikingService.getHikingDetail(hikingId);
 
         log.info(responseDto.toString());
 
