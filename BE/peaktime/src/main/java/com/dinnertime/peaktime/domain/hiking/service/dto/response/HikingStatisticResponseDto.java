@@ -15,13 +15,13 @@ public class HikingStatisticResponseDto {
 
     private String nickname;
 
-    private int totalHikingTime;
+    private Integer totalHikingTime;
 
     private Long totalHikingCount;
 
-    private int totalSuccessCount;
+    private Integer totalSuccessCount;
 
-    private int totalBlockedCount;
+    private Integer totalBlockedCount;
 
     private int preferTimeZone;
 
@@ -30,7 +30,7 @@ public class HikingStatisticResponseDto {
     private List<BlockInfo> mostProgramList;
 
     @Builder
-    private HikingStatisticResponseDto(String nickname, int totalHikingTime, Long totalHikingCount, int totalSuccessCount, int totalBlockedCount, int preferTimeZone, List<BlockInfo> mostSiteList, List<BlockInfo> mostProgramList) {
+    private HikingStatisticResponseDto(String nickname, Integer totalHikingTime, Long totalHikingCount, Integer totalSuccessCount, Integer totalBlockedCount, int preferTimeZone, List<BlockInfo> mostSiteList, List<BlockInfo> mostProgramList) {
         this.nickname = nickname;
         this.totalHikingTime = totalHikingTime;
         this.totalHikingCount = totalHikingCount;
@@ -41,16 +41,16 @@ public class HikingStatisticResponseDto {
         this.mostProgramList = mostProgramList;
     }
 
-    public static HikingStatisticResponseDto createHikingStatisticResponseDto(HikingStatisticQueryDto hikingStatisticQueryDto, String nickname) {
+    public static HikingStatisticResponseDto createHikingStatisticResponseDto(HikingStatisticQueryDto hikingStatisticQueryDto, String nickname, List<BlockInfo> mostSiteList, List<BlockInfo> mostProgramList, int preferTimeZone) {
         return HikingStatisticResponseDto.builder()
                 .nickname(nickname)
                 .totalHikingTime(hikingStatisticQueryDto.getTotalHikingTime())
                 .totalHikingCount(hikingStatisticQueryDto.getTotalHikingCount())
                 .totalSuccessCount(hikingStatisticQueryDto.getTotalHikingSuccessCount())
                 .totalBlockedCount(hikingStatisticQueryDto.getTotalBlockedCount())
-                .preferTimeZone(hikingStatisticQueryDto.getPreferTimeZone())
-                .mostSiteList(hikingStatisticQueryDto.getMostSiteList())
-                .mostProgramList(hikingStatisticQueryDto.getMostProgramList())
+                .preferTimeZone(preferTimeZone)
+                .mostSiteList(mostSiteList)
+                .mostProgramList(mostProgramList)
                 .build();
     }
 }

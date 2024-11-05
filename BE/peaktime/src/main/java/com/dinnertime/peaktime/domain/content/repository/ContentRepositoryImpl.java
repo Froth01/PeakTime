@@ -3,6 +3,7 @@ package com.dinnertime.peaktime.domain.content.repository;
 import com.dinnertime.peaktime.domain.content.entity.QContent;
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.BlockInfo;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -21,13 +22,31 @@ public class ContentRepositoryImpl implements ContentRepositoryCustom {
     public List<BlockInfo> getTopBlockInfoList(String type, Long hikingId) {
         return queryFactory.select(Projections.fields(
                         BlockInfo.class,
-                        content.usingTime.as("usingTime"),
+                        content.usingTime.sum().as("usingTime"),
                         content.name.as("name")
                 ))
                 .from(content)
                 .where(content.hiking.hikingId.eq(hikingId).and(content.type.eq(type)))
-                .orderBy(content.usingTime.desc())
+                .groupBy(content.name)
+                .orderBy(content.usingTime.sum().desc())
                 .limit(5)
                 .fetch();
     }
+
+    @Override
+    public List<BlockInfo> getTopBlockInfoListByUserId(String type, Long userId) {
+        return queryFactory.select(Projections.fields(
+                        BlockInfo.class,
+                        content.usingTime.sum().as("usingTime"),
+                        content.name.as("name")
+                ))
+                .from(content)
+                .where(content.hiking.user.userId.eq(userId)
+                        .and(content.type.eq(type)))
+                .groupBy(content.name)
+                .orderBy(content.usingTime.sum().desc())
+                .limit(5)
+                .fetch();
+    }
+
 }

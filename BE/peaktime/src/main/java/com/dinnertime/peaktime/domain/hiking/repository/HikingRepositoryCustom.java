@@ -14,9 +14,11 @@ import java.util.List;
 public interface HikingRepositoryCustom {
     List<HikingCalendarQueryDto> getCalendar(Long userId);
 
-    List<HikingCalendarDetailQueryDto> getCalendarByDate(LocalDate date, User user);
+    List<HikingCalendarDetailQueryDto> getCalendarByDate(LocalDate date, Long userId);
 
     HikingDetailQueryDto getHikingDetail(Long hikingId);
 
-    HikingStatisticQueryDto getHikingStatistic(User findUser);
+    HikingStatisticQueryDto getHikingStatistic(Long findUserId);
+
+    Integer getPreferTimeByUserId(Long userId);
 }
