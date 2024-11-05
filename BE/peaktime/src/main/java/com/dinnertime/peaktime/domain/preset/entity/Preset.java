@@ -75,10 +75,8 @@ public class Preset {
     }
 
     // 웹사이트 프리셋 추가
-    public void addWebsitePreset(AddUrlPresetRequestDto requestDto, Preset preset) {
-        List<String> blockWebsiteArray = preset.getBlockWebsiteArray();
-        blockWebsiteArray.add(requestDto.getUrl());
-        this.blockWebsiteArray = blockWebsiteArray;
+    public void addWebsitePreset(AddUrlPresetRequestDto requestDto) {
+        this.blockWebsiteArray.add(requestDto.getUrl());
     }
 
 }

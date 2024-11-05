@@ -104,7 +104,7 @@ public class PresetService {
         Preset preset = presetRepository.findByPresetId(presetId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PRESET_NOT_FOUND));
 
-        preset.addWebsitePreset(requestDto, preset);
+        preset.addWebsitePreset(requestDto);
 
         presetRepository.save(preset);
     }
