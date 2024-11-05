@@ -6,8 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.attribute.UserPrincipal;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -16,13 +14,13 @@ public class SummaryFacade {
     private final SummaryService summaryService;
     private final ChatGPTService chatGPTService;
 
-    public void createOrUpdateSummary(UserPrincipal userPrincipal, SaveSummaryRequestDto requestDto){
+    public void createOrUpdateSummary(SaveSummaryRequestDto requestDto){
 
         String GPTContent = chatGPTService.getGPTResult(requestDto);
-        summaryService.createOrUpdateSummary(userPrincipal, requestDto, GPTContent);
+        summaryService.createOrUpdateSummary(requestDto, GPTContent);
     }
 
-    public void deleteSummary(UserPrincipal userPrincipal, Long summaryId){
-        summaryService.deleteSummary(userPrincipal, summaryId);
+    public void deleteSummary(Long summaryId){
+        summaryService.deleteSummary(summaryId);
     }
 }

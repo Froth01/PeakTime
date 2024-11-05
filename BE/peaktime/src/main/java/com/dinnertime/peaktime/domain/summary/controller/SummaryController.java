@@ -46,7 +46,7 @@ public class SummaryController {
         log.info("createSummary 메서드가 호출되었습니다.");
         log.info("요약 생성 : " + requestDto.toString());
 
-        summaryFacade.createOrUpdateSummary(userPrincipal, requestDto);
+        summaryFacade.createOrUpdateSummary(requestDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "요약 생성 및 수정에 성공했습니다."));
 
@@ -73,7 +73,7 @@ public class SummaryController {
 
         log.info("deleteSummary  메서드가 호출되었습니다.");
 
-        summaryFacade.deleteSummary(userPrincipal, summaryId);
+        summaryFacade.deleteSummary(summaryId);
 
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(),"프리셋 삭제에 성공했습니다."));
     }
