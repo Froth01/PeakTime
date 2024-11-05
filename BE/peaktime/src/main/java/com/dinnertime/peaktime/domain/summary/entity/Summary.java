@@ -1,7 +1,6 @@
 package com.dinnertime.peaktime.domain.summary.entity;
 
 import com.dinnertime.peaktime.domain.memo.entity.Memo;
-import com.dinnertime.peaktime.domain.summary.service.dto.request.SaveSummaryRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -45,10 +44,9 @@ public class Summary {
     }
 
     // 요약 내용 수정
-    public void updateSummary(String GPTContent, Memo memo) {
+    public void updateSummary(String GPTContent) {
         this.updateAt = LocalDateTime.now();
         this.content = GPTContent; // gpt 내용이 담겨야 함
-        this.memo = memo;
     }
 
 }
