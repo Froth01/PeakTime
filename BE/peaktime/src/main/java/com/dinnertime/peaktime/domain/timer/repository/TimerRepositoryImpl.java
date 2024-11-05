@@ -28,7 +28,7 @@ public class TimerRepositoryImpl implements TimerRepositoryCustom {
                 "AND ( " +
                 "      ((t.repeat_day & :repeatDayNumber) != 0) " + // 요일이 설정된 경우
                 "      OR " +
-                "      (t.repeat_day = 0 AND (1 << (7 - CAST(EXTRACT(DOW FROM t.start_time) AS INTEGER))) & :repeatDayNumber != 0) " + // repeat_day가 0인 경우 t.start_time의 요일로 비트마스킹 적용
+                "      (t.repeat_day = 0 AND (1 << (CASE WHEN EXTRACT(DOW FROM t.start_time) = 0 THEN 0 ELSE 7 - CAST(EXTRACT(DOW FROM t.start_time) AS INTEGER) END)) & :repeatDayNumber != 0) " +
                 "    )";
 
         Long count = (Long) entityManager.createNativeQuery(query)
