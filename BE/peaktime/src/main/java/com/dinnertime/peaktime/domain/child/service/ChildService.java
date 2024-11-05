@@ -37,7 +37,7 @@ public class ChildService {
         Group group = groupRepository.findByGroupIdAndIsDeleteFalse(requestDto.getGroupId())
                 .orElseThrow(() -> new CustomException(ErrorCode.GROUP_NOT_FOUND));
 
-        Long userCount = userGroupRepository.countAllByGroup(group);
+        Long userCount = userGroupRepository.countAllByGroup_groupId(requestDto.getGroupId());
         if(userCount >= 30) {
             throw new CustomException(ErrorCode.FAILED_CREATE_CHILD_USER);
         }
@@ -47,34 +47,37 @@ public class ChildService {
             throw new CustomException(ErrorCode.INVALID_USER_LOGIN_ID_FORMAT);
         }
 
-        // 3. 아이디 중복 확인
-        if(this.checkDuplicateUserLoginId(requestDto.getChildLoginId())){
+        // 3. 아이디 소문자 변환
+        String childLoginId = AuthUtil.convertUpperToLower(requestDto.getChildLoginId());
+
+        // 4. 아이디 중복 확인
+        if(this.checkDuplicateUserLoginId(childLoginId)){
             throw new CustomException(ErrorCode.DUPLICATED_USER_LOGIN_ID);
         };
 
-        // 4. 비밀번호 형식 확인
+        // 5. 비밀번호 형식 확인
         if(!AuthUtil.checkFormatValidationPassword(requestDto.getChildPassword())){
            throw new CustomException(ErrorCode.INVALID_PASSWORD_FORMAT);
         }
 
-        // 5. 비밀번호, 비밀번호 확인 일치 확인
+        // 6. 비밀번호, 비밀번호 확인 일치 확인
         if(!requestDto.getChildPassword().equals(requestDto.getChildConfirmPassword())){
             throw new CustomException(ErrorCode.NOT_EQUAL_PASSWORD);
         }
 
-        // 6. 닉네임 형식 확인
+        // 7. 닉네임 형식 확인
         if(!AuthUtil.checkFormatValidationNickname(requestDto.getChildNickname())){
             throw new CustomException(ErrorCode.INVALID_NICKNAME_FORMAT);
         }
 
-        // 7. 비밀번호 암호화
+        // 8. 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(requestDto.getChildPassword());
 
-        // 8. 유저 테이블 저장
+        // 9. 유저 테이블 저장
         User user = User.createChildUser(requestDto.getChildLoginId(), encodedPassword, requestDto.getChildNickname());
         userRepository.save(user);
 
-        // 9. 유저 그룹 테이블 저장
+        // 10. 유저 그룹 테이블 저장
         UserGroup userGroup = UserGroup.createUserGroup(user, group);
         userGroupRepository.save(userGroup);
     }
@@ -110,7 +113,7 @@ public class ChildService {
                     .orElseThrow(() -> new CustomException(ErrorCode.GROUP_NOT_FOUND));
 
             // 5. 해당 그룹의 인원이 30명 미만인지 확인
-            Long userCount = userGroupRepository.countAllByGroup(group);
+            Long userCount = userGroupRepository.countAllByGroup_groupId(requestDto.getGroupId());
             if(userCount >= 30) {
                 throw new CustomException(ErrorCode.FAILED_CREATE_CHILD_USER);
             }
@@ -119,7 +122,6 @@ public class ChildService {
             userGroup.changeUserGroup(group);
             userGroupRepository.save(userGroup);
         }
-
 
         // 7. 유저 닉네임이 변경될 경우
         if(!childUser.getNickname().equals(requestDto.getChildNickName())){

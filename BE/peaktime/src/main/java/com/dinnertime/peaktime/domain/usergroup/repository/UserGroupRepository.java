@@ -14,7 +14,7 @@ public interface UserGroupRepository extends JpaRepository<UserGroup, Long> {
     List<UserGroup> findAllByGroup(Group group);
 
     // 그룹에 존재하는 유저 수
-    Long countAllByGroup(Group group);
+    Long countAllByGroup_groupId(Long groupId);
 
     // 자식 계정에 대한 user_group
     Optional<UserGroup> findByUser_UserId(Long userId);
