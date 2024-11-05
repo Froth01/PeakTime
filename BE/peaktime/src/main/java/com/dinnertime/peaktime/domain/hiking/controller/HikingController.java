@@ -142,8 +142,8 @@ public class HikingController {
     @GetMapping(value = "/statistics")
     public ResponseEntity<?> getHikingStatistics(
             /*@AuthenticationPrincipal UserPrincipal userPrincipal,*/
-            @RequestParam("user-id") Long childUserId) {
-        log.info(childUserId.toString());
+            @RequestParam(value = "user-id", required = false) Long childUserId) {
+
         HikingStatisticResponseDto responseDto = hikingService.getHikingStatistic(/*userPrincipal.getUserId(),*/childUserId);
 
         log.info(responseDto.toString());
