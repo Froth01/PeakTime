@@ -1,10 +1,12 @@
 package com.dinnertime.peaktime.domain.memo.entity;
 
+import com.dinnertime.peaktime.domain.memo.service.dto.request.SaveMemoRequestDto;
 import com.dinnertime.peaktime.domain.summary.entity.Summary;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.nio.file.attribute.UserPrincipal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -44,6 +46,15 @@ public class Memo {
         this.createAt = createAt;
         this.content = content;
         this.user = user;
+    }
+
+    public static Memo createMemo(SaveMemoRequestDto requestDto, User user){
+        return Memo.builder()
+                .title(requestDto.getTitle())
+                .createAt(LocalDateTime.now())
+                .content(requestDto.getContent())
+                .user(user)
+                .build();
     }
 
 }
