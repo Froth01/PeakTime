@@ -4,7 +4,7 @@ import com.dinnertime.peaktime.domain.content.entity.Content;
 import com.dinnertime.peaktime.domain.content.repository.ContentRepository;
 import com.dinnertime.peaktime.domain.hiking.entity.Hiking;
 import com.dinnertime.peaktime.domain.hiking.repository.HikingRepository;
-import com.dinnertime.peaktime.domain.hiking.service.dto.query.BlockInfo;
+import com.dinnertime.peaktime.domain.hiking.service.dto.query.UsingInfo;
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingCalendarDetailQueryDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingCalendarQueryDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingDetailQueryDto;
@@ -18,7 +18,6 @@ import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -108,8 +107,8 @@ public class HikingService {
         //없으면 null 반환
         if(hikingDetail==null) return null;
 
-        List<BlockInfo> visitedSiteList = contentRepository.getTopBlockInfoListByUserId("site", /*userId*/1L);
-        List<BlockInfo> visitedProgramList = contentRepository.getTopBlockInfoListByUserId("program", /*userId*/1L);
+        List<UsingInfo> visitedSiteList = contentRepository.getTopUsingInfoList("site", hikingId);
+        List<UsingInfo> visitedProgramList = contentRepository.getTopUsingInfoList("program", hikingId);
 
         hikingDetail.setVisitedSiteList(visitedSiteList);
         hikingDetail.setVisitedProgramList(visitedProgramList);
@@ -135,9 +134,9 @@ public class HikingService {
         //전체 차단 접근 횟수
         Integer totalBlockedCount = hikingRepository.getTotalBlockedCount(findUserId);
         //사이트 리스트 조회
-        List<BlockInfo> siteList = contentRepository.getTopBlockInfoListByUserId("site", findUserId);
+        List<UsingInfo> siteList = contentRepository.getTopUsingInfoListByUserId("site", findUserId);
         //프로그램 리스트 조회
-        List<BlockInfo> programList = contentRepository.getTopBlockInfoListByUserId("program", findUserId);
+        List<UsingInfo> programList = contentRepository.getTopUsingInfoListByUserId("program", findUserId);
         //선호 시간 조회
         Integer preferTime = hikingRepository.getPreferTimeByUserId(findUserId);
 

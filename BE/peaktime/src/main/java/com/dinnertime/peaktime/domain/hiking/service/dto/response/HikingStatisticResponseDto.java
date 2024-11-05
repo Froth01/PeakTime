@@ -1,6 +1,6 @@
 package com.dinnertime.peaktime.domain.hiking.service.dto.response;
 
-import com.dinnertime.peaktime.domain.hiking.service.dto.query.BlockInfo;
+import com.dinnertime.peaktime.domain.hiking.service.dto.query.UsingInfo;
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingStatisticQueryDto;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,12 +24,12 @@ public class HikingStatisticResponseDto {
 
     private int preferTimeZone;
 
-    private List<BlockInfo> mostSiteList;
+    private List<UsingInfo> mostSiteList;
 
-    private List<BlockInfo> mostProgramList;
+    private List<UsingInfo> mostProgramList;
 
     @Builder
-    private HikingStatisticResponseDto(String nickname, Integer totalHikingTime, Long totalHikingCount, Integer totalSuccessCount, Integer totalBlockedCount, int preferTimeZone, List<BlockInfo> mostSiteList, List<BlockInfo> mostProgramList) {
+    private HikingStatisticResponseDto(String nickname, Integer totalHikingTime, Long totalHikingCount, Integer totalSuccessCount, Integer totalBlockedCount, int preferTimeZone, List<UsingInfo> mostSiteList, List<UsingInfo> mostProgramList) {
         this.nickname = nickname;
         this.totalHikingTime = totalHikingTime;
         this.totalHikingCount = totalHikingCount;
@@ -40,7 +40,7 @@ public class HikingStatisticResponseDto {
         this.mostProgramList = mostProgramList;
     }
 
-    public static HikingStatisticResponseDto createHikingStatisticResponseDto(HikingStatisticQueryDto hikingStatisticQueryDto, Integer totalBlockedCount, String nickname, List<BlockInfo> mostSiteList, List<BlockInfo> mostProgramList, int preferTimeZone) {
+    public static HikingStatisticResponseDto createHikingStatisticResponseDto(HikingStatisticQueryDto hikingStatisticQueryDto, Integer totalBlockedCount, String nickname, List<UsingInfo> mostSiteList, List<UsingInfo> mostProgramList, int preferTimeZone) {
         return HikingStatisticResponseDto.builder()
                 .nickname(nickname)
                 .totalHikingTime(hikingStatisticQueryDto.getTotalHikingTime())

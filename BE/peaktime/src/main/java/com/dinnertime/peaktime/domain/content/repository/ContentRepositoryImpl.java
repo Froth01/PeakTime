@@ -1,9 +1,8 @@
 package com.dinnertime.peaktime.domain.content.repository;
 
 import com.dinnertime.peaktime.domain.content.entity.QContent;
-import com.dinnertime.peaktime.domain.hiking.service.dto.query.BlockInfo;
+import com.dinnertime.peaktime.domain.hiking.service.dto.query.UsingInfo;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -19,9 +18,9 @@ public class ContentRepositoryImpl implements ContentRepositoryCustom {
 
     // "site"와 "program" 타입의 상위 5개 BlockInfo 리스트 가져오는 메서드
     @Override
-    public List<BlockInfo> getTopBlockInfoList(String type, Long hikingId) {
+    public List<UsingInfo> getTopUsingInfoList(String type, Long hikingId) {
         return queryFactory.select(Projections.fields(
-                        BlockInfo.class,
+                        UsingInfo.class,
                         content.usingTime.sum().as("usingTime"),
                         content.name.as("name")
                 ))
@@ -34,9 +33,9 @@ public class ContentRepositoryImpl implements ContentRepositoryCustom {
     }
 
     @Override
-    public List<BlockInfo> getTopBlockInfoListByUserId(String type, Long userId) {
+    public List<UsingInfo> getTopUsingInfoListByUserId(String type, Long userId) {
         return queryFactory.select(Projections.fields(
-                        BlockInfo.class,
+                        UsingInfo.class,
                         content.usingTime.sum().as("usingTime"),
                         content.name.as("name")
                 ))

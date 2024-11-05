@@ -16,8 +16,6 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     List<Group> findByIsDeleteOrderByTitleAsc(Boolean isDelete);
 
     // 그룹 조회
-    // groupId로 group 조회
-    Optional<Group> findByGroupIdAndIsDelete(Long groupId, Boolean isDelete);
     // groupId로 group 조회, 삭제되지 않은 그룹만 조회
     Optional<Group> findByGroupIdAndIsDeleteFalse(Long groupId);
 

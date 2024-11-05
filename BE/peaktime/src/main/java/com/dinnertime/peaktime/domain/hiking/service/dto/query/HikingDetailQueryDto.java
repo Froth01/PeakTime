@@ -24,8 +24,8 @@ public class HikingDetailQueryDto {
     private Integer blockedProgramCount;
 
     @Setter
-    private List<BlockInfo> visitedSiteList;
+    private List<UsingInfo> visitedSiteList;
 
     @Setter
-    private List<BlockInfo> visitedProgramList;
+    private List<UsingInfo> visitedProgramList;
 }
