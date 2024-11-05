@@ -6,8 +6,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import java.time.format.DateTimeParseException;
 
 @Slf4j
 @ControllerAdvice
@@ -34,13 +38,31 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
-    // 400 bad request
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex) {
-
+    public ResponseEntity<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         ResultDto<Object> response = ResultDto.res(
                 HttpStatus.BAD_REQUEST.value(),
+                // Annotation에 설정된 메시지 추출 후 담기
                 ex.getBindingResult().getAllErrors().get(0).getDefaultMessage()
+        );
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<?> handleMissingServletRequestParameterException(MissingServletRequestParameterException ex) {
+        ResultDto<Object> response = ResultDto.res(
+                HttpStatus.BAD_REQUEST.value(),
+                "잘못된 형식의 요청입니다."
+        );
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({ MethodArgumentTypeMismatchException.class, DateTimeParseException.class })
+    public ResponseEntity<?> handleDateParsingException(Exception ex) {
+        log.info(ex.getMessage());
+        ResultDto<Object> response = ResultDto.res(
+                HttpStatus.BAD_REQUEST.value(),
+                "유효하지 않은 날짜 형식입니다."
         );
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
