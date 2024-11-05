@@ -1,6 +1,7 @@
 package com.dinnertime.peaktime.domain.preset.controller;
 
 import com.dinnertime.peaktime.domain.preset.service.PresetService;
+import com.dinnertime.peaktime.domain.preset.service.dto.request.AddUrlPresetRequestDto;
 import com.dinnertime.peaktime.domain.preset.service.dto.request.SavePresetRequestDto;
 import com.dinnertime.peaktime.domain.preset.service.dto.response.PresetWrapperResponseDto;
 import com.dinnertime.peaktime.global.util.CommonSwaggerResponse;
@@ -126,5 +127,30 @@ public class PresetController {
 
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(),"프리셋 삭제에 성공했습니다."));
     }
+
+    // 특정 프리셋 생성
+    @Operation(summary = "ex에서 프리셋 웹사이트 추가", description = "ex에서 프리셋 웹사이트 추가해주기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "웹사이트를 프리셋에 추가하기에 성공했습니다.",
+                    content = @Content(schema= @Schema(implementation = ResultDto.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "웹사이트를 프리셋에 추가하기에 실패했습니다.",
+                    content= @Content(schema= @Schema(implementation = ResultDto.class))
+            )
+
+    })
+    @CommonSwaggerResponse.CommonResponses
+    @PostMapping("/{presetId}")
+    public ResponseEntity<?> addUrl(
+            @Valid @RequestBody AddUrlPresetRequestDto requestDto,
+            @PathVariable Long presetId) {
+        //단순한 데이터 형식과 길이에 대한 유효성 검증은 컨트롤러에서 처리 @Valid
+        log.info("addUrl 메서드가 호출되었습니다.");
+
+        presetService.addWebsitePreset(requestDto, presetId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(),"웹사이트를 프리셋에 추가하기에 성공했습니다."));
+    }
+
 
 }

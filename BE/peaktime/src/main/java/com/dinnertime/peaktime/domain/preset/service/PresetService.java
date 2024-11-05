@@ -2,6 +2,7 @@ package com.dinnertime.peaktime.domain.preset.service;
 
 import com.dinnertime.peaktime.domain.preset.entity.Preset;
 import com.dinnertime.peaktime.domain.preset.repository.PresetRepository;
+import com.dinnertime.peaktime.domain.preset.service.dto.request.AddUrlPresetRequestDto;
 import com.dinnertime.peaktime.domain.preset.service.dto.request.SavePresetRequestDto;
 import com.dinnertime.peaktime.domain.preset.service.dto.response.PresetWrapperResponseDto;
 import com.dinnertime.peaktime.domain.user.entity.User;
@@ -94,6 +95,18 @@ public class PresetService {
         }
 
 
+    }
+
+    // ex에서 받아온 특정 웹사이트 프리셋 추가
+    @Transactional
+    public void addWebsitePreset(AddUrlPresetRequestDto requestDto, Long presetId) {
+
+        Preset preset = presetRepository.findByPresetId(presetId)
+                .orElseThrow(() -> new CustomException(ErrorCode.PRESET_NOT_FOUND));
+
+        preset.addWebsitePreset(requestDto, preset);
+
+        presetRepository.save(preset);
     }
 
 }
