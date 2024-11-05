@@ -19,5 +19,5 @@ public interface HikingRepositoryCustom {
 
     Integer getPreferTimeByUserId(Long userId);
 
-    Integer getTotalBlockedCount(Long findUserId);
+    Long getTotalBlockedCount(Long findUserId);
 }

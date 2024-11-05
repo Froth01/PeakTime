@@ -1,4 +1,4 @@
-package com.dinnertime.peaktime.domain.hiking.service.dto;
+package com.dinnertime.peaktime.domain.hiking.service;
 
 import com.dinnertime.peaktime.domain.content.entity.Content;
 import com.dinnertime.peaktime.domain.content.repository.ContentRepository;
@@ -132,7 +132,7 @@ public class HikingService {
 
         if(hikingStatistic==null) return null;
         //전체 차단 접근 횟수
-        Integer totalBlockedCount = hikingRepository.getTotalBlockedCount(findUserId);
+        Long totalBlockedCount = hikingRepository.getTotalBlockedCount(findUserId);
         //사이트 리스트 조회
         List<UsingInfo> siteList = contentRepository.getTopUsingInfoListByUserId("site", findUserId);
         //프로그램 리스트 조회

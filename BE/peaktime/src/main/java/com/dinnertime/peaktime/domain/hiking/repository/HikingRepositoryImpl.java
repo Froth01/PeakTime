@@ -134,15 +134,10 @@ public class HikingRepositoryImpl implements HikingRepositoryCustom {
     }
 
     @Override
-    public Integer getTotalBlockedCount(Long findUserId) {
-        return queryFactory.select(
-                        new CaseBuilder()
-                                .when(content.isBlocked).then(1)
-                                .otherwise(0)
-                                .sum()
-                )
+    public Long getTotalBlockedCount(Long findUserId) {
+        return queryFactory.select(content.count())
                 .from(content)
-                .where(content.hiking.user.userId.eq(findUserId))
+                .where(content.hiking.user.userId.eq(findUserId).and(content.isBlocked.isTrue()))
                 .fetchOne();
     }
 

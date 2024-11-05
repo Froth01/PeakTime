@@ -20,7 +20,7 @@ public class HikingStatisticResponseDto {
 
     private Integer totalSuccessCount;
 
-    private Integer totalBlockedCount;
+    private Long totalBlockedCount;
 
     private int preferTimeZone;
 
@@ -29,7 +29,7 @@ public class HikingStatisticResponseDto {
     private List<UsingInfo> mostProgramList;
 
     @Builder
-    private HikingStatisticResponseDto(String nickname, Integer totalHikingTime, Long totalHikingCount, Integer totalSuccessCount, Integer totalBlockedCount, int preferTimeZone, List<UsingInfo> mostSiteList, List<UsingInfo> mostProgramList) {
+    private HikingStatisticResponseDto(String nickname, Integer totalHikingTime, Long totalHikingCount, Integer totalSuccessCount, Long totalBlockedCount, int preferTimeZone, List<UsingInfo> mostSiteList, List<UsingInfo> mostProgramList) {
         this.nickname = nickname;
         this.totalHikingTime = totalHikingTime;
         this.totalHikingCount = totalHikingCount;
@@ -40,7 +40,7 @@ public class HikingStatisticResponseDto {
         this.mostProgramList = mostProgramList;
     }
 
-    public static HikingStatisticResponseDto createHikingStatisticResponseDto(HikingStatisticQueryDto hikingStatisticQueryDto, Integer totalBlockedCount, String nickname, List<UsingInfo> mostSiteList, List<UsingInfo> mostProgramList, int preferTimeZone) {
+    public static HikingStatisticResponseDto createHikingStatisticResponseDto(HikingStatisticQueryDto hikingStatisticQueryDto, Long totalBlockedCount, String nickname, List<UsingInfo> mostSiteList, List<UsingInfo> mostProgramList, int preferTimeZone) {
         return HikingStatisticResponseDto.builder()
                 .nickname(nickname)
                 .totalHikingTime(hikingStatisticQueryDto.getTotalHikingTime())
