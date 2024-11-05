@@ -2,6 +2,8 @@ package com.dinnertime.peaktime.domain.hiking.service;
 
 import com.dinnertime.peaktime.domain.content.entity.Content;
 import com.dinnertime.peaktime.domain.content.repository.ContentRepository;
+import com.dinnertime.peaktime.domain.group.entity.Group;
+import com.dinnertime.peaktime.domain.group.repository.GroupRepository;
 import com.dinnertime.peaktime.domain.hiking.entity.Hiking;
 import com.dinnertime.peaktime.domain.hiking.repository.HikingRepository;
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.UsingInfo;
@@ -14,13 +16,17 @@ import com.dinnertime.peaktime.domain.hiking.service.dto.request.StartHikingRequ
 import com.dinnertime.peaktime.domain.hiking.service.dto.response.*;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
+import com.dinnertime.peaktime.domain.usergroup.entity.UserGroup;
+import com.dinnertime.peaktime.domain.usergroup.repository.UserGroupRepository;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
+import com.dinnertime.peaktime.global.util.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,6 +39,9 @@ public class HikingService {
     private final HikingRepository hikingRepository;
     private final UserRepository userRepository;
     private final ContentRepository contentRepository;
+    private final GroupRepository groupRepository;
+    private final UserGroupRepository userGroupRepository;
+    private final RedisService redisService;
 
     @Transactional
     public StartHikingResponseDto startHiking(/*Long userId, */StartHikingRequestDto requestDto) {
@@ -41,8 +50,28 @@ public class HikingService {
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
 
+
+        //권한으로 child계정인지 확인
+        UserGroup userGroup = userGroupRepository.findByUser_UserId(1L).orElseThrow(
+                () -> new CustomException(ErrorCode.GROUP_NOT_FOUND)
+        );
+        //검증
+        LocalDateTime startTime = requestDto.getStartTime();
+        //월요일이 1 일요일이 7 -> 일요일이 0, 월이 6으로 변경
+        int day = 7 - startTime.getDayOfWeek().getValue();
+        //분 구함
+        int minute = startTime.getHour() * 60 + startTime.getMinute();
+        //레디스 저장된 시간으로 구하기
+        int start = minute + (day * 14400);
+        //child계정이 속한 그룹의 타이머에 속하는지 확인
+        boolean checkDuplicated = redisService.checkTimerByGroupId(userGroup.getGroup().getGroupId(), start, start + requestDto.getAttentionTime());
+        if(checkDuplicated) {
+            throw new CustomException(ErrorCode.TIME_SLOT_OVERLAP);
+        }
+
+
         //시작시간에 집중 시간을 더하여 endTime을 구함
-        LocalDateTime endTime = requestDto.getStartTime().plusMinutes(requestDto.getAttentionTime());
+        LocalDateTime endTime = startTime.plusMinutes(requestDto.getAttentionTime());
 
         Hiking hiking = Hiking.createHiking(user, requestDto, endTime);
         hikingRepository.save(hiking);

@@ -51,4 +51,11 @@ public class RedisService {
 
         zSet.add(key, start + "-" + end, start);
     }
+
+    public void deleteTimerByGroupIdAndTime(Long groupId, int start, int end) {
+        String key = "timer:"+groupId;
+        ZSetOperations<String, String> zSet = redisTemplate.opsForZSet();
+
+        zSet.remove(key, start +"-"+end);
+    }
 }
