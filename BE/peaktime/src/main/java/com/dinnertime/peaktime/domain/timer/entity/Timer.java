@@ -1,6 +1,7 @@
 package com.dinnertime.peaktime.domain.timer.entity;
 
 import com.dinnertime.peaktime.domain.group.entity.Group;
+import com.dinnertime.peaktime.domain.timer.service.dto.request.TimerCreateRequestDto;
 import io.hypersistence.utils.hibernate.type.array.IntArrayType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
@@ -50,13 +51,13 @@ public class Timer {
         this.repeatDay = repeatDay;
     }
 
-    public static Timer createTimer(Group group, LocalDateTime startTime, int attentionTime, Boolean isRepeat, int repeatDay) {
+    public static Timer createTimer(Group group, TimerCreateRequestDto requestDto) {
         return Timer.builder()
                 .group(group)
-                .startTime(startTime)
-                .attentionTime(attentionTime)
-                .isRepeat(isRepeat)
-                .repeatDay(repeatDay)
+                .startTime(requestDto.getStartTime())
+                .attentionTime(requestDto.getAttentionTime())
+                .isRepeat(requestDto.getIsRepeat())
+                .repeatDay(requestDto.getRepeatDay())
                 .build();
     }
 }
