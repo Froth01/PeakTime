@@ -2,23 +2,28 @@ package com.dinnertime.peaktime.domain.timer.service;
 
 import com.dinnertime.peaktime.domain.group.entity.Group;
 import com.dinnertime.peaktime.domain.group.repository.GroupRepository;
+import com.dinnertime.peaktime.domain.group.service.GroupService;
 import com.dinnertime.peaktime.domain.timer.entity.Timer;
 import com.dinnertime.peaktime.domain.timer.repository.TimerRepository;
 import com.dinnertime.peaktime.domain.timer.service.dto.request.TimerCreateRequestDto;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
+import com.dinnertime.peaktime.global.util.RedisService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TimerService {
 
     private final TimerRepository timerRepository;
     private final GroupRepository groupRepository;
+    private final RedisService redisService;
 
     @Transactional
     public void postTimer(TimerCreateRequestDto requestDto) {
@@ -26,6 +31,36 @@ public class TimerService {
         LocalDateTime startTime = requestDto.getStartTime();
         int attentionTime = requestDto.getAttentionTime();
         int repeatDay = requestDto.getRepeatDay();
+
+        int plusMinute = (startTime.getHour()*60) + startTime.getMinute();
+
+        boolean checkDuplicate = false;
+
+        for(int i=0; i<6;i++) {
+            if((repeatDay & (1 << i)) != 0) {
+                //날짜를 일차원 배열로 만들기 위함
+                int start = 14400 * i + plusMinute;
+                int end = start + attentionTime;
+                checkDuplicate = redisService.checkTimerByGroupId(groupId, start, end);
+                if(checkDuplicate) {
+                    throw new CustomException(ErrorCode.TIME_SLOT_OVERLAP);
+                }
+            }
+        }
+        
+        log.info("중복 체크");
+
+
+        for(int i=0; i<6;i++) {
+            if((repeatDay & (1 << i)) != 0) {
+                //날짜를 일차원 배열로 만들기 위함
+                int start = 14400 * i + plusMinute;
+                int end = start + attentionTime;
+                redisService.addTimerByGroupId(groupId, start, end);
+            }
+        }
+
+        log.info("저장");
 
         // 그룹 정보 확인
         Group group = groupRepository.findByGroupIdAndIsDeleteFalse(requestDto.getGroupId())
