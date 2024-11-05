@@ -24,7 +24,7 @@ public class Memo {
     @Column(name="create_at", nullable = false)
     private LocalDateTime createAt;
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", columnDefinition = "TEXT", nullable = false)
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
