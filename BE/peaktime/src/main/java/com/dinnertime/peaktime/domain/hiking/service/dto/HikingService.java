@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -120,25 +121,29 @@ public class HikingService {
     }
 
     @Transactional(readOnly = true)
-    public HikingStatisticResponseDto getHikingStatistic(Long findUserId) {
-        //유저 조회
-        User findUser = userRepository.findByUserIdAndIsDeleteFalse(findUserId).orElseThrow(
+    public HikingStatisticResponseDto getHikingStatistic(/*Long userId,*/ Long childUserId) {
+
+        Long findUserId = Optional.ofNullable(childUserId).orElse(/*userId*/1L);
+
+        User findUser = userRepository.findById(findUserId).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
-
-        log.info(findUser.getNickname());
 
         HikingStatisticQueryDto hikingStatistic = hikingRepository.getHikingStatistic(findUserId);
 
         if(hikingStatistic==null) return null;
-
+        //전체 차단 접근 횟수
+        Integer totalBlockedCount = hikingRepository.getTotalBlockedCount(findUserId);
+        //사이트 리스트 조회
         List<BlockInfo> siteList = contentRepository.getTopBlockInfoListByUserId("site", findUserId);
+        //프로그램 리스트 조회
         List<BlockInfo> programList = contentRepository.getTopBlockInfoListByUserId("program", findUserId);
+        //선호 시간 조회
         Integer preferTime = hikingRepository.getPreferTimeByUserId(findUserId);
 
         log.info(hikingStatistic.toString());
 
-        return HikingStatisticResponseDto.createHikingStatisticResponseDto(hikingStatistic, findUser.getNickname(), siteList, programList, preferTime);
+        return HikingStatisticResponseDto.createHikingStatisticResponseDto(hikingStatistic, totalBlockedCount, findUser.getNickname(), siteList, programList, preferTime);
 
     }
 }

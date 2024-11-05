@@ -21,4 +21,6 @@ public interface HikingRepositoryCustom {
     HikingStatisticQueryDto getHikingStatistic(Long findUserId);
 
     Integer getPreferTimeByUserId(Long userId);
+
+    Integer getTotalBlockedCount(Long findUserId);
 }

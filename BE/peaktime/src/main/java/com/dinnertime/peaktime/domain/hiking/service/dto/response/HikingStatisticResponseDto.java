@@ -2,7 +2,6 @@ package com.dinnertime.peaktime.domain.hiking.service.dto.response;
 
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.BlockInfo;
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingStatisticQueryDto;
-import com.dinnertime.peaktime.domain.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,13 +40,13 @@ public class HikingStatisticResponseDto {
         this.mostProgramList = mostProgramList;
     }
 
-    public static HikingStatisticResponseDto createHikingStatisticResponseDto(HikingStatisticQueryDto hikingStatisticQueryDto, String nickname, List<BlockInfo> mostSiteList, List<BlockInfo> mostProgramList, int preferTimeZone) {
+    public static HikingStatisticResponseDto createHikingStatisticResponseDto(HikingStatisticQueryDto hikingStatisticQueryDto, Integer totalBlockedCount, String nickname, List<BlockInfo> mostSiteList, List<BlockInfo> mostProgramList, int preferTimeZone) {
         return HikingStatisticResponseDto.builder()
                 .nickname(nickname)
                 .totalHikingTime(hikingStatisticQueryDto.getTotalHikingTime())
                 .totalHikingCount(hikingStatisticQueryDto.getTotalHikingCount())
                 .totalSuccessCount(hikingStatisticQueryDto.getTotalHikingSuccessCount())
-                .totalBlockedCount(hikingStatisticQueryDto.getTotalBlockedCount())
+                .totalBlockedCount(totalBlockedCount)
                 .preferTimeZone(preferTimeZone)
                 .mostSiteList(mostSiteList)
                 .mostProgramList(mostProgramList)

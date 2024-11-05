@@ -139,12 +139,12 @@ public class HikingController {
             )
     })
     @CommonSwaggerResponse.CommonResponses
-    @GetMapping(value = "/statistics/{user-id}")
+    @GetMapping(value = "/statistics")
     public ResponseEntity<?> getHikingStatistics(
-            @PathVariable("user-id") Long userId) {
-
-        log.info(userId.toString());
-        HikingStatisticResponseDto responseDto = hikingService.getHikingStatistic( userId);
+            /*@AuthenticationPrincipal UserPrincipal userPrincipal,*/
+            @RequestParam("user-id") Long childUserId) {
+        log.info(childUserId.toString());
+        HikingStatisticResponseDto responseDto = hikingService.getHikingStatistic(/*userPrincipal.getUserId(),*/childUserId);
 
         log.info(responseDto.toString());
 

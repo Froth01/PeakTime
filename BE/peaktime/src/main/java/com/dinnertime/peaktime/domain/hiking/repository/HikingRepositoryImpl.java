@@ -102,28 +102,21 @@ public class HikingRepositoryImpl implements HikingRepositoryCustom {
 
     @Override
     public HikingStatisticQueryDto getHikingStatistic(Long findUserId) {
-        
+
         //통계 조회
         return queryFactory.select(Projections.fields(
-                HikingStatisticQueryDto.class,
-                Expressions.numberTemplate(Integer.class,
-                        "COALESCE(FLOOR(SUM((EXTRACT(EPOCH FROM {0}) - EXTRACT(EPOCH FROM {1})) / 60)), 0)",
-                        hiking.realEndTime, hiking.startTime
-                ).as("totalHikingTime"),
-                hiking.hikingId.count().as("totalHikingCount"),
-                new CaseBuilder()
-                        .when(hiking.realEndTime.after(hiking.endTime)).then(1)
-                        .otherwise(0)
-                        .sum().as("totalHikingSuccessCount"),
-                new CaseBuilder()
-                        .when(content.isBlocked).then(1)
-                        .otherwise(0)
-                        .sum().as("totalBlockedCount")
-
-        ))
+                        HikingStatisticQueryDto.class,
+                        Expressions.numberTemplate(Integer.class,
+                                "COALESCE(FLOOR(SUM((EXTRACT(EPOCH FROM {0}) - EXTRACT(EPOCH FROM {1})) / 60)), 0)",
+                                hiking.realEndTime, hiking.startTime
+                        ).as("totalHikingTime"),
+                        hiking.hikingId.count().as("totalHikingCount"),
+                        new CaseBuilder()
+                                .when(hiking.realEndTime.after(hiking.endTime)).then(1)
+                                .otherwise(0)
+                                .sum().as("totalHikingSuccessCount")
+                ))
                 .from(hiking)
-                .join(content)
-                .on(hiking.hikingId.eq(content.hiking.hikingId))
                 .where(hiking.user.userId.eq(findUserId).and(hiking.realEndTime.isNotNull()))
                 .groupBy(hiking.user.userId)
                 .fetchOne();
@@ -137,6 +130,19 @@ public class HikingRepositoryImpl implements HikingRepositoryCustom {
                 .groupBy(hiking.startTime.hour())
                 .orderBy(hiking.startTime.hour().asc())
                 .limit(1)
+                .fetchOne();
+    }
+
+    @Override
+    public Integer getTotalBlockedCount(Long findUserId) {
+        return queryFactory.select(
+                        new CaseBuilder()
+                                .when(content.isBlocked).then(1)
+                                .otherwise(0)
+                                .sum()
+                )
+                .from(content)
+                .where(content.hiking.user.userId.eq(findUserId))
                 .fetchOne();
     }
 
