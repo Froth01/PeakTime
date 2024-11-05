@@ -1,11 +1,16 @@
 package com.dinnertime.peaktime.global.util;
 
+import com.dinnertime.peaktime.domain.schedule.entity.Schedule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -13,6 +18,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class RedisService {
     private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, List<Schedule>> scheduleRedisTemplate;
 
     public boolean checkTimerByGroupId(Long groupId, int start, int end) {
         //키는 timer:그룹아이디
@@ -58,4 +64,31 @@ public class RedisService {
 
         zSet.remove(key, start +"-"+end);
     }
+
+    public void addSchedule(Schedule schedule) {
+        // 1. 오늘 날짜 키 생성 (예: "schedule:2024-11-04")
+        String cacheKey = "schedule:"+ LocalDate.now();
+
+        // 2. Redis에서 스케줄을 조회
+        List<Schedule> scheduleList = scheduleRedisTemplate.opsForValue().get(cacheKey);
+        Long ttl = scheduleRedisTemplate.getExpire(cacheKey);
+
+        //불변 객체일 경우가 있으므로 복사
+        scheduleList = new ArrayList<>(scheduleList);
+        scheduleList.add(schedule);
+
+        //레디스에 저장 만료일은 자정12시
+        scheduleRedisTemplate.opsForValue().set(cacheKey, scheduleList, ttl);
+    }
+
+    public void addFirstSchedule(List<Schedule> scheduleList) {
+        // 1. 오늘 날짜 키 생성 (예: "schedule:2024-11-04")
+        String cacheKey = "schedule:"+ LocalDate.now();
+
+        // 2. Redis에서 스케줄을 조회
+
+        //레디스에 저장 만료일은 자정12시
+        scheduleRedisTemplate.opsForValue().set(cacheKey, scheduleList, Duration.ofDays(1));
+    }
+
 }

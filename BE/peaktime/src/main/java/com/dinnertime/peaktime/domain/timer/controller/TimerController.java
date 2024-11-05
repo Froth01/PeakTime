@@ -2,6 +2,7 @@ package com.dinnertime.peaktime.domain.timer.controller;
 
 import com.dinnertime.peaktime.domain.timer.service.TimerService;
 import com.dinnertime.peaktime.domain.timer.service.dto.request.TimerCreateRequestDto;
+import com.dinnertime.peaktime.domain.timer.service.facade.TimerFacade;
 import com.dinnertime.peaktime.global.util.CommonSwaggerResponse;
 import com.dinnertime.peaktime.global.util.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class TimerController {
 
     private final TimerService timerService;
+    private final TimerFacade timerFacade;
 
     @Operation(summary = "그룹 타이머 생성", description = "그룹의 타이머 목록과 비교해서 겹치는 시간이 존재하지 않을 때 타이머를 생성합니다.")
     @ApiResponses(value = {
@@ -34,7 +36,7 @@ public class TimerController {
     @CommonSwaggerResponse.CommonResponses
     @PostMapping("")
     public ResponseEntity<?> postTimer(@RequestBody @Valid TimerCreateRequestDto requestDto) {
-        timerService.postTimer(requestDto);
+        timerFacade.createTimer(requestDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "타이머 생성을 성공했습니다."));
     }
