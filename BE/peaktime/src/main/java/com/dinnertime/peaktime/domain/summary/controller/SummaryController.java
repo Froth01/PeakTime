@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -40,8 +41,7 @@ public class SummaryController {
     @CommonSwaggerResponse.CommonResponses
     @PostMapping()
     public ResponseEntity<?> createSummary(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
-            @RequestBody SaveSummaryRequestDto requestDto) {
+            @Valid @RequestBody SaveSummaryRequestDto requestDto) {
 
         log.info("createSummary 메서드가 호출되었습니다.");
         log.info("요약 생성 : " + requestDto.toString());
