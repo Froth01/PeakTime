@@ -1,14 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <link rel="stylesheet" href="/css/popup.css" type="text/css" />
-</head>
-<body>
-    <div><h1>PeakTime</h1></div>
-<script src="/js/index.js"></script>
-
-</body>
+    <style>
+      @font-face {
+        font-family: "netmarbleL";
+        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_four@1.1/netmarbleL.woff")
+          format("woff");
+        font-weight: normal;
+        font-style: normal;
+      }
+      .main {
+        font-family: "netmarbleL";
+        width: 320px;
+        height: 450px;
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+        justify-content: space-between;
+      }
+      .head {
+        display: flex;
+        justify-content: space-between;
+      }
+      .content {
+        flex-grow: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main">
+      <div class="head">
+        <h2>PeakTime</h2>
+        <img
+          src="../image/peaktime.png"
+          alt=""
+          style="width: 50px; height: 50px"
+        />
+      </div>
+      <div class="content">
+        <h2>프로그램에서 하이킹을 시작해주세요.</h2>
+      </div>
+    </div>
+    <script src="/js/index.js"></script>
+  </body>
 </html>
