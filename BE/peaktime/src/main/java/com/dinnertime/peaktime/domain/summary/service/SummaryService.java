@@ -9,10 +9,6 @@ import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
-import com.dinnertime.peaktime.global.util.chatgpt.ChatGPTService;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,10 +28,7 @@ public class SummaryService {
 
     // 요약 정보 저장 및 업데이트
     @Transactional
-    public void createOrUpdateSummary(UserPrincipal userPrincipal, SaveSummaryRequestDto requestDto, String GPTContent) {
-
-        User user = userRepository.findByUserIdAndIsDeleteFalse(1).
-                orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    public void createOrUpdateSummary(SaveSummaryRequestDto requestDto, String GPTContent) {
 
         Memo memo = memoRepository.findByMemoId(requestDto.getMemoId())
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMO_NOT_FOUND));
@@ -57,20 +50,16 @@ public class SummaryService {
             // insert
             Summary createdSummary = Summary.createSummary(GPTContent, memo);
             summaryRepository.save(createdSummary);
-        } else{
-            // update
-            summary.updateSummary(GPTContent, memo);
-            summaryRepository.save(summary);
+            return;
         }
-
+        // update
+        summary.updateSummary(GPTContent);
+        summaryRepository.save(summary);
     }
 
 
     @Transactional
-    public void deleteSummary(UserPrincipal userPrincipal, Long summaryId) {
-
-        User user = userRepository.findByUserIdAndIsDeleteFalse(1).
-                orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    public void deleteSummary(Long summaryId) {
 
         Summary summary = summaryRepository.findBySummaryId(summaryId)
                 .orElseThrow(() -> new CustomException(ErrorCode.SUMMARY_NOT_FOUND));
