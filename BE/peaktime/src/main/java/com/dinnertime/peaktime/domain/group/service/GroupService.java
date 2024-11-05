@@ -80,7 +80,7 @@ public class GroupService {
     @Transactional
     public GroupDetailResponseDto getGroupDetail(Long groupId) {
         // 그룹 조회
-        Group group = groupRepository.findByGroupIdAndIsDelete(groupId, false)
+        Group group = groupRepository.findByGroupIdAndIsDeleteFalse(groupId)
                 .orElseThrow(() -> new CustomException(ErrorCode.GROUP_NOT_FOUND));
 
         // 타이머 리스트 조회
@@ -124,7 +124,7 @@ public class GroupService {
     public void putGroup(Long userId, Long groupId, GroupPutRequestDto requestDto) {
 
         // 그룹 조회
-        Group groupSelected = groupRepository.findByGroupIdAndIsDelete(groupId, false)
+        Group groupSelected = groupRepository.findByGroupIdAndIsDeleteFalse(groupId)
                 .orElseThrow(() -> new CustomException(ErrorCode.GROUP_NOT_FOUND));
 
         // 그룹명 중복 검사
@@ -148,7 +148,7 @@ public class GroupService {
     // 그룹 삭제
     @Transactional
     public void deleteGroup(Long userId, Long groupId) {
-        Group groupSelected = groupRepository.findByGroupIdAndIsDelete(groupId, false)
+        Group groupSelected = groupRepository.findByGroupIdAndIsDeleteFalse(groupId)
                 .orElseThrow(() -> new CustomException(ErrorCode.GROUP_NOT_FOUND));
 
         // 그룹에 속해있는 child_user를 검색해서 삭제하기

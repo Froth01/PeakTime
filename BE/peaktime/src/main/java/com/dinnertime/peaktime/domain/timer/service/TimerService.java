@@ -28,7 +28,7 @@ public class TimerService {
         int repeatDay = requestDto.getRepeatDay();
 
         // 그룹 정보 확인
-        Group group = groupRepository.findByGroupIdAndIsDelete(requestDto.getGroupId(), false)
+        Group group = groupRepository.findByGroupIdAndIsDeleteFalse(requestDto.getGroupId())
                 .orElseThrow(() -> new CustomException(ErrorCode.GROUP_NOT_FOUND));
 
         // 중복되는 타이머가 있는지 확인
@@ -37,13 +37,7 @@ public class TimerService {
         }
 
         // 타이머 생성 및 저장
-        Timer timer = Timer.createTimer(
-                group,
-                startTime,
-                attentionTime,
-                requestDto.getIsRepeat(),
-                repeatDay
-        );
+        Timer timer = Timer.createTimer(group, requestDto);
         timerRepository.save(timer);
     }
 

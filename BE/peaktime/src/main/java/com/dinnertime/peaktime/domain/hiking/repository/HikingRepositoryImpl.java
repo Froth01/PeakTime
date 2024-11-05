@@ -3,19 +3,11 @@ package com.dinnertime.peaktime.domain.hiking.repository;
 import com.dinnertime.peaktime.domain.content.entity.QContent;
 import com.dinnertime.peaktime.domain.hiking.entity.QCalendar;
 import com.dinnertime.peaktime.domain.hiking.entity.QHiking;
-import com.dinnertime.peaktime.domain.hiking.service.dto.query.BlockInfo;
-import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingCalendarDetailQueryDto;
-import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingCalendarQueryDto;
-import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingDetailQueryDto;
+import com.dinnertime.peaktime.domain.hiking.service.dto.query.*;
 import com.dinnertime.peaktime.domain.user.entity.User;
-import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.core.types.dsl.DateTemplate;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.JPQLQuery;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -33,18 +25,18 @@ public class HikingRepositoryImpl implements HikingRepositoryCustom {
     private final QContent content = QContent.content;
     private final JPAQueryFactory queryFactory;
 
-// 날짜만 가져오기
+    // 날짜만 가져오기
     @Override
     public List<HikingCalendarQueryDto> getCalendar(Long userId) {
         //날짜별로 하이킹 시간 조회
         return queryFactory.select(Projections.fields(
                 HikingCalendarQueryDto.class,
                 calendar.date.as("date"),
-                        //없는 경우 0을 출력
-                        Expressions.numberTemplate(Integer.class,
-                                "COALESCE(FLOOR(SUM((EXTRACT(EPOCH FROM {0}) - EXTRACT(EPOCH FROM {1})) / 60)), 0)",
-                                hiking.realEndTime, hiking.startTime
-                        ).as("totalMinute")
+                //없는 경우 0을 출력
+                Expressions.numberTemplate(Integer.class,
+                    "COALESCE(FLOOR(SUM((EXTRACT(EPOCH FROM {0}) - EXTRACT(EPOCH FROM {1})) / 60)), 0)",
+                    hiking.realEndTime, hiking.startTime
+                ).as("totalMinute")
                 ))
                 .from(calendar)
                 .leftJoin(hiking)
@@ -60,7 +52,7 @@ public class HikingRepositoryImpl implements HikingRepositoryCustom {
     }
 
     @Override
-    public List<HikingCalendarDetailQueryDto> getCalendarByDate(LocalDate date, User user) {
+    public List<HikingCalendarDetailQueryDto> getCalendarByDate(LocalDate date, Long userId) {
 
         return queryFactory.select(Projections.fields(
                         HikingCalendarDetailQueryDto.class,
@@ -71,7 +63,7 @@ public class HikingRepositoryImpl implements HikingRepositoryCustom {
                 ))
                 .from(hiking)
                 .where(
-                        hiking.user.eq(user)
+                        hiking.user.userId.eq(userId)
                                 .and(hiking.realEndTime.isNotNull())
                                 .and(Expressions.dateTemplate(LocalDate.class, "DATE({0})", hiking.startTime).eq(date))
                 )
@@ -104,6 +96,48 @@ public class HikingRepositoryImpl implements HikingRepositoryCustom {
                 .on(hiking.hikingId.eq(content.hiking.hikingId))
                 .where(hiking.hikingId.eq(hikingId))
                 .groupBy(hiking.hikingId)
+                .fetchOne();
+    }
+
+
+    @Override
+    public HikingStatisticQueryDto getHikingStatistic(Long findUserId) {
+
+        //통계 조회
+        return queryFactory.select(Projections.fields(
+                        HikingStatisticQueryDto.class,
+                        Expressions.numberTemplate(Integer.class,
+                                "COALESCE(FLOOR(SUM((EXTRACT(EPOCH FROM {0}) - EXTRACT(EPOCH FROM {1})) / 60)), 0)",
+                                hiking.realEndTime, hiking.startTime
+                        ).as("totalHikingTime"),
+                        hiking.hikingId.count().as("totalHikingCount"),
+                        new CaseBuilder()
+                                .when(hiking.realEndTime.after(hiking.endTime)).then(1)
+                                .otherwise(0)
+                                .sum().as("totalHikingSuccessCount")
+                ))
+                .from(hiking)
+                .where(hiking.user.userId.eq(findUserId).and(hiking.realEndTime.isNotNull()))
+                .groupBy(hiking.user.userId)
+                .fetchOne();
+    }
+
+    @Override
+    public Integer getPreferTimeByUserId(Long userId) {
+        return queryFactory.select(hiking.startTime.hour())
+                .from(hiking)
+                .where(hiking.user.userId.eq(userId).and(hiking.realEndTime.isNotNull()))
+                .groupBy(hiking.startTime.hour())
+                .orderBy(hiking.startTime.hour().count().desc())
+                .limit(1)
+                .fetchOne();
+    }
+
+    @Override
+    public Long getTotalBlockedCount(Long findUserId) {
+        return queryFactory.select(content.count())
+                .from(content)
+                .where(content.hiking.user.userId.eq(findUserId).and(content.isBlocked.isTrue()))
                 .fetchOne();
     }
 
