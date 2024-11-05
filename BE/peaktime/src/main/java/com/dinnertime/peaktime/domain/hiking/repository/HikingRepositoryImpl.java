@@ -128,7 +128,7 @@ public class HikingRepositoryImpl implements HikingRepositoryCustom {
                 .from(hiking)
                 .where(hiking.user.userId.eq(userId).and(hiking.realEndTime.isNotNull()))
                 .groupBy(hiking.startTime.hour())
-                .orderBy(hiking.startTime.hour().asc())
+                .orderBy(hiking.startTime.hour().count().desc())
                 .limit(1)
                 .fetchOne();
     }
