@@ -20,7 +20,7 @@ public class Summary {
     @Column(name="update_at", nullable = false)
     private LocalDateTime updateAt;
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", columnDefinition = "TEXT", nullable = false)
     private String content;
 
     @OneToOne(fetch = FetchType.LAZY)

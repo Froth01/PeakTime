@@ -31,8 +31,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<?> handleBadCredentialsException(final BadCredentialsException ex) {
         ResultDto<Object> response = ResultDto.res(
-                HttpStatus.UNAUTHORIZED.value(),
-                "회원정보가 일치하지 않습니다."
+                HttpStatus.NOT_FOUND.value(),
+                "등록되지 않은 아이디이거나 아이디 또는 비밀번호를 잘못 입력했습니다."
         );
 
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
