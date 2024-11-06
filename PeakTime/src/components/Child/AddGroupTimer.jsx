@@ -133,7 +133,7 @@ function AddGroupTimer({ groupId, onSave }) {
             className="px-4 py-2 border rounded text-white"
             style={{
               backgroundColor:
-                repeatDay & dayBitValues[day] ? "#03C777" : "#C5C5C5",
+                repeatDay & dayBitValues[day] ? "#66AADF" : "#C5C5C5",
             }}
           >
             {day}

@@ -43,6 +43,14 @@ function AddGroup({ onChangeContent }) {
       confirmButtonText: "확인",
       confirmButtonColor: "#03C777",
     },
+    // 기타 그룹 생성 실패 시
+    failToCreateGroup: {
+      title: "그룹 생성 실패",
+      text: "그룹 생성을 실패했습니다. 잠시 후 다시 시도해주세요.",
+      icon: "error",
+      confirmButtonText: "확인",
+      confirmButtonColor: "#03C777",
+    },
   };
 
   // 프리셋 조회 API 호출
@@ -89,15 +97,16 @@ function AddGroup({ onChangeContent }) {
         })
         .catch((err) => {
           switch (err.status) {
-            // 빈 값이 있을 경우
-            case 400:
+            // 중복된 그룹명이 있으르 경우
+            case 409:
               Swal.fire(ALERT_MESSAGE.duplicateGroupTitleError);
               break;
-            // 중복된 그룹명이 있을 경우
+            // 그룹 수 제한을 초과해 생성을 시도하는 경우
             case 422:
               Swal.fire(ALERT_MESSAGE.groupCreationLimitExceeded);
               break;
             default:
+              Swal.fire(ALERT_MESSAGE.failToCreateGroup);
               break;
           }
         });

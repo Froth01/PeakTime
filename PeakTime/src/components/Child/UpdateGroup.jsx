@@ -83,6 +83,14 @@ function UpdateGroup({ groupId, onChangeContent }) {
       confirmButtonText: "확인",
       confirmButtonColor: "#03C777",
     },
+    // 그룹 타이머 attention_time 조건 불만족
+    attentionTimeOutOfRangeError: {
+      title: "시간 설정 오류",
+      text: "입력한 시간이 30분에서 240분 사이여야 합니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+      confirmButtonColor: "#03C777",
+    },
     // 그룹 타이머 중복 오류
     duplicateGroupTimerError: {
       title: "타이머 중복",
@@ -225,6 +233,15 @@ function UpdateGroup({ groupId, onChangeContent }) {
         root.render(<AddGroupTimer groupId={groupId} onSave={onSave} />);
       },
       preConfirm: () => {
+        // attentionTime이 30분에서 240분 사이인지 확인
+        if (
+          timerSetting.attentionTime < 30 ||
+          timerSetting.attentionTime > 240
+        ) {
+          Swal.fire(ALERT_MESSAGE.attentionTimeOutOfRangeError);
+          return false;
+        }
+
         timersApi
           .post("", timerSetting)
           .then((response) => {
@@ -316,7 +333,7 @@ function UpdateGroup({ groupId, onChangeContent }) {
   };
 
   return (
-    <div className="absolute left-[40vw] w-[60vw] h-[100vh] bg-white">
+    <div className="absolute left-[40vw] w-[60vw] h-[100vh] bg-white border border-black">
       {/* title */}
       <h2>{groupTitle}</h2>
 
@@ -352,9 +369,13 @@ function UpdateGroup({ groupId, onChangeContent }) {
       </div>
 
       {/* timers */}
-      <div className="border">
+      <div className="p-3 border">
         {groupInfo?.timerList.map((timer) => (
-          <div key={timer.timerId} value={timer.timerId}>
+          <div
+            key={timer.timerId}
+            value={timer.timerId}
+            className="flex justify-between"
+          >
             <span>
               {timeOnly(timer.startTime)} ~{" "}
               {timeOnly(timer.startTime, timer.attentionTime)}
@@ -366,7 +387,7 @@ function UpdateGroup({ groupId, onChangeContent }) {
       </div>
 
       <div className="flex justify-around">
-        <button onClick={() => openTimeSetModal(groupId)}>시간 추가</button>
+        <button onClick={() => openTimeSetModal(groupId)}>+시간 추가</button>
         <button onClick={() => openDeleteModal(groupId)}>그룹삭제</button>
         <button onClick={() => openUpdateModal(groupId)}>적용하기</button>
       </div>

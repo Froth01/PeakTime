@@ -16,11 +16,11 @@ function ChildList({ onChangeContent, groupList }) {
 
   return (
     <div
-      className="absolute left-[10vw] w-[25vw] h-[100vh] flex flex-col justify-start items-start p-5"
+      className="absolute left-[10vw] w-[21vw] h-[100vh] flex flex-col justify-start items-start p-5"
       style={{ backgroundColor: "#66AADF" }}
     >
-      <h2 className="self-start mb-3">그룹 목록</h2>
-      <div className="flex flex-col border border-black bg-white w-[20vw] h-[70vh] overflow-y-auto">
+      <h2 className="self-start mb-3 text-white font-bold">그룹 목록</h2>
+      <div className="flex flex-col bg-white w-[18vw] h-[70vh] overflow-y-auto rounded-lg">
         {groupList.map((group, index) => (
           <div key={index} className="flex flex-col">
             <button
@@ -47,9 +47,14 @@ function ChildList({ onChangeContent, groupList }) {
       </div>
       <div className="self-start mt-3">
         {groupList.length < 5 ? (
-          <button onClick={handleAddGroup}>+그룹 추가</button>
+          <button onClick={handleAddGroup} className="text-white font-bold">
+            +그룹 추가
+          </button>
         ) : null}
-        <button onClick={handleAddChild}>+계정 추가</button>
+        <span className="px-4" />
+        <button onClick={handleAddChild} className="text-white font-bold">
+          +계정 추가
+        </button>
       </div>
     </div>
   );
