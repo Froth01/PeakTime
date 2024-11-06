@@ -2,8 +2,11 @@ package com.dinnertime.peaktime.global.util;
 
 import com.dinnertime.peaktime.domain.schedule.entity.Schedule;
 import com.dinnertime.peaktime.domain.schedule.service.dto.RedisSchedule;
+import com.dinnertime.peaktime.global.exception.CustomException;
+import com.dinnertime.peaktime.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
@@ -25,7 +28,7 @@ public class RedisService {
     private final RedisTemplate<String, Object> redisTemplate;
     private static final int TTL = 24; // 하루 단위 gpt
     private final RedisTemplate<String, String> stringRedisTemplate;
-    private final RedisTemplate<String, List<RedisSchedule>> scheduleRedisTemplate;
+    private final RedisTemplate<String, RedisSchedule> scheduleRedisTemplate;
 
     public void saveRefreshToken(long userId, String refreshToken) {
         String key = "refreshToken:" + userId;
@@ -76,14 +79,7 @@ public class RedisService {
     public void addTimerByGroupId(Long groupId, int start, int end) {
         String key = "timer:"+groupId;
         ZSetOperations<String, String> zSet = stringRedisTemplate.opsForZSet();
-
-        //key에 해당하는 score(start시간) 중 겹치는 것을 확인
-        //최대 4시간 집중할 수 있으므로 시작시간 - 240부터 end시간까지 중 시작시간이 것을 확인
-        //
-        Set<String> checkRange = zSet.rangeByScore(key, start-240, end);
-
         zSet.add(key, start + "-" + end+"-"+groupId, start);
-
         log.info("타이머 추가: "+key);
 
     }
@@ -91,8 +87,9 @@ public class RedisService {
     public void deleteTimerByGroupIdAndTime(Long groupId, int start, int end) {
         String key = "timer:"+groupId;
         ZSetOperations<String, String> zSet = stringRedisTemplate.opsForZSet();
+        log.info("타이머 제거 "+key+" "+start);
 
-        zSet.remove(key, start +"-"+end+"-"+groupId);
+        zSet.remove(key, start +"-"+end+"-"+groupId, String.valueOf(start));
     }
 
     //현재 시간을 가져와서 보내주기
@@ -117,51 +114,40 @@ public class RedisService {
     }
 
     public void addSchedule(Schedule schedule) {
-        // 1. 오늘 날짜 키 생성 (예: "schedule:2024-11-04")
-        String cacheKey = "schedule:"+ LocalDate.now();
+        String cacheKey = "schedule:" + LocalDate.now();
+        log.info("오늘 스케줄 추가: " + cacheKey);
 
         RedisSchedule saveSchedule = RedisSchedule.createRedisSchedule(schedule);
 
-        // 2. Redis에서 스케줄을 조회
-        List<RedisSchedule> scheduleList = scheduleRedisTemplate.opsForValue().get(cacheKey);
+        ListOperations<String, RedisSchedule> listOps = scheduleRedisTemplate.opsForList();
+        Long ttl = scheduleRedisTemplate.getExpire(cacheKey);
 
-        List<RedisSchedule> copyScheduleList = new ArrayList<>();
+        listOps.rightPush(cacheKey, saveSchedule);
 
-        if(scheduleList != null) {
-            Long ttl = scheduleRedisTemplate.getExpire(cacheKey);
-            copyScheduleList = new ArrayList<>(scheduleList);
-            //불변 객체일 경우가 있으므로 복사
-            copyScheduleList.add(saveSchedule);
-
-            //레디스에 저장 만료일은 자정12시
-            scheduleRedisTemplate.opsForValue().set(cacheKey, copyScheduleList, ttl);
-            return;
+        // 만료 시간 설정
+        if (ttl == null || ttl <= 0) {
+            LocalDateTime midnight = LocalDate.now().plusDays(1).atStartOfDay();
+            ttl = Duration.between(LocalDateTime.now(), midnight).getSeconds();
+            scheduleRedisTemplate.expire(cacheKey, ttl, TimeUnit.SECONDS);
         }
-
-        //불변 객체일 경우가 있으므로 복사
-        copyScheduleList.add(saveSchedule);
-
-        //내일 정각 시간
-        LocalDateTime midnight = LocalDate.now().plusDays(1).atStartOfDay();
-
-        //현재시간을 기준으로 자정까지 남은 초
-        Long ttl = Duration.between(LocalDateTime.now(), midnight).getSeconds();
-
-        //레디스에 저장 만료일은 자정12시
-        scheduleRedisTemplate.opsForValue().set(cacheKey, copyScheduleList, ttl);
     }
 
     public void addFirstSchedule(List<Schedule> scheduleList) {
-        // 1. 오늘 날짜 키 생성 (예: "schedule:2024-11-04")
-        String cacheKey = "schedule:"+ LocalDate.now();
+        String cacheKey = "schedule:" + LocalDate.now();
 
-        // 2. Redis에서 스케줄을 조회
         List<RedisSchedule> redisScheduleList = scheduleList.stream()
                 .map(RedisSchedule::createRedisSchedule)
                 .toList();
 
-        //레디스에 저장 만료일은 자정12시
-        scheduleRedisTemplate.opsForValue().set(cacheKey, redisScheduleList, Duration.ofDays(1));
+        ListOperations<String, RedisSchedule> listOps = scheduleRedisTemplate.opsForList();
+        listOps.rightPushAll(cacheKey, redisScheduleList);
+
+        // 자정까지 남은 시간으로 만료 설정
+        LocalDateTime midnight = LocalDate.now().plusDays(1).atStartOfDay();
+        Long ttl = Duration.between(LocalDateTime.now(), midnight).getSeconds();
+        scheduleRedisTemplate.expire(cacheKey, ttl, TimeUnit.SECONDS);
+
+        log.info("첫 스케줄 추가 완료: " + cacheKey);
     }
 
 

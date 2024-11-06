@@ -15,27 +15,26 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "@class")
-public class RedisSchedule {
+public class RedisSchedule implements Serializable {
+
     //6이 월 0이 일
     //요일을 나타내는 컬럼
     private int dayOfWeek;
 
     //이벤트 발생 시간 -> 시작 시간
-    @JsonSerialize(using = LocalTimeSerializer.class)
-    @JsonDeserialize(using = LocalTimeDeserializer.class)
-    private LocalTime startTime;
+    private String startTime;
 
     private int attentionTime;
 
     private Long groupId;
 
     @Builder
-    private RedisSchedule(int dayOfWeek, LocalTime startTime, int attentionTime, Long groupId) {
+    private RedisSchedule(int dayOfWeek, String startTime, int attentionTime, Long groupId) {
         this.dayOfWeek = dayOfWeek;
         this.startTime = startTime;
         this.attentionTime = attentionTime;
@@ -45,7 +44,7 @@ public class RedisSchedule {
     public static RedisSchedule createRedisSchedule(Schedule schedule) {
         return RedisSchedule.builder()
                 .dayOfWeek(schedule.getDayOfWeek())
-                .startTime(schedule.getStartTime())
+                .startTime(String.valueOf(schedule.getStartTime()))
                 .attentionTime(schedule.getAttentionTime())
                 .groupId(schedule.getGroup().getGroupId())
                 .build();
