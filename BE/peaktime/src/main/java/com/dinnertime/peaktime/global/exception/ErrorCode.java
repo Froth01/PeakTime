@@ -31,6 +31,8 @@ public enum ErrorCode {
     FAILED_CREATE_CHILD_USER("그룹에는 최대 30명의 자식 계정만 존재할 수 있습니다.", HttpStatus.UNPROCESSABLE_ENTITY),
     TIMER_NOT_FOUND("존재하지 않는 타이머입니다.", HttpStatus.NOT_FOUND),
     TIME_SLOT_OVERLAP("선택한 시간 범위가 다른 예약과 겹칩니다.", HttpStatus.CONFLICT),
+    INVALID_LOGIN_PROCESS("등록되지 않은 아이디이거나 아이디 또는 비밀번호를 잘못 입력했습니다.", HttpStatus.NOT_FOUND),
+    UNAUTHORIZED("유효하지 않은 토큰입니다.", HttpStatus.UNAUTHORIZED)
     ;
 
     private final String message;
