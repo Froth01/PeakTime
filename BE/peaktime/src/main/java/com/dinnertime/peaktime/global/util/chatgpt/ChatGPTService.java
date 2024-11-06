@@ -3,6 +3,7 @@ package com.dinnertime.peaktime.global.util.chatgpt;
 import com.dinnertime.peaktime.domain.summary.service.dto.request.SaveSummaryRequestDto;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
+import com.dinnertime.peaktime.global.util.RedisService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -25,8 +26,7 @@ public class ChatGPTService {
 
     private static final int MAX_TOKEN = 1000;
     private static final int MAX_GPT_REQUEST_PER_DAY = 3;
-    private static final int TTL = 24; // 하루 단위
-    private final RedisTemplate<String, Integer> redisTemplate;
+    private final RedisService redisService;
 
     @Value("${openai.api.model}")
     private String gptModel;
@@ -40,13 +40,9 @@ public class ChatGPTService {
     public String getGPTResult(SaveSummaryRequestDto requestDto, Long userId) {
 
         // 1. 유저당 하루 gpt 사용 횟수(3번) 처리하기
-        // redis 연결 후 처리
-        String userKey = "gpt_usage_count: " + userId;
 
-        // null값일 경우의 처리를 위해 래퍼클래스 활용
-        // set 처리 x, 바로 get으로 접근해서 null이면 기본값 넣어주기
-        Integer count = redisTemplate.opsForValue().get(userKey);
-        count = count == null ? 0 : count;
+        Integer count = redisService.getGPTcount(userId);
+        count = count == null ? 0 : count; // 초기 횟수가 null이면 0으로 처리
 
         // 유저마다 하루 gpt 요청 최대 3번
         if (count >= MAX_GPT_REQUEST_PER_DAY) {
@@ -125,13 +121,9 @@ public class ChatGPTService {
                 String text = messageNode.asText();
 
                 // redis count 늘리기
-                redisTemplate.opsForValue().increment(userKey);
-                if(count == 0){
-                    redisTemplate.expire(userKey, TTL, TimeUnit.HOURS);
-                }
+                redisService.setGPTIncrement(userId);
                 return text;
             }
-
         } catch (Exception e) {
             throw new CustomException(ErrorCode.GPT_BAD_REQUEST);
         }

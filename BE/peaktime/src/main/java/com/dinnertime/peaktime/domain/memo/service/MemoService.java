@@ -11,6 +11,7 @@ import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
+import com.dinnertime.peaktime.global.util.RedisService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class MemoService {
     private final UserRepository userRepository;
     private final SummaryRepository summaryRepository;
 
-    private final RedisTemplate<String, Integer> redisTemplate;
+    private final RedisService redisService;
     // 메모 리스트 조회, 삭제 구현
 
     // 메모 리스트 조회
@@ -45,9 +46,7 @@ public class MemoService {
         List<Memo> memos = memoRepository.findAllByUser(user);
 
         // redis에서 임시 저장되어있는 요약 횟수 가져오기
-        Long userId = 1L;
-        String userKey = "gpt_usage_count: " + userId;
-        Integer count = redisTemplate.opsForValue().get(userKey);
+        Integer count = redisService.getGPTcount(1L);
 
         MemoWrapperResponseDto responseDto = MemoWrapperResponseDto.createMemoWrapperResponseDto(memos, count);
 
