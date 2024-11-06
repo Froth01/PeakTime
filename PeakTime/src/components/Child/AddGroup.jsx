@@ -4,7 +4,7 @@ import groupsApi from "../../api/groupsApi";
 import presetsApi from "../../api/presetsApi";
 import Swal from "sweetalert2";
 
-function AddGroup({ onChangeContent }) {
+function AddGroup({ onChangeContent, onChangeGroupList }) {
   // 그룹명, 프리셋 아이디
   const [title, setTitle] = useState(null);
   const [presetId, setPresetId] = useState(null);
@@ -43,6 +43,14 @@ function AddGroup({ onChangeContent }) {
       confirmButtonText: "확인",
       confirmButtonColor: "#03C777",
     },
+    // 그룹명 길이 초과 시
+    groupTitleLengthExceeded: {
+      title: "그룹명 길이 초과",
+      text: "그룹명은 최대 32자까지 입력할 수 있습니다.",
+      icon: "error",
+      confirmButtonText: "확인",
+      confirmButtonColor: "#03C777",
+    },
     // 기타 그룹 생성 실패 시
     failToCreateGroup: {
       title: "그룹 생성 실패",
@@ -77,6 +85,12 @@ function AddGroup({ onChangeContent }) {
       return;
     }
 
+    // 그룹명 길이 초과 시
+    if (title.length > 32) {
+      Swal.fire(ALERT_MESSAGE.groupTitleLengthExceeded);
+      return;
+    }
+
     const fetchCreateGroup = async () => {
       groupsApi
         .post(
@@ -89,15 +103,17 @@ function AddGroup({ onChangeContent }) {
             },
           }
         )
-        .then(() => {
+        .then((result) => {
           // 새 그룹 생성 성공 알림창
           Swal.fire(ALERT_MESSAGE.successToCreateGroup).then(() => {
-            window.location.reload();
+            // 그룹 목록 갱신
+            onChangeGroupList(result.data.data.groupList);
+            onChangeContent(null);
           });
         })
         .catch((err) => {
           switch (err.status) {
-            // 중복된 그룹명이 있으르 경우
+            // 중복된 그룹명이 있을 경우
             case 409:
               Swal.fire(ALERT_MESSAGE.duplicateGroupTitleError);
               break;

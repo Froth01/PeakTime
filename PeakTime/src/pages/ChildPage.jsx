@@ -24,6 +24,10 @@ function ChildPage() {
   // 그룹 리스트 > 차일드 리스트
   const [groupList, setGroupList] = useState([]);
 
+  const onChangeGroupList = (group) => {
+    setGroupList(group);
+  };
+
   // 페이지 진입 시 그룹 전체 조회 API 호출
   useEffect(() => {
     groupsApi
@@ -39,9 +43,18 @@ function ChildPage() {
       {showNow === "updateChild" && (
         <UpdateChild childId={updateId} onChangeContent={onChangeContent} />
       )}
-      {showNow === "addGroup" && <AddGroup onChangeContent={onChangeContent} />}
+      {showNow === "addGroup" && (
+        <AddGroup
+          onChangeContent={onChangeContent}
+          onChangeGroupList={onChangeGroupList}
+        />
+      )}
       {showNow === "updateGroup" && (
-        <UpdateGroup groupId={updateId} onChangeContent={onChangeContent} />
+        <UpdateGroup
+          groupId={updateId}
+          onChangeContent={onChangeContent}
+          onChangeGroupList={onChangeGroupList}
+        />
       )}
     </>
   );

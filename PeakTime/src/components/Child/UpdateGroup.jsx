@@ -7,7 +7,7 @@ import PropTypes from "prop-types";
 import Swal from "sweetalert2";
 import ReactDOM from "react-dom/client";
 
-function UpdateGroup({ groupId, onChangeContent }) {
+function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
   const [groupTitle, setGroupTitle] = useState(null);
   const [presetList, setPresetList] = useState(null);
   const [groupInfo, setGroupInfo] = useState(null);
@@ -40,7 +40,15 @@ function UpdateGroup({ groupId, onChangeContent }) {
       confirmButtonText: "확인",
       confirmButtonColor: "#03C777",
     },
-    // 그룹 수정 실패
+    // 그룹명 길이 초과 시
+    groupTitleLengthExceeded: {
+      title: "그룹명 길이 초과",
+      text: "그룹명은 최대 32자까지 입력할 수 있습니다.",
+      icon: "error",
+      confirmButtonText: "확인",
+      confirmButtonColor: "#03C777",
+    },
+    // 기타 그룹 수정 실패
     failToUpdateGroup: {
       title: "그룹 수정 실패",
       text: "그룹 정보 수정을 실패했습니다. 잠시 후 다시 시도해주세요.",
@@ -233,7 +241,7 @@ function UpdateGroup({ groupId, onChangeContent }) {
         root.render(<AddGroupTimer groupId={groupId} onSave={onSave} />);
       },
       preConfirm: () => {
-        // attentionTime이 30분에서 240분 사이인지 확인
+        // attentionTime이 30분에서 240분 사이가 아니라면 경고 모달 띄우고 false 반환
         if (
           timerSetting.attentionTime < 30 ||
           timerSetting.attentionTime > 240
@@ -293,13 +301,14 @@ function UpdateGroup({ groupId, onChangeContent }) {
           .delete(`/${groupId}`, {
             // params수정
             params: {
-              userId: 7,
+              userId: 1,
             },
           })
-          .then(() => {
+          .then((result) => {
+            // 삭제 완료 모달 띄운 후 그룹 목록 수정하고 페이지 닫기
             Swal.fire(ALERT_MESSAGE.succcessToDeleteGroup).then(() => {
-              // 확인 버튼을 눌렀을 때 페이지 새로고침
-              window.location.reload();
+              onChangeGroupList(result.data.data.groupList);
+              onChangeContent(null);
             });
           })
           .catch(() => {
@@ -309,9 +318,14 @@ function UpdateGroup({ groupId, onChangeContent }) {
     });
   };
 
-  // 적용하기 클릭
+  // 적용하기(그룹 수정) 클릭
   const openUpdateModal = (groupId) => {
-    Swal.fire(ALERT_MESSAGE.warningForUpdateGroupInfo).then((result) => {
+    if (groupInfo.title.length > 32) {
+      Swal.fire(ALERT_MESSAGE.groupTitleLengthExceeded);
+      return;
+    }
+
+    Swal.fire(ALERT_MESSAGE.warningForUpdateGroupInfo).then(() => {
       groupsApi
         .put(
           `/${groupId}`,
@@ -319,9 +333,10 @@ function UpdateGroup({ groupId, onChangeContent }) {
           // params수정
           { params: { userId: 1 } }
         )
-        .then(() => {
+        .then((result) => {
           Swal.fire(ALERT_MESSAGE.successToUpdateGroup).then(() => {
-            window.location.reload();
+            setGroupTitle(groupInfo.title);
+            onChangeGroupList(result.data.data.groupList);
           });
         })
         .catch((err) => {
