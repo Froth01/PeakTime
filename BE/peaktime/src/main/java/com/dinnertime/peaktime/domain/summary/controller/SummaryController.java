@@ -41,12 +41,14 @@ public class SummaryController {
     @CommonSwaggerResponse.CommonResponses
     @PostMapping()
     public ResponseEntity<?> createSummary(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @Valid @RequestBody SaveSummaryRequestDto requestDto) {
 
         log.info("createSummary 메서드가 호출되었습니다.");
         log.info("요약 생성 : " + requestDto.toString());
 
-        summaryFacade.createOrUpdateSummary(requestDto);
+        // userPrincipal.getUserId()
+        summaryFacade.createOrUpdateSummary(requestDto, 1L);
 
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "요약 생성 및 수정에 성공했습니다."));
 
