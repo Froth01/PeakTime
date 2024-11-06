@@ -1,8 +1,10 @@
 package com.dinnertime.peaktime.domain.memo.controller;
 
 import com.dinnertime.peaktime.domain.memo.service.MemoService;
+import com.dinnertime.peaktime.domain.memo.service.dto.request.SaveMemoRequestDto;
 import com.dinnertime.peaktime.domain.memo.service.dto.response.MemoSummaryResponseDto;
 import com.dinnertime.peaktime.domain.memo.service.dto.response.MemoWrapperResponseDto;
+import com.dinnertime.peaktime.domain.summary.service.dto.request.SaveSummaryRequestDto;
 import com.dinnertime.peaktime.global.util.CommonSwaggerResponse;
 import com.dinnertime.peaktime.global.util.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -93,5 +96,30 @@ public class MemoController {
 
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(),"메모 삭제에 성공했습니다."));
     }
+
+    // 메모 생성
+    @Operation(summary = "ex에서 받은 메모 저장하기", description = "새로운 메모 생성하기")
+    @ApiResponses(value ={
+            @ApiResponse(responseCode = "200", description = "새로운 메모 저장에 성공했습니다.",
+                    content=@Content(schema = @Schema(implementation = ResultDto.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "새로운 메모 저장에 실패했습니다.",
+                    content=@Content(schema = @Schema(implementation = ResultDto.class))
+            ),
+    })
+    @CommonSwaggerResponse.CommonResponses
+    @PostMapping()
+    public ResponseEntity<?> saveMemo(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @Valid @RequestBody SaveMemoRequestDto requestDto) {
+
+        log.info("saveMemo 메서드가 호출되었습니다.");
+
+        memoService.createMemo(userPrincipal, requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "메모 생성에 성공했습니다."));
+
+    }
+
+
 
 }

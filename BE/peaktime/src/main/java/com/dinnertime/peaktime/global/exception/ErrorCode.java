@@ -17,6 +17,9 @@ public enum ErrorCode {
     MEMO_NOT_FOUND("해당 메모 내용을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     HIKING_NOT_FOUND("존재하지 않는 하이킹입니다.", HttpStatus.NOT_FOUND),
     CHILD_ACCOUNT_HIKING_NOT_TERMINABLE("자식 계정은 하이킹 중 종료 할 수 없습니다.", HttpStatus.FORBIDDEN),
+    MAX_GPT_REQUEST_TODAY("하루에 GPT 요약 요청은 최대 3번까지 가능합니다.", HttpStatus.BAD_REQUEST),
+    GPT_BAD_REQUEST("GPT 요청을 처리하다가 실패했습니다.", HttpStatus.BAD_REQUEST),
+    FAILED_PROMPT_TO_JSON("요약을 위한 본문 처리에 실패했습니다. 잠시 후 다시 시도해주세요.", HttpStatus.BAD_REQUEST),
     INVALID_USER_LOGIN_ID_FORMAT("유저 로그인 아이디 형식이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
     INVALID_PASSWORD_FORMAT("비밀번호 형식이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
     INVALID_NICKNAME_FORMAT("닉네임 형식이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
@@ -29,6 +32,8 @@ public enum ErrorCode {
     TIMER_NOT_FOUND("존재하지 않는 타이머입니다.", HttpStatus.NOT_FOUND),
     TIME_SLOT_OVERLAP("선택한 시간 범위가 다른 예약과 겹칩니다.", HttpStatus.CONFLICT),
     FAIL_SEND_SSE_MESSAGE("메시지를 전송하는데 실패했습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_LOGIN_PROCESS("등록되지 않은 아이디이거나 아이디 또는 비밀번호를 잘못 입력했습니다.", HttpStatus.NOT_FOUND),
+    UNAUTHORIZED("유효하지 않은 토큰입니다.", HttpStatus.UNAUTHORIZED)
     ;
 
     private final String message;

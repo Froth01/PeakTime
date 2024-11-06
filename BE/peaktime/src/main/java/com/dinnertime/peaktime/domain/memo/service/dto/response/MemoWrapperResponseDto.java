@@ -10,19 +10,22 @@ import java.util.List;
 @ToString
 public class MemoWrapperResponseDto {
     private List<MemoResponseDto> memoList;
+    private Integer summaryCount; // 하루 gpt 사용 횟수
 
     @Builder
-    private MemoWrapperResponseDto(List<MemoResponseDto> memoList) {
+    private MemoWrapperResponseDto(List<MemoResponseDto> memoList, Integer summaryCount) {
         this.memoList = memoList;
+        this.summaryCount = summaryCount;
     }
 
-    public static MemoWrapperResponseDto createMemoWrapperResponseDto(List<Memo> memos) {
+    public static MemoWrapperResponseDto createMemoWrapperResponseDto(List<Memo> memos, Integer count) {
         List<MemoResponseDto> responseDto = memos.stream()
                 .map(MemoResponseDto::createMemoResponseDto)
                 .toList();
 
         return MemoWrapperResponseDto.builder()
                 .memoList(responseDto)
+                .summaryCount(count)
                 .build();
     }
 

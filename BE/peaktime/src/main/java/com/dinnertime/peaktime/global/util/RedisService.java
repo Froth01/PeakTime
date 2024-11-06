@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
+import java.util.concurrent.TimeUnit;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -20,8 +21,31 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class RedisService {
+
+    private final RedisTemplate<String, Object> redisTemplate;
+    private static final int TTL = 24; // 하루 단위 gpt
     private final RedisTemplate<String, String> stringRedisTemplate;
     private final RedisTemplate<String, List<RedisSchedule>> scheduleRedisTemplate;
+
+    public void saveRefreshToken(long userId, String refreshToken) {
+        String key = "refreshToken:" + userId;
+        redisTemplate.opsForValue().set(key, refreshToken);
+    }
+
+    public Integer getGPTcount(Long userId) {
+        String key = "gpt_usage_count: " + userId;
+        Integer count = (Integer) redisTemplate.opsForValue().get(key);
+        return count;
+    }
+
+    public void setGPTIncrement(Long userId) {
+        String key = "gpt_usage_count: " + userId;
+        // 초기 설정 or 개수 증가
+        redisTemplate.opsForValue().increment(key);
+        if (getGPTcount(userId) == 1) { // 맨 처음 생성 시 expire 설정
+            redisTemplate.expire(key, TTL, TimeUnit.HOURS);
+        }
+    }
 
     public boolean checkTimerByGroupId(Long groupId, int start, int end) {
         //키는 timer:그룹아이디
@@ -114,7 +138,7 @@ public class RedisService {
         //불변 객체일 경우가 있으므로 복사
         copyScheduleList.add(saveSchedule);
 
-        //내일 정각 시간 
+        //내일 정각 시간
         LocalDateTime midnight = LocalDate.now().plusDays(1).atStartOfDay();
 
         //현재시간을 기준으로 자정까지 남은 초
@@ -131,10 +155,11 @@ public class RedisService {
         // 2. Redis에서 스케줄을 조회
         List<RedisSchedule> redisScheduleList = scheduleList.stream()
                 .map(RedisSchedule::createRedisSchedule)
-                        .toList();
+                .toList();
 
         //레디스에 저장 만료일은 자정12시
         scheduleRedisTemplate.opsForValue().set(cacheKey, redisScheduleList, Duration.ofDays(1));
     }
+
 
 }

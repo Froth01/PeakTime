@@ -2,6 +2,7 @@ package com.dinnertime.peaktime.domain.memo.service;
 
 import com.dinnertime.peaktime.domain.memo.entity.Memo;
 import com.dinnertime.peaktime.domain.memo.repository.MemoRepository;
+import com.dinnertime.peaktime.domain.memo.service.dto.request.SaveMemoRequestDto;
 import com.dinnertime.peaktime.domain.memo.service.dto.response.MemoSummaryResponseDto;
 import com.dinnertime.peaktime.domain.memo.service.dto.response.MemoWrapperResponseDto;
 import com.dinnertime.peaktime.domain.summary.entity.Summary;
@@ -10,6 +11,8 @@ import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
+import com.dinnertime.peaktime.global.util.RedisService;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +29,8 @@ public class MemoService {
     private final MemoRepository memoRepository;
     private final UserRepository userRepository;
     private final SummaryRepository summaryRepository;
+
+    private final RedisService redisService;
     // 메모 리스트 조회, 삭제 구현
 
     // 메모 리스트 조회
@@ -40,7 +45,10 @@ public class MemoService {
 
         List<Memo> memos = memoRepository.findAllByUser(user);
 
-        MemoWrapperResponseDto responseDto = MemoWrapperResponseDto.createMemoWrapperResponseDto(memos);
+        // redis에서 임시 저장되어있는 요약 횟수 가져오기
+        Integer count = redisService.getGPTcount(1L);
+
+        MemoWrapperResponseDto responseDto = MemoWrapperResponseDto.createMemoWrapperResponseDto(memos, count);
 
         return responseDto;
     }
@@ -79,6 +87,19 @@ public class MemoService {
 
         return responseDto;
 
+    }
+
+    // ex에서 받은 메모 정보 저장
+    @Transactional
+    public void createMemo(UserPrincipal userPrincipal, SaveMemoRequestDto requestDto) {
+
+        // userPrincipal.getUserId()
+        // userId = 1로 임의 설정
+        User user = userRepository.findByUserIdAndIsDeleteFalse(1)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Memo memo = Memo.createMemo(requestDto, user);
+        memoRepository.save(memo);
     }
 
 
