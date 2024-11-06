@@ -1,12 +1,21 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import path from "path";
 import url from "url";
+import WebSocket, { WebSocketServer } from "ws";
+
+const __dirname = path.resolve();
 
 function createWindow() {
   // 일렉트론 크기
   const win = new BrowserWindow({
     width: 1366,
     height: 768,
+    webPreferences: {
+      preload: path.join(__dirname, "public", "preload.js"),
+      contextIsolation: true,
+      sandbox: true,
+      enableRemoteModule: false,
+    },
   });
 
   /*
@@ -28,4 +37,62 @@ function createWindow() {
   win.loadURL(startUrl);
 }
 
-app.on("ready", createWindow);
+let wss;
+
+// 웹소켓 메세지 주고받기
+ipcMain.on("websocket-message", (event, action) => {
+  if (wss && wss.clients) {
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(action);
+      }
+    });
+  }
+});
+
+// 하이킹 정보 받기
+ipcMain.on("hikingInfo", (event, data) => {
+  console.log("메인 프로세스에서 받은 하이킹 정보:", data);
+
+  // 하이킹 정보를 렌더러로 응답으로 보내기
+  event.reply("hikingInfoResponse", data);
+});
+
+app.whenReady().then(() => {
+  createWindow();
+  console.log(__dirname);
+  // WebSocket 서버 생성
+  const port = 12345;
+  wss = new WebSocketServer({ port }, () => {
+    console.log(`WebSocket server is running on port ${port}`);
+  });
+
+  // WebSocket 연결 처리
+  wss.on("connection", (ws) => {
+    console.log("New client connected");
+
+    // 클라이언트로부터 메시지 수신
+    ws.on("message", (message) => {
+      console.log(`Received from client: ${message}`);
+      BrowserWindow.getAllWindows().forEach((win) => {
+        win.webContents.send("websocket-message", message);
+      });
+      // 클라이언트에게 응답 보내기
+      ws.send(JSON.stringify({ website: "mashable.com" }));
+    });
+
+    // 클라이언트 연결 종료
+    ws.on("close", () => {
+      console.log("Client disconnected");
+    });
+
+    // 에러 처리
+    ws.on("error", (err) => {
+      console.error("WebSocket error:", err);
+    });
+  });
+
+  wss.on("error", (err) => {
+    console.error("WebSocket server error:", err);
+  });
+});
