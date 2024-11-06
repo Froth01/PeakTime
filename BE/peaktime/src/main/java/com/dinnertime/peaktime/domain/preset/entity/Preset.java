@@ -1,5 +1,6 @@
 package com.dinnertime.peaktime.domain.preset.entity;
 
+import com.dinnertime.peaktime.domain.preset.service.dto.request.AddUrlPresetRequestDto;
 import com.dinnertime.peaktime.domain.preset.service.dto.request.SavePresetRequestDto;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
@@ -71,6 +72,11 @@ public class Preset {
         this.title = requestDto.getTitle();
         this.blockWebsiteArray = Arrays.asList(requestDto.getBlockWebsiteList());
         this.blockProgramArray = Arrays.asList(requestDto.getBlockProgramList());
+    }
+
+    // 웹사이트 프리셋 추가
+    public void addWebsitePreset(AddUrlPresetRequestDto requestDto) {
+        this.blockWebsiteArray.add(requestDto.getUrl());
     }
 
 }

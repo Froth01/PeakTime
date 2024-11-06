@@ -4,6 +4,7 @@ import com.dinnertime.peaktime.global.util.ResultDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -31,8 +32,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<?> handleBadCredentialsException(final BadCredentialsException ex) {
         ResultDto<Object> response = ResultDto.res(
-                HttpStatus.UNAUTHORIZED.value(),
-                "회원정보가 일치하지 않습니다."
+                HttpStatus.NOT_FOUND.value(),
+                "등록되지 않은 아이디이거나 아이디 또는 비밀번호를 잘못 입력했습니다."
         );
 
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
@@ -55,6 +56,15 @@ public class GlobalExceptionHandler {
                 "잘못된 형식의 요청입니다."
         );
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException ex) {
+        ResultDto<Object> response = ResultDto.res(
+                HttpStatus.FORBIDDEN.value(),
+                "해당 권한으로는 이 API를 호출할 수 없습니다."
+        );
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler({ MethodArgumentTypeMismatchException.class, DateTimeParseException.class })
