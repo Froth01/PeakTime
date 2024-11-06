@@ -1,5 +1,8 @@
 package com.dinnertime.peaktime.global.auth.service;
 
+import com.dinnertime.peaktime.global.exception.CustomException;
+import com.dinnertime.peaktime.global.exception.ErrorCode;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
@@ -77,6 +80,47 @@ public class JwtService implements InitializingBean {
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
         httpServletResponse.addCookie(cookie);
+    }
+
+    // JWT 유효성 검사
+    public boolean validateToken(String token) {
+        try {
+            // 유효한 토큰이라면 Claims 객체를 추출 가능
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            return true;
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
+    }
+
+    // JWT에서 User PK 추출
+    public long getUserId(String token) {
+        Claims claims = this.getClaims(token);
+        Number userId = (Number) claims.get("userId");
+        return userId.longValue();
+    }
+
+    // JWT에서 Authority 추출
+    public String getAuthority(String token) {
+        Claims claims = this.getClaims(token);
+        return (String) claims.get("authority");
+    }
+
+    // JWT에서 Claims 추출
+    private Claims getClaims(String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
     }
 
 }

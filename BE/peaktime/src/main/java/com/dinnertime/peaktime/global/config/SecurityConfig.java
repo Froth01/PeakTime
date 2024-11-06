@@ -1,22 +1,36 @@
 package com.dinnertime.peaktime.global.config;
 
+import com.dinnertime.peaktime.domain.user.service.UserService;
+import com.dinnertime.peaktime.global.auth.filter.ExceptionHandlerFilter;
+import com.dinnertime.peaktime.global.auth.filter.JwtFilter;
+import com.dinnertime.peaktime.global.auth.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.ExceptionTranslationFilter;
 
 @Slf4j
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableMethodSecurity
 public class SecurityConfig {
+
+    private final JwtService jwtService;
+    private final UserService userService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -31,11 +45,28 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf((csrf) -> csrf.disable());
-        http.authorizeHttpRequests((authorize) ->
-                authorize.requestMatchers("/**").permitAll()
-        );
-        return http.build();
+        return http
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/auth/logout", "/users/**", "/children/**", "/groups/**", "/presets/**", "/hikings/**", "/timers/**", "/summaries/**", "/memos/**").hasAuthority("root")
+                        .requestMatchers("/auth/logout", "/hikings/**", "/summaries/**", "/memos/**").hasAuthority("child")
+                        .anyRequest().denyAll())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .addFilterBefore(new JwtFilter(jwtService, userService), ExceptionTranslationFilter.class)
+                .addFilterBefore(new ExceptionHandlerFilter(), JwtFilter.class)
+                .build();
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        // 아래 url은 filter 에서 제외
+        return web ->
+                web.ignoring()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**", "/ws/**")
+                        .requestMatchers("/auth/login", "/auth/signup", "/auth/user-login-id", "/auth/email", "/auth/code/**", "/auth/reset-password", "/auth/token/reissue");
+                        // 테스트가 끝나면 "/auth/login"을 추가해주세요.
     }
 
 }
