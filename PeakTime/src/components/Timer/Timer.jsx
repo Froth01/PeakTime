@@ -5,14 +5,15 @@ import hikingsApi from "../../api/hikingsApi";
 function Timer() {
   const [inputTime, setInputTime] = useState(""); // 사용자 입력 시간 (분 단위)
   const [totalTime, setTotalTime] = useState(0); // 타이머 시간 (분 단위)
-  const [remainTime, setRemainTime] = useState(0); // 남은 시간 (초 단위)
+  const [remainTime, setRemainTime] = useState(null); // 남은 시간 (초 단위)
   const [isRunning, setIsRunning] = useState(false); // 타이머 시작 상태
 
   const [startedHikingId, setStartedHikingId] = useState(null); // 시작한 hikingId 정보
+  const [parsedData, setParsedData] = useState(null);
 
   // 시작 상태, 남은 시간 변경시마다 적용
   useEffect(() => {
-    if (remainTime === 0) {
+    if (remainTime && remainTime === 0) {
       setIsRunning(false);
     }
 
@@ -32,7 +33,8 @@ function Timer() {
       "0"
     )}`;
   };
-  // 시작버튼
+
+  // 시작버튼 누르기
   // 커스텀 이벤트
   const hikingStart = new CustomEvent("hikingStart", { bubbles: true });
   const handleStart = () => {
@@ -101,13 +103,14 @@ function Timer() {
             title: "하이킹을 시작하는 데 실패했습니다.",
             text: `오류 내용: ${err.response?.data?.message || err.message}`,
             icon: "error",
-            confirmButtonColor: "red",
+            confirmButtonColor: "green",
             confirmButtonText: "확인",
           });
         }
       },
     });
   };
+
   // 요청해서 아이디 받으면
   useEffect(() => {
     if (startedHikingId !== null) {
@@ -115,9 +118,95 @@ function Timer() {
     }
   }, [startedHikingId]);
 
+  // ipc 처리
+  const handleExtensionMessage = async (data) => {
+    await setParsedData(data); // 받은 데이터를 상태로 저장
+  };
+  // onWebSocketMessage 이벤트 리스너 등록
+  useEffect(() => {
+    console.log("onHikingInfo 리스너 등록 중...");
+    window.electronAPI.onHikingInfo(handleExtensionMessage);
+  }, []);
+
+  // 포기 버튼 누르기
+  // 커스텀 이벤트
+  const hikingEnd = new CustomEvent("hikingEnd", { bubbles: true });
+  const handleGiveup = () => {
+    Swal.fire({
+      title: `진행중인 하이킹을 포기하시겠습니까?`,
+      showDenyButton: true,
+      confirmButtonColor: "#f40000",
+      denyButtonColor: "#c5c5c5",
+      confirmButtonText: "포기하기",
+      denyButtonText: "취소",
+      preConfirm: async () => {
+        try {
+          console.log("취소 로직 작동");
+
+          // 종료 커스텀 이벤트 발생시키기
+          const endBtn = document.getElementById("giveup");
+          endBtn.dispatchEvent(hikingEnd);
+
+          // 현재 시간 포맷 생성
+          const now = new Date();
+          const year = now.getFullYear();
+          const month = now.getMonth() + 1;
+          const day = now.getDate();
+          const hour = now.getHours();
+          const minute = now.getMinutes();
+          const second = now.getSeconds();
+
+          const format = `${year}-${("00" + month.toString()).slice(-2)}-${(
+            "00" + day.toString()
+          ).slice(-2)} ${("00" + hour.toString()).slice(-2)}:${(
+            "00" + minute.toString()
+          ).slice(-2)}:${("00" + second.toString()).slice(-2)}`;
+          const endHikingData = {
+            data: parsedData,
+          };
+          // const endHikingData = {
+          //   realEndTime: format,
+          //   contentList: [
+          //     {
+          //       contentName: "더미",
+          //       contentType: "site",
+          //       usingTime: 130,
+          //       isBlockContent: false,
+          //     },
+          //   ],
+          // };
+          console.log(endHikingData);
+
+          // API 요청
+          const responseEndHiking = await hikingsApi.put(
+            `${startedHikingId}`,
+            endHikingData
+          );
+
+          // 상태 업데이트
+          setTotalTime(0);
+          setRemainTime(null); // 분 단위로 받은 시간을 초로 변환
+          setIsRunning(false);
+        } catch (err) {
+          console.error("API 요청 중 오류 발생:", err);
+
+          // SweetAlert를 사용하여 오류 메시지 표시
+          Swal.fire({
+            title: "하이킹을 종료하는 데 실패했습니다.",
+            text: `오류 내용: ${err.response?.data?.message || err.message}`,
+            icon: "error",
+            confirmButtonColor: "green",
+            confirmButtonText: "확인",
+          });
+        }
+      },
+    });
+  };
+
   return (
     <>
       <style>
+        {/* 타이머 시계 css */}
         {`
           .timer {
             background: ${
@@ -248,6 +337,17 @@ function Timer() {
                 id="start"
               >
                 시작
+              </button>
+            </div>
+          )}
+          {isRunning && (
+            <div className="flex flex-col mt-[15%] items-center">
+              <button
+                className="w-[10vw] h-[6vh] mt-[10%] rounded-xl text-white bg-[#f40000]"
+                onClick={handleGiveup}
+                id="giveup"
+              >
+                포기하기
               </button>
             </div>
           )}
