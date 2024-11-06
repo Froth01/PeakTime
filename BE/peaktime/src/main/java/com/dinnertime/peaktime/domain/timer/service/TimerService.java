@@ -5,6 +5,7 @@ import com.dinnertime.peaktime.domain.group.repository.GroupRepository;
 import com.dinnertime.peaktime.domain.timer.entity.Timer;
 import com.dinnertime.peaktime.domain.timer.repository.TimerRepository;
 import com.dinnertime.peaktime.domain.timer.service.dto.request.TimerCreateRequestDto;
+import com.dinnertime.peaktime.domain.timer.service.dto.response.TimerCreateResponseDto;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
 import jakarta.transaction.Transactional;
@@ -21,7 +22,7 @@ public class TimerService {
     private final GroupRepository groupRepository;
 
     @Transactional
-    public void postTimer(TimerCreateRequestDto requestDto) {
+    public TimerCreateResponseDto postTimer(TimerCreateRequestDto requestDto) {
         Long groupId = requestDto.getGroupId();
         LocalDateTime startTime = requestDto.getStartTime();
         int attentionTime = requestDto.getAttentionTime();
@@ -38,7 +39,10 @@ public class TimerService {
 
         // 타이머 생성 및 저장
         Timer timer = Timer.createTimer(group, requestDto);
-        timerRepository.save(timer);
+        Timer savedTimer = timerRepository.save(timer);
+
+        TimerCreateResponseDto timerCreateResponseDto = TimerCreateResponseDto.createTimerCreateResponseDto(savedTimer);
+        return timerCreateResponseDto;
     }
 
     @Transactional

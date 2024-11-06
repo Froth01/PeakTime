@@ -32,6 +32,8 @@ public class Timer {
     private LocalDateTime startTime;
 
     @Column(name = "attention_time", nullable = false)
+    @Min(30)
+    @Max(240)
     private int attentionTime;
 
     @Column(name = "is_repeat", nullable = false)

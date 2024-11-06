@@ -2,6 +2,7 @@ package com.dinnertime.peaktime.domain.timer.controller;
 
 import com.dinnertime.peaktime.domain.timer.service.TimerService;
 import com.dinnertime.peaktime.domain.timer.service.dto.request.TimerCreateRequestDto;
+import com.dinnertime.peaktime.domain.timer.service.dto.response.TimerCreateResponseDto;
 import com.dinnertime.peaktime.global.util.CommonSwaggerResponse;
 import com.dinnertime.peaktime.global.util.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,9 +35,9 @@ public class TimerController {
     @CommonSwaggerResponse.CommonResponses
     @PostMapping("")
     public ResponseEntity<?> postTimer(@RequestBody @Valid TimerCreateRequestDto requestDto) {
-        timerService.postTimer(requestDto);
+        TimerCreateResponseDto responseDto = timerService.postTimer(requestDto);
 
-        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "타이머 생성을 성공했습니다."));
+        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "타이머 생성을 성공했습니다.", responseDto));
     }
 
     @Operation(summary = "그룹 타이머 삭제", description = "선택한 그룹 타이머를 삭제합니다.")

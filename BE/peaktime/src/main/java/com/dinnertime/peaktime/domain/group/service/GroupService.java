@@ -38,15 +38,15 @@ public class GroupService {
     private final PresetRepository presetRepository;
 
     @Transactional
-    public GroupListResponseDto getGroupListResponseDto() {
-        List<GroupItemResponseDto> groupList = getGroupList();
+    public GroupListResponseDto getGroupListResponseDto(Long userId) {
+        List<GroupItemResponseDto> groupList = getGroupList(userId);
 
         return GroupListResponseDto.createGroupListResponseDto(groupList);
     }
 
     @Transactional
-    public List<GroupItemResponseDto> getGroupList() {
-        List<Group> groupList = groupRepository.findByIsDeleteOrderByTitleAsc(false);
+    public List<GroupItemResponseDto> getGroupList(Long userId) {
+        List<Group> groupList = groupRepository.findByUser_UserIdAndIsDeleteOrderByTitleAsc(userId, false);
 
         return groupList.stream()
                 .map(groupItem -> GroupItemResponseDto.createGroupItemResponseDto(

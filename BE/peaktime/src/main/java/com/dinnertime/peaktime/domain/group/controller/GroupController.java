@@ -36,9 +36,9 @@ public class GroupController {
     })
     @CommonSwaggerResponse.CommonResponses
     @GetMapping("")
-    public ResponseEntity<?> getGroupList() {
+    public ResponseEntity<?> getGroupList(@RequestParam Long userId) {
         // 계정 설정 업데이트 시 접속한 ID로 조회하는 부분 추가
-        GroupListResponseDto groupListResponseDto = groupService.getGroupListResponseDto();
+        GroupListResponseDto groupListResponseDto = groupService.getGroupListResponseDto(userId);
 
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "그룹 및 서브유저 전체 조회 성공했습니다.", groupListResponseDto));
     }
