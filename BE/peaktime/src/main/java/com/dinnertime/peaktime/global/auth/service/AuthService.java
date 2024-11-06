@@ -10,11 +10,13 @@ import com.dinnertime.peaktime.global.auth.service.dto.request.LoginRequest;
 import com.dinnertime.peaktime.global.auth.service.dto.request.SignupRequest;
 import com.dinnertime.peaktime.global.auth.service.dto.response.IsDuplicatedResponse;
 import com.dinnertime.peaktime.global.auth.service.dto.response.LoginResponse;
+import com.dinnertime.peaktime.global.auth.service.dto.response.ReissueResponse;
 import com.dinnertime.peaktime.global.auth.service.dto.security.UserPrincipal;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
 import com.dinnertime.peaktime.global.util.AuthUtil;
 import com.dinnertime.peaktime.global.util.RedisService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -157,6 +159,12 @@ public class AuthService {
         UserGroup userGroup = userGroupRepository.findByUser_UserId(user.getUserId())
                 .orElseThrow(() -> new CustomException(ErrorCode.INVALID_LOGIN_PROCESS));
         return LoginResponse.createLoginResponse(accessToken, false, userGroup.getGroup().getGroupId(), user.getNickname());
+    }
+
+    // Reissue JWT
+    @Transactional
+    public ReissueResponse reissue(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        // 1. 클라이언트의 요청에 담긴 쿠키에서 Refresh Token 꺼내깅 ㅎ
     }
 
     // 아이디 중복 검사 (유저 로그인 아이디로 검사. 이미 존재하면 true 반환)

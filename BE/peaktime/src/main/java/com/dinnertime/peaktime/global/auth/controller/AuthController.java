@@ -5,6 +5,7 @@ import com.dinnertime.peaktime.global.auth.service.dto.request.LoginRequest;
 import com.dinnertime.peaktime.global.auth.service.dto.request.SignupRequest;
 import com.dinnertime.peaktime.global.auth.service.dto.response.IsDuplicatedResponse;
 import com.dinnertime.peaktime.global.auth.service.dto.response.LoginResponse;
+import com.dinnertime.peaktime.global.auth.service.dto.response.ReissueResponse;
 import com.dinnertime.peaktime.global.util.CommonSwaggerResponse;
 import com.dinnertime.peaktime.global.util.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -62,7 +64,7 @@ public class AuthController {
     })
     @CommonSwaggerResponse.CommonResponses
     @GetMapping("/user-login-id")
-    public ResponseEntity<?> isDuplicatedUserLoginId(@RequestParam String userLoginId) {
+    public ResponseEntity<?> isDuplicatedUserLoginId(@RequestParam(value = "userLoginId") String userLoginId) {
         IsDuplicatedResponse response = authService.isDuplicatedUserLoginId(userLoginId);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -82,7 +84,7 @@ public class AuthController {
     })
     @CommonSwaggerResponse.CommonResponses
     @GetMapping("/email")
-    public ResponseEntity<?> isDuplicatedEmail(@RequestParam String email) {
+    public ResponseEntity<?> isDuplicatedEmail(@RequestParam(value = "email") String email) {
         IsDuplicatedResponse response = authService.isDuplicatedEmail(email);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -110,6 +112,16 @@ public class AuthController {
                 .status(HttpStatus.OK)
                 .body(ResultDto.res(HttpStatus.OK.value(),
                         "로그인에 성공하였습니다.", response));
+    }
+
+    // Reissue JWT
+    @PostMapping("/token/reissue")
+    public ResponseEntity<?> reissue(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        ReissueResponse response = authService.reissue(httpServletRequest, httpServletResponse);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResultDto.res(HttpStatus.OK.value(),
+                        "JWT가 재발급되었습니다.", response));
     }
 
 }
