@@ -21,6 +21,8 @@ import java.time.LocalTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "@class")
 public class RedisSchedule {
+    //6이 월 0이 일
+    //요일을 나타내는 컬럼
     private int dayOfWeek;
 
     //이벤트 발생 시간 -> 시작 시간

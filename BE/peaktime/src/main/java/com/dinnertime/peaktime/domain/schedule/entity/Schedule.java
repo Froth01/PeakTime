@@ -18,6 +18,7 @@ public class Schedule {
     @Column(name = "schedule_id")
     private Long scheduleId;
 
+    //6이 월 0이 일
     //요일을 나타내는 컬럼
     @Column(name = "day_of_week", nullable = false)
     private int dayOfWeek;
