@@ -39,6 +39,7 @@ function createWindow() {
 
 let wss;
 
+// 웹소켓 메세지 주고받기
 ipcMain.on("websocket-message", (event, action) => {
   if (wss && wss.clients) {
     wss.clients.forEach((client) => {
@@ -47,6 +48,14 @@ ipcMain.on("websocket-message", (event, action) => {
       }
     });
   }
+});
+
+// 하이킹 정보 받기
+ipcMain.on("hikingInfo", (event, data) => {
+  console.log("메인 프로세스에서 받은 하이킹 정보:", data);
+
+  // 하이킹 정보를 렌더러로 응답으로 보내기
+  event.reply("hikingInfoResponse", data);
 });
 
 app.whenReady().then(() => {
