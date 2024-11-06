@@ -14,9 +14,9 @@ public class SummaryFacade {
     private final SummaryService summaryService;
     private final ChatGPTService chatGPTService;
 
-    public void createOrUpdateSummary(SaveSummaryRequestDto requestDto){
+    public void createOrUpdateSummary(SaveSummaryRequestDto requestDto, Long userId){
 
-        String GPTContent = chatGPTService.getGPTResult(requestDto);
+        String GPTContent = chatGPTService.getGPTResult(requestDto, userId);
         summaryService.createOrUpdateSummary(requestDto, GPTContent);
     }
 
