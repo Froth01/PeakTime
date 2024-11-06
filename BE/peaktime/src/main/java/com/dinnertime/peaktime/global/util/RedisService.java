@@ -15,20 +15,19 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class RedisService {
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, String> stringRedisTemplate;
     private final RedisTemplate<String, List<RedisSchedule>> scheduleRedisTemplate;
 
     public boolean checkTimerByGroupId(Long groupId, int start, int end) {
         //키는 timer:그룹아이디
         String key = "timer:"+groupId;
 
-        ZSetOperations<String, String> zSet = redisTemplate.opsForZSet();
+        ZSetOperations<String, String> zSet = stringRedisTemplate.opsForZSet();
 
         //key에 해당하는 score(start시간) 중 겹치는 것을 확인
         //최대 4시간 집중할 수 있으므로 시작시간 - 240부터 end시간까지 중 시작시간이 것을 확인
@@ -52,7 +51,7 @@ public class RedisService {
 
     public void addTimerByGroupId(Long groupId, int start, int end) {
         String key = "timer:"+groupId;
-        ZSetOperations<String, String> zSet = redisTemplate.opsForZSet();
+        ZSetOperations<String, String> zSet = stringRedisTemplate.opsForZSet();
 
         //key에 해당하는 score(start시간) 중 겹치는 것을 확인
         //최대 4시간 집중할 수 있으므로 시작시간 - 240부터 end시간까지 중 시작시간이 것을 확인
@@ -64,7 +63,7 @@ public class RedisService {
 
     public void deleteTimerByGroupIdAndTime(Long groupId, int start, int end) {
         String key = "timer:"+groupId;
-        ZSetOperations<String, String> zSet = redisTemplate.opsForZSet();
+        ZSetOperations<String, String> zSet = stringRedisTemplate.opsForZSet();
 
         zSet.remove(key, start +"-"+end+"-"+groupId);
     }
@@ -73,8 +72,8 @@ public class RedisService {
     public List<String> findTimerByStart(int start) {
 
         // "timer:"로 시작하는 모든 키 가져오기
-        ZSetOperations<String, String> zSet = redisTemplate.opsForZSet();
-        Set<String> keys = redisTemplate.keys("timer:*");
+        ZSetOperations<String, String> zSet = stringRedisTemplate.opsForZSet();
+        Set<String> keys = stringRedisTemplate.keys("timer:*");
 
         // 각 키에서 해당 score에 해당하는 요소만 가져오기
         Set<String> elements = new HashSet<>();
