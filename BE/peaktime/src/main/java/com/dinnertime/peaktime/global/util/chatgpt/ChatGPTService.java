@@ -9,12 +9,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -23,8 +25,8 @@ public class ChatGPTService {
 
     private static final int MAX_TOKEN = 1000;
     private static final int MAX_GPT_REQUEST_PER_DAY = 3;
-
-//    private static final
+    private static final int TTL = 24; // 하루 단위
+    private final RedisTemplate<String, Integer> redisTemplate;
 
     @Value("${openai.api.model}")
     private String gptModel;
@@ -35,25 +37,26 @@ public class ChatGPTService {
     @Value("${openai.api.url}")
     private String apiURL;
 
-    public String getGPTResult(SaveSummaryRequestDto requestDto) {
+    public String getGPTResult(SaveSummaryRequestDto requestDto, Long userId) {
 
         // 1. 유저당 하루 gpt 사용 횟수(3번) 처리하기
         // redis 연결 후 처리
-        int getGPTToday = 2;
-        // 2. gpt 프롬포트와 연결하기
+        String userKey = "gpt_usage_count: " + userId;
 
-        // 3. 처리 결과 파일 받아서 사용하기
+        // null값일 경우의 처리를 위해 래퍼클래스 활용
+        // set 처리 x, 바로 get으로 접근해서 null이면 기본값 넣어주기
+        Integer count = redisTemplate.opsForValue().get(userKey);
+        count = count == null ? 0 : count;
 
         // 유저마다 하루 gpt 요청 최대 3번
-        if (getGPTToday > MAX_GPT_REQUEST_PER_DAY) {
+        if (count >= MAX_GPT_REQUEST_PER_DAY) {
             throw new CustomException(ErrorCode.MAX_GPT_REQUEST_TODAY);
         }
-
-        RestTemplate restTemplate = new RestTemplate();
 
         // 요청 본문 준비
         // 모든 형태는 hashmap 형태로 담아서 처리한다.
         // 1. requestBody 요청 부분에 Model 설정하기
+        RestTemplate restTemplate = new RestTemplate();
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("model", gptModel);
 
@@ -72,14 +75,11 @@ public class ChatGPTService {
         // description으로 받아오는 문자열 추가 설정도 가능
 
         // 3. 추가 키워드 받아와서 프롬포트 문자열 생성하기
-//        StringBuilder sb = new StringBuilder();
-//        sb.append(String.join(",", requestDto.getKeywords()));
 
         // user : 질의를 진행하는 실제 템플릿 양식(질문 양식 작성)
         Map<String, Object> userMessage = new HashMap<>();
 
         try {
-            log.info("여기까지 오긴하나");
             String originContent = requestDto.getContent();
 
             // ObjectMapper를 사용하여 JSON 객체 생성
@@ -123,6 +123,12 @@ public class ChatGPTService {
                 // 응답 내용 추출하기
                 JsonNode messageNode = responseBody.path("choices").get(0).path("message").path("content");
                 String text = messageNode.asText();
+
+                // redis count 늘리기
+                redisTemplate.opsForValue().increment(userKey);
+                if(count == 0){
+                    redisTemplate.expire(userKey, TTL, TimeUnit.HOURS);
+                }
                 return text;
             }
 
