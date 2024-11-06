@@ -6,6 +6,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -71,6 +72,18 @@ public class JwtService implements InitializingBean {
                 .compact();
     }
 
+    // 만료시점을 지정할 수 있는 Refresh Token 생성
+    public String createRefreshTokenWithExp(long userId, String authority, Date expirationTime) {
+        Instant now = Instant.now();
+        return Jwts.builder()
+                .claim("userId", userId)
+                .claim("authority", authority)
+                .signWith(secretKey)
+                .setIssuedAt(Date.from(now))
+                .setExpiration(expirationTime)
+                .compact();
+    }
+
     // Cookie에 Refresh Token 담기
     public void addRefreshTokenToCookie(HttpServletResponse httpServletResponse, String refreshToken) {
         Cookie cookie = new Cookie("refresh_token", refreshToken);
@@ -110,6 +123,12 @@ public class JwtService implements InitializingBean {
         return (String) claims.get("authority");
     }
 
+    // JWT에서 만료시간 추출
+    public Date getExpirationTime(String token) {
+        Claims claims = this.getClaims(token);
+        return claims.getExpiration();
+    }
+
     // JWT에서 Claims 추출
     private Claims getClaims(String token) {
         try {
@@ -121,6 +140,20 @@ public class JwtService implements InitializingBean {
         } catch (Exception e) {
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
+    }
+
+    // 클라이언트의 요청에서 Refresh Token 추출하기
+    public String extractRefreshToken(HttpServletRequest httpServletRequest) {
+        Cookie[] cookies = httpServletRequest.getCookies();
+        if(cookies == null) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
+        for(Cookie cookie : cookies) {
+            if(cookie.getName().equals("refresh_token")) {
+                return cookie.getValue();
+            }
+        }
+        throw new CustomException(ErrorCode.UNAUTHORIZED);
     }
 
 }

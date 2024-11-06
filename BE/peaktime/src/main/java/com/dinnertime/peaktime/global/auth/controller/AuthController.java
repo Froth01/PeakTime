@@ -115,6 +115,16 @@ public class AuthController {
     }
 
     // Reissue JWT
+    @Operation(summary = "JWT 재발급", description = "JWT 재발급하기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "JWT가 재발급되었습니다.",
+                    content = @Content(schema = @Schema(implementation = ReissueResponse.class))),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "500", description = "JWT 재발급 요청에 실패하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+    })
+    @CommonSwaggerResponse.CommonResponses
     @PostMapping("/token/reissue")
     public ResponseEntity<?> reissue(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         ReissueResponse response = authService.reissue(httpServletRequest, httpServletResponse);

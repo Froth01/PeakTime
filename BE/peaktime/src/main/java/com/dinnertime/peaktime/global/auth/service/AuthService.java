@@ -27,12 +27,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -173,7 +175,30 @@ public class AuthService {
     // Reissue JWT
     @Transactional
     public ReissueResponse reissue(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        // 1. 클라이언트의 요청에 담긴 쿠키에서 Refresh Token 꺼내깅 ㅎ
+        // 1. 클라이언트의 요청에서 Refresh Token 추출하기
+        String refreshToken = jwtService.extractRefreshToken(httpServletRequest);
+        // 2. Refresh Token 유효성 검증 (위변조, 만료 등) -> 유효하지 않으면 401 예외 던지기
+        if((!StringUtils.hasText(refreshToken)) || (!jwtService.validateToken(refreshToken))) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
+        // 3. Redis에 존재하는 Refresh Token과 일치하는지 확인하기 -> 일치하지 않으면 401 예외 던지기
+        long userId = jwtService.getUserId(refreshToken);
+        String redisRefreshToken = redisService.getRefreshToken(userId);
+        if(!refreshToken.equals(redisRefreshToken)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
+        // 4. 새 Access Token과 새 Refresh Token을 생성하기 위한 정보를 기존 Refresh Token에서 추출하기 (userId, Authority, 만료시간)
+        String authority = jwtService.getAuthority(refreshToken);
+        Date expirationTime = jwtService.getExpirationTime(refreshToken);
+        // 5. 새 Access Token과 새 Refresh Token 생성
+        String newAccessToken = jwtService.createAccessToken(userId, authority);
+        String newRefreshToken = jwtService.createRefreshTokenWithExp(userId, authority, expirationTime);
+        // 6. 새 Refresh Token을 Redis에 저장 (기존 Refresh Token 반드시 덮어쓰기)
+        redisService.saveRefreshToken(userId, newRefreshToken);
+        // 7. 새 Refresh Token을 Cookie에 담아서 클라이언트에게 전송
+        jwtService.addRefreshTokenToCookie(httpServletResponse, newRefreshToken);
+        // 8. ReissueResponse 객체 생성하여 반환 (새 Access Token을 Response Body에 담아서 클라이언트에게 전송)
+        return ReissueResponse.createReissueResponse(newAccessToken);
     }
 
     // 아이디 중복 검사 (유저 로그인 아이디로 검사. 이미 존재하면 true 반환)
@@ -184,16 +209,6 @@ public class AuthService {
     // 이메일 중복 검사 (이메일 주소로 검사. 이미 존재하면 true 반환)
     private boolean checkDuplicateEmail(String email) {
         return userRepository.findByEmail(email).isPresent();
-    }
-
-    // 경로로 파일을 참조하여 차단 웹사이트 목록 List로 반환
-    private List<String> loadWebsitesFromFile(String filePath) {
-        try {
-            Path path = Paths.get(filePath);
-            return Files.readAllLines(path);
-        } catch (IOException e) {
-            throw new CustomException(ErrorCode.FILE_NOT_FOUND);
-        }
     }
 
 }
