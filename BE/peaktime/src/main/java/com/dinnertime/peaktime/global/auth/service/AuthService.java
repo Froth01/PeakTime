@@ -28,9 +28,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -39,6 +37,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -102,7 +101,18 @@ public class AuthService {
         // 6. Save User
         userRepository.save(user);
         // 7. Create Block Website Array For Default Preset
-        List<String> blockWebsiteList = this.loadWebsitesFromFile("src/main/resources/DistractionsWebsites.txt");
+        List<String> blockWebsiteList;
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("DistractionsWebsites.txt")) {
+            if (inputStream == null) {
+                throw new CustomException(ErrorCode.FILE_NOT_FOUND);
+            }
+            blockWebsiteList = new BufferedReader(new InputStreamReader(inputStream))
+                    .lines()
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new CustomException(ErrorCode.FILE_NOT_FOUND);
+        }
+
         // 8. Create Default Preset
         Preset preset = Preset.createDefaultPreset(blockWebsiteList, user);
         // 9. Save Preset
