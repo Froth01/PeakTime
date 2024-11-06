@@ -288,12 +288,7 @@ function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
     Swal.fire(ALERT_MESSAGE.warningForDeleteGroup).then((result) => {
       if (result.isConfirmed) {
         groupsApi
-          .delete(`/${groupId}`, {
-            // params수정
-            params: {
-              userId: 1,
-            },
-          })
+          .delete(`/${groupId}`)
           .then((result) => {
             // 삭제 완료 모달 띄운 후 그룹 목록 수정하고 페이지 닫기
             Swal.fire(ALERT_MESSAGE.succcessToDeleteGroup).then(() => {
@@ -317,12 +312,10 @@ function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
 
     Swal.fire(ALERT_MESSAGE.warningForUpdateGroupInfo).then(() => {
       groupsApi
-        .put(
-          `/${groupId}`,
-          { title: groupInfo.title, presetId: groupInfo.presetId },
-          // params수정
-          { params: { userId: 1 } }
-        )
+        .put(`/${groupId}`, {
+          title: groupInfo.title,
+          presetId: groupInfo.presetId,
+        })
         .then((result) => {
           Swal.fire(ALERT_MESSAGE.successToUpdateGroup).then(() => {
             setGroupTitle(groupInfo.title);

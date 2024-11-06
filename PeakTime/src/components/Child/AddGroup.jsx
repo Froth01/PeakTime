@@ -93,16 +93,7 @@ function AddGroup({ onChangeContent, onChangeGroupList }) {
 
     const fetchCreateGroup = async () => {
       groupsApi
-        .post(
-          "",
-          { title, presetId },
-          // Userprincipal 적용 후 params 부분 지우기
-          {
-            params: {
-              userId: 1,
-            },
-          }
-        )
+        .post("", { title, presetId })
         .then((result) => {
           // 새 그룹 생성 성공 알림창
           Swal.fire(ALERT_MESSAGE.successToCreateGroup).then(() => {
