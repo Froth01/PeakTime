@@ -112,7 +112,6 @@ public class AuthService {
         } catch (IOException e) {
             throw new CustomException(ErrorCode.FILE_NOT_FOUND);
         }
-
         // 8. Create Default Preset
         Preset preset = Preset.createDefaultPreset(blockWebsiteList, user);
         // 9. Save Preset
