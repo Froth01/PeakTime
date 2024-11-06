@@ -28,7 +28,6 @@ import java.util.List;
 public class JwtFilter extends GenericFilterBean {
 
     private final JwtService jwtService;
-    private final UserService userService;
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {

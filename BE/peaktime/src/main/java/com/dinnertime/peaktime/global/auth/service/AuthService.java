@@ -130,7 +130,7 @@ public class AuthService {
     }
 
     // 로그인
-    @Transactional
+    @Transactional(readOnly = true)
     public LoginResponse login(LoginRequest loginRequest, HttpServletResponse httpServletResponse) {
         // 1. loadUserByUsername 메서드 호출
         Authentication authentication = authenticationManager.authenticate(

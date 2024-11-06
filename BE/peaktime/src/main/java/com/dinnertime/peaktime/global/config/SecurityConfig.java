@@ -30,7 +30,6 @@ import org.springframework.security.web.access.ExceptionTranslationFilter;
 public class SecurityConfig {
 
     private final JwtService jwtService;
-    private final UserService userService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -54,7 +53,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .addFilterBefore(new JwtFilter(jwtService, userService), ExceptionTranslationFilter.class)
+                .addFilterBefore(new JwtFilter(jwtService), ExceptionTranslationFilter.class)
                 .addFilterBefore(new ExceptionHandlerFilter(), JwtFilter.class)
                 .build();
     }
