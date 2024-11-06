@@ -47,7 +47,7 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/logout", "/users/**", "/children/**", "/groups/**", "/presets/**", "/hikings/**", "/timers/**", "/summaries/**", "/memos/**").hasAuthority("root")
+                        .requestMatchers("/auth/logout", "/users/**", "/children/**", "/groups/**", "/presets/**", "/hikings/**", "/summaries/**", "/memos/**").hasAuthority("root")
                         .requestMatchers("/auth/logout", "/hikings/**", "/summaries/**", "/memos/**").hasAuthority("child")
                         .anyRequest().denyAll())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -63,8 +63,8 @@ public class SecurityConfig {
         // 아래 url은 filter 에서 제외
         return web ->
                 web.ignoring()
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**", "/ws/**")
-                        .requestMatchers("/auth/login", "/auth/signup", "/auth/user-login-id", "/auth/email", "/auth/code/**", "/auth/reset-password", "/auth/token/reissue");
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**")
+                        .requestMatchers("**","/timers/**","/schedules","/auth/login", "/auth/signup", "/auth/user-login-id", "/auth/email", "/auth/code/**", "/auth/reset-password", "/auth/token/reissue");
                         // 테스트가 끝나면 "/auth/login"을 추가해주세요.
     }
 

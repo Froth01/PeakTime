@@ -29,7 +29,7 @@ public class SchedulerService {
     }
 
     //1분마다 실행
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0/1 * * * *")
     public void send() {
         LocalDateTime now = LocalDateTime.now();
         log.info(now.toString());

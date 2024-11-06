@@ -50,8 +50,8 @@ public class TimerController {
     })
     @CommonSwaggerResponse.CommonResponses
     @DeleteMapping("/{timerId}")
-    public ResponseEntity<?> deleteTimer(@PathVariable Long timerId) {
-        timerService.deleteTimer(timerId);
+    public ResponseEntity<?> deleteTimer(@PathVariable("timerId") Long timerId) {
+        timerFacade.deleteTimer(timerId);
 
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "타이머 삭제를 성공했습니다."));
     }

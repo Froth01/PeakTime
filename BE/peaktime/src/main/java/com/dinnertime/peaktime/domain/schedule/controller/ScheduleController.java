@@ -2,6 +2,7 @@ package com.dinnertime.peaktime.domain.schedule.controller;
 
 import com.dinnertime.peaktime.domain.schedule.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,9 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/schedule")
+@RequestMapping("/schedules")
 public class ScheduleController {
     private final ScheduleService scheduleService;
 
@@ -23,6 +25,7 @@ public class ScheduleController {
 //            @AuthenticationPrincipal final Principal principal,
             @RequestHeader(value = "LAST-EVENT-ID", required = false, defaultValue = "") String lastEventId
     ) {
+        log.info("구독");
         //구독 하기
         return scheduleService.subScribe(2L, lastEventId);
     }

@@ -2,6 +2,7 @@ package com.dinnertime.peaktime.domain.schedule.service.dto;
 
 import com.dinnertime.peaktime.domain.group.entity.Group;
 import com.dinnertime.peaktime.domain.schedule.entity.Schedule;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
@@ -18,6 +19,7 @@ import java.time.LocalTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "@class")
 public class RedisSchedule {
     private int dayOfWeek;
 

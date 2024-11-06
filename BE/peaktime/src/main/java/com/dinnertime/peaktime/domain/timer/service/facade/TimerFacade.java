@@ -73,6 +73,7 @@ public class TimerFacade {
         LocalTime startLocalTime = startTime.toLocalTime();
 
         if((repeatDay & (1<<todayDayOfWeek)) != 0 && startLocalTime.isAfter(LocalTime.now())) {
+            log.info("오늘 것 저장");
             Schedule schedule = null;
             for(Schedule s: scheduleList) {
                 if(s.getDayOfWeek() == todayDayOfWeek) {
@@ -86,7 +87,7 @@ public class TimerFacade {
     }
 
     @Transactional
-    public void deleteTimer(Long groupId, Long timerId) {
+    public void deleteTimer(Long timerId) {
         //타이머 삭제
         Timer timer = timerService.deleteTimer(timerId);
 
@@ -106,6 +107,7 @@ public class TimerFacade {
             }
         }
 
+        //스케쥴 삭제
         scheduleService.deleteSchedule(timer);
 
     }

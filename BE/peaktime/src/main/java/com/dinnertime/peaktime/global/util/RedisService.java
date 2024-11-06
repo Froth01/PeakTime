@@ -83,6 +83,9 @@ public class RedisService {
         Set<String> checkRange = zSet.rangeByScore(key, start-240, end);
 
         zSet.add(key, start + "-" + end+"-"+groupId, start);
+
+        log.info("타이머 추가: "+key);
+
     }
 
     public void deleteTimerByGroupIdAndTime(Long groupId, int start, int end) {
