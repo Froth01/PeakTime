@@ -1,14 +1,12 @@
 package com.dinnertime.peaktime.domain.schedule.entity;
 
 import com.dinnertime.peaktime.domain.group.entity.Group;
-import com.dinnertime.peaktime.domain.timer.service.dto.request.TimerCreateRequestDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.DayOfWeek;
 import java.time.LocalTime;
 
 @Entity

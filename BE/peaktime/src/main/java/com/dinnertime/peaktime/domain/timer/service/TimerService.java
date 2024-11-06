@@ -49,28 +49,16 @@ public class TimerService {
     }
 
     @Transactional
-    public void deleteTimer(Long timerId) {
+    public Timer deleteTimer(Long timerId) {
         // is_repeat = false이고 repeat_day가 존재하지 않는 경우
         // 타이머 실행 완료 후 실행
-
         Timer timer = timerRepository.findByTimerId(timerId)
                 .orElseThrow(() -> new CustomException(ErrorCode.TIMER_NOT_FOUND));
 
+        Timer copyTimer = Timer.copyTimer(timer);
+
         timerRepository.delete(timer);
 
-        int repeatDay = timer.getRepeatDay();
-        LocalDateTime startTime = timer.getStartTime();
-        int attentionTime = timer.getAttentionTime();
-
-        int plusMinute = (startTime.getHour()*60) + startTime.getMinute();
-
-        for(int i=0; i<6;i++) {
-            if((repeatDay & (1 << i)) != 0) {
-                //날짜를 일차원 배열로 만들기 위함
-                int start = 14400 * i + plusMinute;
-                int end = start + attentionTime;
-                redisService.deleteTimerByGroupIdAndTime(timer.getGroup().getGroupId(), start, end);
-            }
-        }
+        return copyTimer;
     }
 }
