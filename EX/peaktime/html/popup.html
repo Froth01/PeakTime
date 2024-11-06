@@ -1,25 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css"
+      rel="stylesheet"
+    />
     <title>Document</title>
-    <link rel="stylesheet" href="/css/popup.css" type="text/css" />
-</head>
-<body>
-    <input id="title" maxlength="8">
-    <span class="length">
-        <span class="title_length">0</span>
-        / 8
-    </span>
-    <textarea placeholder="내용을 입력해 주세요." id="savedText" maxlength="1000"></textarea>
-    <span class="length">
-        <span class="comment_length">0</span>
-        / 1000
-    </span>
-    <script type="text/javascript"  src="/js/popup.js"></script>
-    <button id="save">메모 내용 저장하기</button>
-    <button id="reset">메모 내용 초기화</button>
-    <button id="addUrl">현재 url 추가</button>
-</body>
+    <style>
+      @font-face {
+        font-family: "netmarbleL";
+        src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_four@1.1/netmarbleL.woff")
+          format("woff");
+        font-weight: normal;
+        font-style: normal;
+      }
+      .main {
+        font-family: "netmarbleL";
+        width: 320px;
+        height: 450px;
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+        justify-content: space-around;
+        align-items: center;
+      }
+      .head {
+        display: flex;
+        justify-content: space-between;
+      }
+      .content {
+        flex-grow: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main">
+      <div class="head w-full items-center">
+        <h2 class="text-lg text-bold">PeakTime</h2>
+        <img
+          src="../image/peaktime.png"
+          alt=""
+          style="width: 50px; height: 50px"
+        />
+      </div>
+      <div class="h-[10%] w-full flex justify-between">
+        <input
+          id="title"
+          maxlength="8"
+          class="block w-[60%] h-[100%] text-md p-2.5 w-full text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-300 focus:border-blue-300"
+        />
+        <div class="w-40 flex items-center ms-5">
+          <span class="length">
+            <span class="title_length">0</span>
+            / 8
+          </span>
+        </div>
+      </div>
+      <div class="w-full">
+        <textarea
+          id="savedText"
+          maxlength="1000"
+          rows="6"
+          class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-300 focus:border-blue-300"
+          placeholder="내용을 입력해 주세요..."
+        ></textarea>
+
+        <span class="length">
+          <span class="comment_length">0</span>
+          / 1000
+        </span>
+      </div>
+      <div class="w-full flex justify-center mt-0">
+        <button
+          id="save"
+          type="button"
+          class="me-5 text-white font-bold text-center bg-green-400 px-5 py-2.5 rounded-lg"
+        >
+          저장하기
+        </button>
+        <button
+          id="reset"
+          type="button"
+          class="text-white font-bold text-center bg-red-500 px-5 py-2.5 rounded-lg"
+        >
+          초기화
+        </button>
+      </div>
+      <button
+        id="addUrl"
+        type="button"
+        class="text-white font-bold text-center bg-blue-400 px-5 py-2.5 rounded-lg"
+      >
+        현재 URL 차단목록에 추가
+      </button>
+    </div>
+    <script type="text/javascript" src="/js/popup.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
+  </body>
 </html>
