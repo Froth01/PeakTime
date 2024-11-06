@@ -206,14 +206,8 @@ function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
       if (result.isConfirmed) {
         timersApi
           .delete(`/${timerId}`)
-          .then(() => {
-            // 삭제된 타이머를 화면에 반영
-            setGroupInfo((prevGroupInfo) => ({
-              ...prevGroupInfo,
-              timerList: prevGroupInfo.timerList.filter(
-                (timer) => timer.timerId !== timerId
-              ),
-            }));
+          .then((result) => {
+            setGroupInfo(result.data.data);
           })
           .catch(() => {
             Swal.fire(ALERT_MESSAGE.failToDeleteTimer);
@@ -252,14 +246,10 @@ function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
 
         timersApi
           .post("", timerSetting)
-          .then((response) => {
+          .then((result) => {
             Swal.fire(ALERT_MESSAGE.successToCreateGroupTimer);
-
-            // 타이머 생성 성공 시 화면상의 groupInfo 상태 업데이트
-            setGroupInfo((prevGroupInfo) => ({
-              ...prevGroupInfo,
-              timerList: [...prevGroupInfo.timerList, response.data.data],
-            }));
+            console.log(result);
+            setGroupInfo(result.data.data);
             return true;
           })
           .catch((error) => {
