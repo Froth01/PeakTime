@@ -21,12 +21,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // 1. 클라이언트에게 전달받은 아이디가 존재하는지 확인
-        User user = userRepository.findByUserLoginId(username)
+        User user = userRepository.findByUserLoginIdAndIsDeleteFalse(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.INVALID_LOGIN_PROCESS));
         // 2. 해당 유저의 권한 파악
         if(user.getIsRoot()) {
-            return UserPrincipal.createUserPrincipal(user.getUserId(), user.getPassword(), "root", user.getIsDelete());
+            return UserPrincipal.createUserPrincipal(user.getUserId(), user.getPassword(), "root");
         }
-        return UserPrincipal.createUserPrincipal(user.getUserId(), user.getPassword(), "child", user.getIsDelete());
+        return UserPrincipal.createUserPrincipal(user.getUserId(), user.getPassword(), "child");
     }
 }

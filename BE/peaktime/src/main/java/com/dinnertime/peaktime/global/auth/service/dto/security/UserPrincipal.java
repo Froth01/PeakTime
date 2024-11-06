@@ -17,22 +17,19 @@ public class UserPrincipal implements UserDetails {
     private long userId;
     private String password;
     private String authority; // "root" or "child"
-    private Boolean isDelete;
 
     @Builder
-    private UserPrincipal(long userId, String password, String authority, Boolean isDelete) {
+    private UserPrincipal(long userId, String password, String authority) {
         this.userId = userId;
         this.password = password;
         this.authority = authority;
-        this.isDelete = isDelete;
     }
 
-    public static UserPrincipal createUserPrincipal(long userId, String password, String authority, Boolean isDelete) {
+    public static UserPrincipal createUserPrincipal(long userId, String password, String authority) {
         return UserPrincipal.builder()
                 .userId(userId)
                 .password(password)
                 .authority(authority)
-                .isDelete(isDelete)
                 .build();
     }
 

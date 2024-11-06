@@ -141,25 +141,22 @@ public class AuthService {
         );
         // 2. 현재 SecurityContextHolder의 Authentication의 Principal 불러오기
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-        // 3. 해당 유저가 회원탈퇴 처리가 되었는지 확인
-        if(userPrincipal.getIsDelete()) {
-            throw new CustomException(ErrorCode.INVALID_LOGIN_PROCESS);
-        }
-        // 4. PK와 Authority 정보를 추출하여 JWT 생성
+        // 3. PK와 Authority 정보를 추출하여 JWT 생성
         String accessToken = jwtService.createAccessToken(userPrincipal.getUserId(), userPrincipal.getAuthority());
         String refreshToken = jwtService.createRefreshToken(userPrincipal.getUserId(), userPrincipal.getAuthority());
-        // 5. Refresh Token을 Redis에 저장
+        // 4. Refresh Token을 Redis에 저장
         redisService.saveRefreshToken(userPrincipal.getUserId(), refreshToken);
-        // 6. Refresh Token을 Cookie에 담아서 클라이언트에게 전송
+        // 5. Refresh Token을 Cookie에 담아서 클라이언트에게 전송
         jwtService.addRefreshTokenToCookie(httpServletResponse, refreshToken);
-        // 7. LoginResponse 객체 생성하여 반환
+        // 6. LoginResponse 객체 생성하여 반환
         User user = userRepository.findByUserId(userPrincipal.getUserId())
                 .orElseThrow(() -> new CustomException(ErrorCode.INVALID_LOGIN_PROCESS));
-        Optional<UserGroup> userGroup = userGroupRepository.findByUser(user);
-        if(userGroup.isPresent()) {
-            return LoginResponse.createLoginResponse(accessToken, user.getIsRoot(), userGroup.get().getGroup().getGroupId(), user.getNickname());
+        if(user.getIsRoot()) {
+            return LoginResponse.createLoginResponse(accessToken, true, null, user.getNickname());
         }
-        return LoginResponse.createLoginResponse(accessToken, user.getIsRoot(), null, user.getNickname());
+        UserGroup userGroup = userGroupRepository.findByUser_UserId(user.getUserId())
+                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_LOGIN_PROCESS));
+        return LoginResponse.createLoginResponse(accessToken, false, userGroup.getGroup().getGroupId(), user.getNickname());
     }
 
     // 아이디 중복 검사 (유저 로그인 아이디로 검사. 이미 존재하면 true 반환)
