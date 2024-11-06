@@ -59,7 +59,8 @@ public class GroupController {
     @PostMapping("")
     public ResponseEntity<?> postGroup(@RequestParam Long userId, @RequestBody @Valid GroupCreateRequestDto requestDto) {
         groupService.postGroup(userId, requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ResultDto.res(HttpStatus.CREATED.value(), "그룹을 생성하는 데 성공했습니다."));
+        GroupListResponseDto groupListResponseDto = groupService.getGroupListResponseDto(userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ResultDto.res(HttpStatus.CREATED.value(), "그룹을 생성하는 데 성공했습니다.", groupListResponseDto));
     }
 
 //    그룹 조회
@@ -97,8 +98,9 @@ public class GroupController {
     @PutMapping("/{groupId}")
     public ResponseEntity<?> putGroup(@RequestParam Long userId, @PathVariable Long groupId, @RequestBody @Valid GroupPutRequestDto requestDto) {
         groupService.putGroup(userId, groupId, requestDto);
+        GroupListResponseDto groupListResponseDto = groupService.getGroupListResponseDto(userId);
 
-        return ResponseEntity.status(HttpStatus.OK).body((ResultDto.res(HttpStatus.OK.value(), "그룹 정보를 수정하는 데 성공했습니다.")));
+        return ResponseEntity.status(HttpStatus.OK).body((ResultDto.res(HttpStatus.OK.value(), "그룹 정보를 수정하는 데 성공했습니다.", groupListResponseDto)));
     }
 
 //    그룹 삭제
@@ -115,7 +117,8 @@ public class GroupController {
     @DeleteMapping("/{groupId}")
     public ResponseEntity<?> deleteGroup(@RequestParam Long userId, @PathVariable Long groupId) {
         groupService.deleteGroup(userId, groupId);
+        GroupListResponseDto groupListResponseDto = groupService.getGroupListResponseDto(userId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "그룹 정보를 삭제하는 데 성공했습니다."));
+        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "그룹 정보를 삭제하는 데 성공했습니다.", groupListResponseDto));
     }
 }
