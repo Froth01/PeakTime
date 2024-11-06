@@ -15,7 +15,7 @@ import EmailChangePage from "./pages/EmailChangePage"; // 이메일 변경
 import StatisticPage from "./pages/StatisticPage"; // 통계 페이지
 import PresetSettingPage from "./pages/PresetSettingPage"; // 프리셋 설정
 import ReportPage from "./pages/ReportPage"; // 내역 페이지
-import ChildrunPage from "./pages/ChildrunPage"; // 차일드 관리
+import ChildrenPage from "./pages/ChildrenPage"; // 차일드 관리
 import MemoPage from "./pages/MemoPage"; // 메모 페이지
 
 // 로그인 필요한 페이지
@@ -27,7 +27,7 @@ const protectedRoutes = [
   { path: "/statistic", element: <StatisticPage /> },
   { path: "/preset", element: <PresetSettingPage /> },
   { path: "/report", element: <ReportPage /> },
-  { path: "/children", element: <ChildrunPage /> },
+  { path: "/children", element: <ChildrenPage /> },
   { path: "/memo", element: <MemoPage /> },
 ];
 
