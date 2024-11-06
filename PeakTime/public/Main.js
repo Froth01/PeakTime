@@ -52,6 +52,10 @@ ipcMain.on("websocket-message", (event, action) => {
 app.whenReady().then(() => {
   createWindow();
   console.log(__dirname);
+
+  // const blockProcesses = { "Figma.exe": 0 };
+  // startWatcher(blockProcesses);
+
   // WebSocket 서버 생성
   const port = 12345;
   wss = new WebSocketServer({ port }, () => {
