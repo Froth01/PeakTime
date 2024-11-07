@@ -32,7 +32,7 @@ public class SummaryService {
         // insert, update를 별개로 처리해야 하므로 분기 처리 진행
         // memo가 null인 경우엔 insert, 이미 존재하는 경우는 update로 진행하도록 설정
 
-        Summary summary = summaryRepository.findByMemo(memo);
+        Summary summary = summaryRepository.findByMemo_MemoId(memo.getMemoId());
 
         if(summary == null) {
             // insert

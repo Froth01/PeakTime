@@ -13,6 +13,6 @@ public interface SummaryRepository extends JpaRepository<Summary, Long> {
     // 요약 단독 삭제 시 사용하기 위함
     Optional<Summary> findBySummaryId(Long summaryId);
 
-    Summary findByMemo(Memo memo);
+    Summary findByMemo_MemoId(Long momoId);
 
 }

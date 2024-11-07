@@ -4,7 +4,7 @@ import com.dinnertime.peaktime.domain.memo.service.MemoService;
 import com.dinnertime.peaktime.domain.memo.service.dto.request.SaveMemoRequestDto;
 import com.dinnertime.peaktime.domain.memo.service.dto.response.MemoSummaryResponseDto;
 import com.dinnertime.peaktime.domain.memo.service.dto.response.MemoWrapperResponseDto;
-import com.dinnertime.peaktime.domain.summary.service.dto.request.SaveSummaryRequestDto;
+import com.dinnertime.peaktime.global.auth.service.dto.security.UserPrincipal;
 import com.dinnertime.peaktime.global.util.CommonSwaggerResponse;
 import com.dinnertime.peaktime.global.util.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,8 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.nio.file.attribute.UserPrincipal;
 
 @Slf4j
 @RestController
@@ -45,7 +43,7 @@ public class MemoController {
     public ResponseEntity<?> getMemoTitles (@AuthenticationPrincipal UserPrincipal userPrincipal) {
         log.info("getMemoTitles 메서드가 호출되었습니다.");
 
-        MemoWrapperResponseDto responseDto = memoService.getMemos(userPrincipal);
+        MemoWrapperResponseDto responseDto = memoService.getMemos(userPrincipal.getUserId());
 
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(),"메모 리스트 조회에 성공했습니다.", responseDto));
     }
@@ -57,7 +55,7 @@ public class MemoController {
     @Operation(summary = "메모 및 요약 상세 조회", description = "메모 리스트 내 타이틀 클릭시 발생하는 상세 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "메모 및 요약 상세 조회에 성공했습니다.",
-                    content = @Content(schema= @Schema(implementation = ResultDto.class))
+                    content = @Content(schema= @Schema(implementation = MemoSummaryResponseDto.class))
             ),
             @ApiResponse(responseCode = "500", description = "메모 및 요약 상세 조회에 실패했습니다.",
                     content= @Content(schema= @Schema(implementation = ResultDto.class))
@@ -65,12 +63,10 @@ public class MemoController {
     })
     @CommonSwaggerResponse.CommonResponses
     @GetMapping("/{memoId}")
-    public ResponseEntity<?> getMemoDetail (
-            @AuthenticationPrincipal UserPrincipal userPrincipal
-            ,@PathVariable("memoId") Long memoId) {
+    public ResponseEntity<?> getMemoDetail (@PathVariable("memoId") Long memoId) {
         log.info("getMemoDetail 메서드가 호출되었습니다.");
 
-        MemoSummaryResponseDto responseDto = memoService.getDetailedMemo(userPrincipal, memoId);
+        MemoSummaryResponseDto responseDto = memoService.getDetailedMemo(memoId);
 
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(),"메모 및 요약 상세 조회에 성공했습니다.", responseDto));
     }
@@ -87,12 +83,10 @@ public class MemoController {
     })
     @CommonSwaggerResponse.CommonResponses
     @DeleteMapping("/{memoId}")
-    public ResponseEntity<?> deleteMemo(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
-            @PathVariable Long memoId) {
+    public ResponseEntity<?> deleteMemo(@PathVariable("memoId") Long memoId) {
         log.info("deleteMemo 메서드가 호출되었습니다.");
 
-        memoService.deleteMemo(userPrincipal, memoId);
+        memoService.deleteMemo(memoId);
 
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(),"메모 삭제에 성공했습니다."));
     }
@@ -115,7 +109,7 @@ public class MemoController {
 
         log.info("saveMemo 메서드가 호출되었습니다.");
 
-        memoService.createMemo(userPrincipal, requestDto);
+        memoService.createMemo(userPrincipal.getUserId(), requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "메모 생성에 성공했습니다."));
 
     }

@@ -7,6 +7,8 @@ import com.dinnertime.peaktime.domain.preset.service.dto.request.SavePresetReque
 import com.dinnertime.peaktime.domain.preset.service.dto.response.PresetWrapperResponseDto;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
+import com.dinnertime.peaktime.domain.usergroup.entity.UserGroup;
+import com.dinnertime.peaktime.domain.usergroup.repository.UserGroupRepository;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +17,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.file.attribute.UserPrincipal;
 import java.util.List;
 
 @Slf4j
@@ -26,13 +27,14 @@ public class PresetService {
     // preset CRUD 처리
     private final PresetRepository presetRepository;
     private final UserRepository userRepository;
+    private final UserGroupRepository userGroupRepository;
 
     // preset 생성
     @Transactional
-    public void createPreset(UserPrincipal userPrincipal, SavePresetRequestDto requestDto) {
+    public void createPreset(Long userId, SavePresetRequestDto requestDto) {
 
         //임시로 1로 고정시키기 추후 수정 userPrincipal.getUserId());
-        User user = userRepository.findByUserIdAndIsDeleteFalse(1).
+        User user = userRepository.findByUserIdAndIsDeleteFalse(userId).
                 orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         // userId = 1로 임의 설정
@@ -43,28 +45,32 @@ public class PresetService {
 
     // preset 조회
     @Transactional(readOnly = true)
-    public PresetWrapperResponseDto getPresets(UserPrincipal userPrincipal) {
+    public PresetWrapperResponseDto getPresets(Long userId) {
+        
+        User user = userRepository.findByUserId(userId).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+        
+        //유저가 자식계정인 경우
+        if(!user.getIsRoot()) {
+            UserGroup userGroup = userGroupRepository.findByUser_UserId(userId).orElseThrow(
+                    () -> new CustomException(ErrorCode.GROUP_NOT_FOUND)
+            );
 
-        // userPrincipal.getUserId()
-        User user = userRepository.findByUserIdAndIsDeleteFalse(1)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+            Preset preset = userGroup.getGroup().getPreset();
 
-        List<Preset> presets = presetRepository.findAllByUser(user);
-
-        PresetWrapperResponseDto responseDto = PresetWrapperResponseDto.buildPresetResponseDto(presets);
-
+            return PresetWrapperResponseDto.buildPresetResponseDto(preset);
+        }
+        
+        List<Preset> presets = presetRepository.findAllByUser_UserId(userId);
 
         // userId를 뺀 나머지 데이터 Wrapper해서 적용
-        return responseDto;
+        return PresetWrapperResponseDto.buildPresetResponseDto(presets);
     }
 
     // preset 업데이트
     @Transactional
-    public void updatePreset(UserPrincipal userPrincipal, SavePresetRequestDto requestDto, Long presetId) {
-
-        //임시로 1로 고정시키기 추후 수정 userPrincipal.getUserId());
-        User user = userRepository.findByUserIdAndIsDeleteFalse(1).
-                orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    public void updatePreset(SavePresetRequestDto requestDto, Long presetId) {
 
         // userId = 1로 임의 설정
         Preset preset = presetRepository.findByPresetId(presetId)
@@ -77,23 +83,16 @@ public class PresetService {
 
     // 프리셋 삭제
     @Transactional
-    public void deletePreset(UserPrincipal userPrincipal, Long presetId) {
-
-        //임시로 1로 고정시키기 추후 수정 userPrincipal.getUserId());
-        User user = userRepository.findByUserIdAndIsDeleteFalse(1).
-                orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
+    public void deletePreset(Long presetId) {
         Preset preset = presetRepository.findByPresetId(presetId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PRESET_NOT_FOUND));
 
         // 그룹에 있을 때 presetId가 존재하는 경우 데이터 무결성 위반 에러 발생함 -> 예외처리 진행
-
         try{
             presetRepository.delete(preset);
         } catch(DataIntegrityViolationException e){ // 데이터 무결성 위반 exception
             throw new CustomException(ErrorCode.FAILED_DELETE_PRESET_IN_GROUP);
         }
-
 
     }
 
