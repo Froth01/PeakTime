@@ -4,7 +4,8 @@ import AddChild from "../components/Child/AddChild";
 import UpdateChild from "../components/Child/UpdateChild";
 import AddGroup from "../components/Child/AddGroup";
 import UpdateGroup from "../components/Child/UpdateGroup";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import groupsApi from "../api/groupsApi";
 
 function ChildPage() {
   // 현재 창 변수
@@ -20,16 +21,40 @@ function ChildPage() {
     console.log(showNow);
   };
 
+  // 그룹 리스트 > 차일드 리스트
+  const [groupList, setGroupList] = useState([]);
+
+  const onChangeGroupList = (group) => {
+    setGroupList(group);
+  };
+
+  // 페이지 진입 시 그룹 전체 조회 API 호출
+  useEffect(() => {
+    groupsApi
+      .get("", { params: { userId: 1 } })
+      .then((result) => setGroupList(result.data.data.groupList))
+      .catch((err) => console.log(err));
+  }, []);
+
   return (
     <>
-      <ChildList onChangeContent={onChangeContent} />
+      <ChildList onChangeContent={onChangeContent} groupList={groupList} />
       {showNow === "addChild" && <AddChild onChangeContent={onChangeContent} />}
       {showNow === "updateChild" && (
         <UpdateChild childId={updateId} onChangeContent={onChangeContent} />
       )}
-      {showNow === "addGroup" && <AddGroup onChangeContent={onChangeContent} />}
+      {showNow === "addGroup" && (
+        <AddGroup
+          onChangeContent={onChangeContent}
+          onChangeGroupList={onChangeGroupList}
+        />
+      )}
       {showNow === "updateGroup" && (
-        <UpdateGroup groupId={updateId} onChangeContent={onChangeContent} />
+        <UpdateGroup
+          groupId={updateId}
+          onChangeContent={onChangeContent}
+          onChangeGroupList={onChangeGroupList}
+        />
       )}
     </>
   );
