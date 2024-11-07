@@ -23,9 +23,13 @@ public class TimerRepositoryImpl implements TimerRepositoryCustom {
 
         String query = "SELECT COUNT(*) FROM timers t " +
                 "WHERE t.group_id = :groupId " +
-                "AND t.start_time <= :requestEndTime " + // DB data의 start_time이 request의 end_time보다 이른 것
-                "AND (t.start_time + INTERVAL '1 minute' * t.attention_time) >= :startTime " + // DB data의 end_time이 request의 start_time보다 늦는 것
-                "AND ((t.repeat_day & :repeatDayNumber) != 0)"; // 요일이 겹치는 타이머 조회
+                "AND t.start_time <= :requestEndTime " +
+                "AND (t.start_time + INTERVAL '1 minute' * t.attention_time) >= :startTime " +
+                "AND ( " +
+                "      ((t.repeat_day & :repeatDayNumber) != 0) " + // 요일이 설정된 경우
+                "      OR " +
+                "      (t.repeat_day = 0 AND (1 << (CASE WHEN EXTRACT(DOW FROM t.start_time) = 0 THEN 0 ELSE 7 - CAST(EXTRACT(DOW FROM t.start_time) AS INTEGER) END)) & :repeatDayNumber != 0) " +
+                "    )";
 
         Long count = (Long) entityManager.createNativeQuery(query)
                 .setParameter("groupId", groupId)
