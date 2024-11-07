@@ -82,7 +82,7 @@ public class HikingController {
             )
     })
     @CommonSwaggerResponse.CommonResponses
-    @GetMapping("/calender")
+    @GetMapping("/calendar")
     public ResponseEntity<?> getCalendar(/*@AuthenticationPrincipal UserPrincipal userPrincipal*/) {
         HikingCalendarResponseDto responseDto = hikingService.getCalendar(/*userPrincipal.getUserId()*/);
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "하이킹 캘린더를 조회하는데 성공하였습니다.", responseDto));
@@ -98,7 +98,7 @@ public class HikingController {
             )
     })
     @CommonSwaggerResponse.CommonResponses
-    @GetMapping(value = "/calender/date/{date}")
+    @GetMapping(value = "/calendar/date/{date}")
     public ResponseEntity<?> getCalendarByDate(
             /*@AuthenticationPrincipal UserPrincipal userPrincipal,*/
             @PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
