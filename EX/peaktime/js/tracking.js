@@ -8,18 +8,44 @@ let isTracking = false;
 async function recordTime(url) {
     if (!isTracking || !url) return;
 
-    const endTime = Date.now();
-    const timeSpent = endTime - startTime;
+    try {
+        // const urlObject = new URL(url);
+        const domainName = url.hostname; // 도메인만 추출
 
-    const getUrlList = await chrome.storage.local.get(['urlList']);
-    const savedData = getUrlList.urlList || {};
+        const endTime = Date.now();
+        const timeSpent = endTime - startTime;
 
-    // URL 누적 시간 저장
-    savedData[url] = (savedData[url] || 0) + Math.floor(timeSpent / 1000);
+        const getUrlList = await chrome.storage.local.get(['urlList']);
+        const savedData = getUrlList.urlList || [];
 
-    await chrome.storage.local.set({ urlList: savedData });
-    console.log(`URL: ${url}, 누적 사용 시간: ${savedData[url]}초`);
+        // 차단 목록 확인
+        const { websiteList = [] } = await chrome.storage.local.get('websiteList');
+        const shouldBlock = websiteList.some((urlPattern) => domainName.startsWith(urlPattern));
+        const isBlock = shouldBlock;
+
+        const newUrlData = {
+            contentName: domainName,
+            contentType: 'site',
+            usingTime: Math.floor(timeSpent / 1000),
+            isBlockContent: isBlock
+        };
+
+        const existingIndex = savedData.findIndex((item) => item.contentName === domainName);
+        if (existingIndex !== -1) {
+            savedData[existingIndex].usingTime += newUrlData.usingTime;
+        } else {
+            savedData.push(newUrlData);
+        }
+
+        await chrome.storage.local.set({ urlList: savedData });
+
+        console.log(`Domain: ${domainName}, 누적 사용 시간: ${newUrlData.usingTime}초, 차단 여부: ${isBlock}`);
+    } catch (error) {
+        console.warn(`Invalid URL: ${url}`, error);
+    }
 }
+
+
 
 // 추적 중지 및 URL 리스트 삭제 (stop + quit 기능)
 async function stopAndClearTracking() {
@@ -90,7 +116,7 @@ function handleUrlChange(newUrl) {
 
     if (currentUrl !== fullUrl) {
         if (currentUrl) {
-            recordTime(currentUrl); // 이전 URL의 시간 기록
+            recordTime(urlObject); // 이전 URL의 시간 기록
         }
         currentUrl = fullUrl; // 새로운 URL 설정
         startTime = Date.now(); // 시작 시간 초기화
@@ -145,5 +171,18 @@ function getCurrentTabUrl(callback) {
         }
     });
 }
+
+// Storage 변경 사항을 감지하고 업데이트된 차단 URL 목록을 반영
+chrome.storage.onChanged.addListener((changes, namespace) => {
+    if (changes.websiteList) {
+        console.log("차단 URL 목록이 변경되었습니다.");
+        chrome.tabs.query({}, (tabs) => {
+            tabs.forEach(tab => {
+                handleUrlChange(tab.url);  // 각 열린 탭에서 URL 차단을 적용
+            });
+        });
+    }
+});
+
 
 export { startTracking, stopAndClearTracking };
