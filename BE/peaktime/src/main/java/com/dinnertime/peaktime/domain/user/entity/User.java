@@ -32,6 +32,7 @@ public class User {
     @Column(name = "is_root", nullable = false)
     private Boolean isRoot; // 루트 유저 여부
 
+    @Setter
     @Column(name = "is_delete", nullable = false)
     private Boolean isDelete; // 삭제 여부
 

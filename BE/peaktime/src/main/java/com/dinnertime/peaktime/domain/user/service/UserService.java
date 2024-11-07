@@ -1,9 +1,13 @@
 package com.dinnertime.peaktime.domain.user.service;
 
+import com.dinnertime.peaktime.domain.group.entity.Group;
+import com.dinnertime.peaktime.domain.group.repository.GroupRepository;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
 import com.dinnertime.peaktime.domain.user.service.dto.request.UpdateNicknameRequest;
 import com.dinnertime.peaktime.domain.user.service.dto.response.GetProfileResponse;
+import com.dinnertime.peaktime.domain.usergroup.entity.UserGroup;
+import com.dinnertime.peaktime.domain.usergroup.repository.UserGroupRepository;
 import com.dinnertime.peaktime.global.auth.service.dto.security.UserPrincipal;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
@@ -12,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -45,6 +51,19 @@ public class UserService {
         user.setNickname(updateNicknameRequest.getNickname());
         // 5. Save User
         userRepository.save(user);
+    }
+
+    // 회원탈퇴
+    @Transactional
+    public void deleteUser(UserPrincipal userPrincipal) {
+        // 1. root 계정에게 종속된 child 계정 전부 탈퇴처리
+        userRepository.updateIsDeleteByRootUserId(userPrincipal.getUserId());
+        // 2. 이어서 root 계정 탈퇴처리
+        User user = userRepository.findByUserId(userPrincipal.getUserId())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        user.setIsDelete(true);
+        userRepository.save(user);
+        // 3. root 계정과 이 root 계정에 종속된 child 계정의 User PK를 추출하여 Redis에 저장된 Refresh Token 삭제하기 (고도화)
     }
 
 }
