@@ -46,7 +46,7 @@ public class GroupService {
 
     @Transactional
     public List<GroupItemResponseDto> getGroupList(Long userId) {
-        List<Group> groupList = groupRepository.findByUser_UserIdAndIsDeleteOrderByTitleAsc(userId, false);
+        List<Group> groupList = groupRepository.findByUser_UserIdAndIsDeleteFalseOrderByTitleAsc(userId);
 
         return groupList.stream()
                 .map(groupItem -> GroupItemResponseDto.createGroupItemResponseDto(
@@ -98,7 +98,7 @@ public class GroupService {
         User user = userRepository.findByUserIdAndIsDeleteFalse(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        List<Group> groupListByUserId = groupRepository.findByUser_UserIdAndIsDelete(userId, false);
+        List<Group> groupListByUserId = groupRepository.findByUser_UserIdAndIsDeleteFalse(userId);
 
         // 그룹 수 확인
         if (groupListByUserId.size() >= 5) {
@@ -128,7 +128,7 @@ public class GroupService {
                 .orElseThrow(() -> new CustomException(ErrorCode.GROUP_NOT_FOUND));
 
         // 그룹명 중복 검사
-        Long countTitle = groupRepository.countByUser_UserIdAndIsDeleteAndTitleAndGroupIdNot(userId, false, requestDto.getTitle(), groupId);
+        Long countTitle = groupRepository.countByUser_UserIdAndIsDeleteFalseAndTitleAndGroupIdNot(userId, requestDto.getTitle(), groupId);
         if (countTitle > 0) {
             throw new CustomException(ErrorCode.GROUP_NAME_ALREADY_EXISTS);
         }
