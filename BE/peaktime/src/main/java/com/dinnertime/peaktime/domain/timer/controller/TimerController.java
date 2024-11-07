@@ -1,5 +1,6 @@
 package com.dinnertime.peaktime.domain.timer.controller;
 
+import com.dinnertime.peaktime.domain.group.service.dto.response.GroupDetailResponseDto;
 import com.dinnertime.peaktime.domain.timer.service.TimerService;
 import com.dinnertime.peaktime.domain.timer.service.dto.request.TimerCreateRequestDto;
 import com.dinnertime.peaktime.domain.timer.service.facade.TimerFacade;
@@ -36,9 +37,10 @@ public class TimerController {
     @CommonSwaggerResponse.CommonResponses
     @PostMapping("")
     public ResponseEntity<?> postTimer(@RequestBody @Valid TimerCreateRequestDto requestDto) {
+        GroupDetailResponseDto responseDto = timerService.postTimer(requestDto);
         timerFacade.createTimer(requestDto);
 
-        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "타이머 생성을 성공했습니다."));
+        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "타이머 생성을 성공했습니다.", responseDto));
     }
 
     @Operation(summary = "그룹 타이머 삭제", description = "선택한 그룹 타이머를 삭제합니다.")
@@ -52,8 +54,10 @@ public class TimerController {
     @DeleteMapping("/{timerId}")
     public ResponseEntity<?> deleteTimer(@PathVariable("timerId") Long timerId) {
         timerFacade.deleteTimer(timerId);
+    public ResponseEntity<?> deleteTimer(@PathVariable Long timerId) {
+        GroupDetailResponseDto responseDto = timerService.deleteTimer(timerId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "타이머 삭제를 성공했습니다."));
+        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "타이머 삭제를 성공했습니다.", responseDto));
     }
 
 }
