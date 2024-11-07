@@ -22,6 +22,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Slf4j
 @Configuration
 @EnableWebSecurity
@@ -44,7 +46,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http
+        return http.cors(withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/logout", "/users/**", "/children/**", "/groups/**", "/presets/**", "/hikings/**", "/summaries/**", "/memos/**").hasAuthority("root")
