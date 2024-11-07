@@ -1,10 +1,7 @@
 package com.dinnertime.peaktime.domain.user.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -15,17 +12,20 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="user_id")
-    private Long userId; //
+    private Long userId; // PK
 
     @Column(name="user_login_id", nullable = false, unique = true, length = 15)
     private String userLoginId; // 유저 로그인 아이디
 
+    @Setter
     @Column(name = "password", nullable = false, length = 64)
     private String password; // 비밀번호
 
+    @Setter
     @Column(name = "nickname", nullable = false, length = 20)
     private String nickname; // 닉네임
 
+    @Setter
     @Column(name = "email", unique = true, length = 64)
     private String email; // 이메일
 

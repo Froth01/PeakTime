@@ -37,7 +37,8 @@ public enum ErrorCode {
     DO_NOT_HAVE_USERGROUP("child 계정이지만 소속된 group이 존재하지 않습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     DO_NOT_HAVE_USER("존재하지 않는 유저입니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     DO_NOT_HAVE_GROUP("존재하지 않는 그룹입니다.", HttpStatus.INTERNAL_SERVER_ERROR),
-    INVALID_ROOT_PASSWORD("비밀번호가 일치하지 않습니다.", HttpStatus.CONFLICT)
+    INVALID_ROOT_PASSWORD("비밀번호가 일치하지 않습니다.", HttpStatus.CONFLICT),
+    DUPLICATED_NICKNAME("현재와 동일한 닉네임입니다.", HttpStatus.CONFLICT)
     ;
 
     private final String message;
