@@ -80,7 +80,7 @@ public class GroupController {
     })
     @CommonSwaggerResponse.CommonResponses
     @GetMapping("/{groupId}")
-    public ResponseEntity<?> getGroupDetail(@PathVariable Long groupId) {
+    public ResponseEntity<?> getGroupDetail(@PathVariable("groupId") Long groupId) {
         GroupDetailResponseDto groupDetailResponseDto = groupService.getGroupDetail(groupId);
 
         return ResponseEntity.status(HttpStatus.OK).body((ResultDto.res(HttpStatus.OK.value(), "그룹을 조회하는 데 성공했습니다.", groupDetailResponseDto)));
@@ -90,7 +90,7 @@ public class GroupController {
     @Operation(summary = "그룹 수정", description = "그룹의 title 혹은 preset 수정")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "그룹 정보를 수정하는 데 성공했습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+                    content = @Content(schema = @Schema(implementation = GroupListResponseDto.class))),
             @ApiResponse(responseCode = "409", description = "중복된 그룹 이름입니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "422", description = "존재하지 않는 그룹입니다.",
@@ -100,7 +100,7 @@ public class GroupController {
     })
     @CommonSwaggerResponse.CommonResponses
     @PutMapping("/{groupId}")
-    public ResponseEntity<?> putGroup(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long groupId, @RequestBody @Valid GroupPutRequestDto requestDto) {
+    public ResponseEntity<?> putGroup(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable("groupId") Long groupId, @RequestBody @Valid GroupPutRequestDto requestDto) {
         Long userId = userPrincipal.getUserId();
 
         groupService.putGroup(userId, groupId, requestDto);
@@ -113,7 +113,7 @@ public class GroupController {
     @Operation(summary = "그룹 삭제", description = "그룹 및 그룹에 속한 모든 child 계정 삭제")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "그룹 정보를 삭제하는 데 성공했습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+                    content = @Content(schema = @Schema(implementation = GroupListResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 그룹입니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "500", description = "그룹을 삭제하는 데 실패했습니다.",
@@ -121,10 +121,9 @@ public class GroupController {
     })
     @CommonSwaggerResponse.CommonResponses
     @DeleteMapping("/{groupId}")
-    public ResponseEntity<?> deleteGroup(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long groupId) {
+    public ResponseEntity<?> deleteGroup(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable("groupId") Long groupId) {
         Long userId = userPrincipal.getUserId();
-
-        groupService.deleteGroup(userId, groupId);
+        groupService.deleteGroup(groupId);
         GroupListResponseDto groupListResponseDto = groupService.getGroupListResponseDto(userId);
 
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "그룹 정보를 삭제하는 데 성공했습니다.", groupListResponseDto));

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -51,6 +52,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/logout", "/users/**", "/children/**", "/groups/**", "/presets/**", "/hikings/**", "/summaries/**", "/memos/**").hasAuthority("root")
                         .requestMatchers("/auth/logout", "/hikings/**", "/summaries/**", "/memos/**").hasAuthority("child")
+                        .requestMatchers(HttpMethod.GET, "/presets").hasAuthority("child")
                         .anyRequest().denyAll())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable)

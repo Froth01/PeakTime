@@ -39,37 +39,36 @@ public class HikingService {
     private final HikingRepository hikingRepository;
     private final UserRepository userRepository;
     private final ContentRepository contentRepository;
-    private final GroupRepository groupRepository;
     private final UserGroupRepository userGroupRepository;
     private final RedisService redisService;
 
     @Transactional
-    public StartHikingResponseDto startHiking(/*Long userId, */StartHikingRequestDto requestDto) {
+    public StartHikingResponseDto startHiking(Long userId, StartHikingRequestDto requestDto) {
         //유저 없으면 에러
-        User user = userRepository.findByUserIdAndIsDeleteFalse(1L).orElseThrow(
+        User user = userRepository.findByUserIdAndIsDeleteFalse(userId).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
-
-
-        //권한으로 child계정인지 확인
-        UserGroup userGroup = userGroupRepository.findByUser_UserId(1L).orElseThrow(
-                () -> new CustomException(ErrorCode.GROUP_NOT_FOUND)
-        );
-        //검증
         LocalDateTime startTime = requestDto.getStartTime();
-        //월요일이 1 일요일이 7 -> 일요일이 0, 월이 6으로 변경
-        int day = 7 - startTime.getDayOfWeek().getValue();
-        //분 구함
-        int minute = startTime.getHour() * 60 + startTime.getMinute();
-        //레디스 저장된 시간으로 구하기
-        int start = minute + (day * 14400);
-        //child계정이 속한 그룹의 타이머에 속하는지 확인
-        boolean checkDuplicated = redisService.checkTimerByGroupId(userGroup.getGroup().getGroupId(), start, start + requestDto.getAttentionTime());
-        if(checkDuplicated) {
-            throw new CustomException(ErrorCode.TIME_SLOT_OVERLAP);
+        
+        //자식계정인 경우
+        if(!user.getIsRoot()) {
+            UserGroup userGroup = userGroupRepository.findByUser_UserId(userId).orElseThrow(
+                    () -> new CustomException(ErrorCode.GROUP_NOT_FOUND)
+            );
+            //검증
+            //월요일이 1 일요일이 7 -> 일요일이 0, 월이 6으로 변경
+            int day = 7 - startTime.getDayOfWeek().getValue();
+            //분 구함
+            int minute = startTime.getHour() * 60 + startTime.getMinute();
+            //레디스 저장된 시간으로 구하기
+            int start = minute + (day * 14400);
+            //child계정이 속한 그룹의 타이머에 속하는지 확인
+            boolean checkDuplicated = redisService.checkTimerByGroupId(userGroup.getGroup().getGroupId(), start, start + requestDto.getAttentionTime());
+            if (checkDuplicated) {
+                throw new CustomException(ErrorCode.TIME_SLOT_OVERLAP);
+            }
         }
-
-
+        
         //시작시간에 집중 시간을 더하여 endTime을 구함
         LocalDateTime endTime = startTime.plusMinutes(requestDto.getAttentionTime());
 
@@ -83,7 +82,7 @@ public class HikingService {
     public void endHiking(EndHikingRequestDto requestDto, Long hikingId) {
 
         //하이킹 조회
-        Hiking hiking = hikingRepository.findById(hikingId).orElseThrow(
+        Hiking hiking = hikingRepository.findByHikingId(hikingId).orElseThrow(
                 () -> new CustomException(ErrorCode.HIKING_NOT_FOUND)
         );
 
@@ -96,6 +95,9 @@ public class HikingService {
         hiking.updateRealEndTime(requestDto.getRealEndTime());
         hikingRepository.save(hiking);
 
+        //없으면 조기 종료
+        if(requestDto.getContentList()==null) return;
+
         //접속 기록 저장
         List<Content> contentList = requestDto.getContentList()
                 .stream()
@@ -105,10 +107,10 @@ public class HikingService {
     }
 
     @Transactional(readOnly = true)
-    public HikingCalendarResponseDto getCalendar(/*Long userId*/) {
+    public HikingCalendarResponseDto getCalendar(Long userId) {
 
         //날짜별로 누적 시간 합치기
-        List<HikingCalendarQueryDto> calendarList = hikingRepository.getCalendar(/*userId*/1L);
+        List<HikingCalendarQueryDto> calendarList = hikingRepository.getCalendar(userId);
 
         HikingCalendarResponseDto responseDto = HikingCalendarResponseDto.createHikingCalenderResponseDto(calendarList);
 
@@ -118,9 +120,9 @@ public class HikingService {
     }
 
     @Transactional(readOnly = true)
-    public HikingCalendarDetailResponseDto getCalendarByDate(/*Long userId, */LocalDate date) {
+    public HikingCalendarDetailResponseDto getCalendarByDate(Long userId, LocalDate date) {
 
-        List<HikingCalendarDetailQueryDto> calendarByDateList = hikingRepository.getCalendarByDate(date, /*userId*/ 1L);
+        List<HikingCalendarDetailQueryDto> calendarByDateList = hikingRepository.getCalendarByDate(date, userId);
 
         log.info(calendarByDateList.toString());
 
@@ -128,7 +130,7 @@ public class HikingService {
     }
 
     @Transactional(readOnly = true)
-    public HikingDetailResponseDto getHikingDetail(/*Long userId, */Long hikingId) {
+    public HikingDetailResponseDto getHikingDetail(Long hikingId) {
 
         //디테일 조회
         HikingDetailQueryDto hikingDetail = hikingRepository.getHikingDetail(hikingId);
@@ -149,11 +151,11 @@ public class HikingService {
     }
 
     @Transactional(readOnly = true)
-    public HikingStatisticResponseDto getHikingStatistic(/*Long userId,*/ Long childUserId) {
+    public HikingStatisticResponseDto getHikingStatistic(Long userId, Long childUserId) {
 
-        Long findUserId = Optional.ofNullable(childUserId).orElse(/*userId*/1L);
+        Long findUserId = Optional.ofNullable(childUserId).orElse(userId);
 
-        User findUser = userRepository.findById(findUserId).orElseThrow(
+        User findUser = userRepository.findByUserId(findUserId).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
 

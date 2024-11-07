@@ -1,9 +1,8 @@
 package com.dinnertime.peaktime.domain.summary.controller;
 
-import com.dinnertime.peaktime.domain.memo.service.MemoService;
 import com.dinnertime.peaktime.domain.summary.service.SummaryFacade;
-import com.dinnertime.peaktime.domain.summary.service.SummaryService;
 import com.dinnertime.peaktime.domain.summary.service.dto.request.SaveSummaryRequestDto;
+import com.dinnertime.peaktime.global.auth.service.dto.security.UserPrincipal;
 import com.dinnertime.peaktime.global.util.CommonSwaggerResponse;
 import com.dinnertime.peaktime.global.util.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import java.nio.file.attribute.UserPrincipal;
 
 @Slf4j
 @RestController
@@ -47,8 +45,7 @@ public class SummaryController {
         log.info("createSummary 메서드가 호출되었습니다.");
         log.info("요약 생성 : " + requestDto.toString());
 
-        // userPrincipal.getUserId()
-        summaryFacade.createOrUpdateSummary(requestDto, 1L);
+        summaryFacade.createOrUpdateSummary(requestDto, userPrincipal.getUserId());
 
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "요약 생성 및 수정에 성공했습니다."));
 
@@ -68,10 +65,7 @@ public class SummaryController {
     })
     @CommonSwaggerResponse.CommonResponses
     @DeleteMapping("/{summaryId}")
-    public ResponseEntity<?> deleteSummary(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
-            @PathVariable Long summaryId) {
-
+    public ResponseEntity<?> deleteSummary(@PathVariable Long summaryId) {
 
         log.info("deleteSummary  메서드가 호출되었습니다.");
 

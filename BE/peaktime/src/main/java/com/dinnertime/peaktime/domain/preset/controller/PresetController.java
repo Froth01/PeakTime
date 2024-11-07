@@ -4,6 +4,7 @@ import com.dinnertime.peaktime.domain.preset.service.PresetService;
 import com.dinnertime.peaktime.domain.preset.service.dto.request.AddUrlPresetRequestDto;
 import com.dinnertime.peaktime.domain.preset.service.dto.request.SavePresetRequestDto;
 import com.dinnertime.peaktime.domain.preset.service.dto.response.PresetWrapperResponseDto;
+import com.dinnertime.peaktime.global.auth.service.dto.security.UserPrincipal;
 import com.dinnertime.peaktime.global.util.CommonSwaggerResponse;
 import com.dinnertime.peaktime.global.util.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,8 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.nio.file.attribute.UserPrincipal;
 
 @Slf4j
 @RestController
@@ -38,7 +37,6 @@ public class PresetController {
             @ApiResponse(responseCode = "500", description = "프리셋 생성에 실패했습니다.",
                     content= @Content(schema= @Schema(implementation = ResultDto.class))
             )
-
     })
     @CommonSwaggerResponse.CommonResponses
     @PostMapping
@@ -49,7 +47,7 @@ public class PresetController {
         log.info("createPreset 메서드가 호출되었습니다.");
         log.info("프리셋 생성 : " + requestDto.toString());
 
-        presetService.createPreset(userPrincipal, requestDto);
+        presetService.createPreset(userPrincipal.getUserId(), requestDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(),"프리셋 생성에 성공했습니다."));
     }
@@ -60,19 +58,18 @@ public class PresetController {
     @Operation(summary = "프리셋 전체 조회", description = "프리셋 전체 조회하기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "프리셋 전체 조회에 성공했습니다.",
-                content = @Content(schema= @Schema(implementation = ResultDto.class))
+                content = @Content(schema= @Schema(implementation = PresetWrapperResponseDto.class))
             ),
             @ApiResponse(responseCode = "500", description = "프리셋 전체 조회에 실패했습니다.",
                 content= @Content(schema= @Schema(implementation = ResultDto.class))
             )
-
     })
     @CommonSwaggerResponse.CommonResponses
     @GetMapping
     public ResponseEntity<?> getPreset(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         log.info("getPreset 메서드가 호출되었습니다.");
 
-        PresetWrapperResponseDto responseDto = presetService.getPresets(userPrincipal);
+        PresetWrapperResponseDto responseDto = presetService.getPresets(userPrincipal.getUserId());
 
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(),"프리셋 전체 조회에 성공했습니다.", responseDto));
     }
@@ -86,19 +83,16 @@ public class PresetController {
             @ApiResponse(responseCode = "500", description = "프리셋 수정에 실패했습니다.",
                     content= @Content(schema= @Schema(implementation = ResultDto.class))
             )
-
     })
     @CommonSwaggerResponse.CommonResponses
     @PutMapping("/{presetId}")
     public ResponseEntity<?> updatePreset(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable Long presetId,
             @Valid @RequestBody SavePresetRequestDto requestDto) {
 
-
         log.info("updatePreset  메서드가 호출되었습니다.");
 
-        presetService.updatePreset(userPrincipal, requestDto, presetId);
+        presetService.updatePreset(requestDto, presetId);
 
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(),"프리셋 수정에 성공했습니다."));
     }
@@ -112,24 +106,20 @@ public class PresetController {
             @ApiResponse(responseCode = "500", description = "프리셋 수정에 삭제했습니다.",
                     content= @Content(schema= @Schema(implementation = ResultDto.class))
             )
-
     })
     @CommonSwaggerResponse.CommonResponses
     @DeleteMapping("/{presetId}")
-    public ResponseEntity<?> deletePreset(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
-            @PathVariable Long presetId) {
-
+    public ResponseEntity<?> deletePreset(@PathVariable Long presetId) {
 
         log.info("deletePreset  메서드가 호출되었습니다.");
 
-        presetService.deletePreset(userPrincipal, presetId);
+        presetService.deletePreset(presetId);
 
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(),"프리셋 삭제에 성공했습니다."));
     }
 
     // 특정 프리셋 생성
-    @Operation(summary = "ex에서 프리셋 웹사이트 추가", description = "ex에서 프리셋 웹사이트 추가해주기")
+    @Operation(summary = "익스텐션에서 프리셋 웹사이트 추가", description = "익스텐션에서 프리셋 웹사이트 추가해주기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "웹사이트를 프리셋에 추가하기에 성공했습니다.",
                     content = @Content(schema= @Schema(implementation = ResultDto.class))
@@ -137,7 +127,6 @@ public class PresetController {
             @ApiResponse(responseCode = "500", description = "웹사이트를 프리셋에 추가하기에 실패했습니다.",
                     content= @Content(schema= @Schema(implementation = ResultDto.class))
             )
-
     })
     @CommonSwaggerResponse.CommonResponses
     @PostMapping("/{presetId}")

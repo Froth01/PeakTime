@@ -3,6 +3,7 @@ package com.dinnertime.peaktime.domain.preset.service.dto.response;
 import com.dinnertime.peaktime.domain.preset.entity.Preset;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -21,6 +22,16 @@ public class PresetWrapperResponseDto {
         List<PresetResponseDto> responseDto = presets.stream()
                 .map(PresetResponseDto::createPresetResponse)
                 .toList();
+
+        return PresetWrapperResponseDto.builder()
+                .presetList(responseDto)
+                .build();
+    }
+
+    public static PresetWrapperResponseDto buildPresetResponseDto(Preset preset) {
+        List<PresetResponseDto> responseDto = new ArrayList<>();
+        PresetResponseDto presetResponse = PresetResponseDto.createPresetResponse(preset);
+        responseDto.add(presetResponse);
 
         return PresetWrapperResponseDto.builder()
                 .presetList(responseDto)
