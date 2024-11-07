@@ -1,5 +1,7 @@
 package com.dinnertime.peaktime.global.auth.service;
 
+import com.dinnertime.peaktime.domain.group.entity.Group;
+import com.dinnertime.peaktime.domain.group.repository.GroupRepository;
 import com.dinnertime.peaktime.domain.preset.entity.Preset;
 import com.dinnertime.peaktime.domain.preset.repository.PresetRepository;
 import com.dinnertime.peaktime.domain.user.entity.User;
@@ -7,14 +9,17 @@ import com.dinnertime.peaktime.domain.user.repository.UserRepository;
 import com.dinnertime.peaktime.domain.usergroup.entity.UserGroup;
 import com.dinnertime.peaktime.domain.usergroup.repository.UserGroupRepository;
 import com.dinnertime.peaktime.global.auth.service.dto.request.LoginRequest;
+import com.dinnertime.peaktime.global.auth.service.dto.request.LogoutRequest;
 import com.dinnertime.peaktime.global.auth.service.dto.request.SignupRequest;
 import com.dinnertime.peaktime.global.auth.service.dto.response.IsDuplicatedResponse;
 import com.dinnertime.peaktime.global.auth.service.dto.response.LoginResponse;
+import com.dinnertime.peaktime.global.auth.service.dto.response.ReissueResponse;
 import com.dinnertime.peaktime.global.auth.service.dto.security.UserPrincipal;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
 import com.dinnertime.peaktime.global.util.AuthUtil;
 import com.dinnertime.peaktime.global.util.RedisService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,12 +30,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -48,6 +55,7 @@ public class AuthService {
     private final RedisService redisService;
     private final UserRepository userRepository;
     private final PresetRepository presetRepository;
+    private final GroupRepository groupRepository;
     private final UserGroupRepository userGroupRepository;
 
     // 회원가입
@@ -110,7 +118,6 @@ public class AuthService {
         } catch (IOException e) {
             throw new CustomException(ErrorCode.FILE_NOT_FOUND);
         }
-
         // 8. Create Default Preset
         Preset preset = Preset.createDefaultPreset(blockWebsiteList, user);
         // 9. Save Preset
@@ -169,6 +176,54 @@ public class AuthService {
         return LoginResponse.createLoginResponse(accessToken, false, userGroup.getGroup().getGroupId(), user.getNickname());
     }
 
+    // Reissue JWT
+    @Transactional
+    public ReissueResponse reissue(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        // 1. 클라이언트의 요청에서 Refresh Token 추출하기
+        String refreshToken = jwtService.extractRefreshToken(httpServletRequest);
+        // 2. Refresh Token 유효성 검증 (위변조, 만료 등) -> 유효하지 않으면 401 예외 던지기
+        if((!StringUtils.hasText(refreshToken)) || (!jwtService.validateToken(refreshToken))) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
+        // 3. Redis에 존재하는 Refresh Token과 일치하는지 확인하기 -> 일치하지 않으면 401 예외 던지기
+        long userId = jwtService.getUserId(refreshToken);
+        String redisRefreshToken = redisService.getRefreshToken(userId);
+        if(!refreshToken.equals(redisRefreshToken)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        }
+        // 4. 새 Access Token과 새 Refresh Token을 생성하기 위한 정보를 기존 Refresh Token에서 추출하기 (userId, Authority, 만료시간)
+        String authority = jwtService.getAuthority(refreshToken);
+        Date expirationTime = jwtService.getExpirationTime(refreshToken);
+        // 5. 새 Access Token과 새 Refresh Token 생성
+        String newAccessToken = jwtService.createAccessToken(userId, authority);
+        String newRefreshToken = jwtService.createRefreshTokenWithExp(userId, authority, expirationTime);
+        // 6. 새 Refresh Token을 Redis에 저장 (기존 Refresh Token 반드시 덮어쓰기)
+        redisService.saveRefreshToken(userId, newRefreshToken);
+        // 7. 새 Refresh Token을 Cookie에 담아서 클라이언트에게 전송
+        jwtService.addRefreshTokenToCookie(httpServletResponse, newRefreshToken);
+        // 8. ReissueResponse 객체 생성하여 반환 (새 Access Token을 Response Body에 담아서 클라이언트에게 전송)
+        return ReissueResponse.createReissueResponse(newAccessToken);
+    }
+
+    // 로그아웃
+    @Transactional
+    public void logout(LogoutRequest logoutRequest, UserPrincipal userPrincipal, HttpServletResponse httpServletResponse) {
+        // 1. 클라이언트의 요청에서 rootUserPassword 추출하기
+        String rootUserPassword = logoutRequest.getRootUserPassword();
+        // 2. DB에 존재하는 비밀번호와 비교하기 위해 암호화 진행
+        String encodedRootUserPassword = passwordEncoder.encode(rootUserPassword);
+        // 3. DB에서 비밀번호 가져오기
+        String rootUserPasswordOnDatabase = this.getRootUserPasswordOnDatabase(userPrincipal);
+        // 4. 비밀번호 비교하기
+        if(!encodedRootUserPassword.equals(rootUserPasswordOnDatabase)) {
+            throw new CustomException(ErrorCode.INVALID_ROOT_PASSWORD);
+        }
+        // 5. Redis에서 해당 유저의 Refresh Token 삭제
+        redisService.removeRefreshToken(userPrincipal.getUserId());
+        // 6. 클라이언트의 Refresh Token 삭제
+        jwtService.letRefreshTokenRemoved(httpServletResponse);
+    }
+
     // 아이디 중복 검사 (유저 로그인 아이디로 검사. 이미 존재하면 true 반환)
     private boolean checkDuplicateUserLoginId(String userLoginId) {
         return userRepository.findByUserLoginId(userLoginId).isPresent();
@@ -179,14 +234,18 @@ public class AuthService {
         return userRepository.findByEmail(email).isPresent();
     }
 
-    // 경로로 파일을 참조하여 차단 웹사이트 목록 List로 반환
-    private List<String> loadWebsitesFromFile(String filePath) {
-        try {
-            Path path = Paths.get(filePath);
-            return Files.readAllLines(path);
-        } catch (IOException e) {
-            throw new CustomException(ErrorCode.FILE_NOT_FOUND);
+    // 데이터베이스에 존재하는 루트 계정 비밀번호 가져오기
+    private String getRootUserPasswordOnDatabase(UserPrincipal userPrincipal) {
+        if(userPrincipal.getAuthority().equals("child")) {
+            UserGroup userGroup = userGroupRepository.findByUser_UserId(userPrincipal.getUserId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.DO_NOT_HAVE_USERGROUP));
+            Group group = groupRepository.findByGroupId(userGroup.getGroup().getGroupId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.DO_NOT_HAVE_GROUP));
+            return group.getUser().getPassword();
         }
+        User user = userRepository.findByUserId(userPrincipal.getUserId())
+                .orElseThrow(() -> new CustomException(ErrorCode.DO_NOT_HAVE_USER));
+        return user.getPassword();
     }
 
 }

@@ -24,4 +24,7 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     
     // 그룹 수정 전 그룹명 중복검사
     Long countByUser_UserIdAndIsDeleteFalseAndTitleAndGroupIdNot(Long userId, String title, Long groupId);
+
+    Optional<Group> findByGroupId(Long groupId);
+
 }
