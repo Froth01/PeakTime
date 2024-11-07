@@ -2,6 +2,8 @@ package com.dinnertime.peaktime.domain.schedule.service;
 
 import com.dinnertime.peaktime.domain.group.entity.Group;
 import com.dinnertime.peaktime.domain.group.repository.GroupRepository;
+import com.dinnertime.peaktime.domain.preset.entity.Preset;
+import com.dinnertime.peaktime.domain.preset.repository.PresetRepository;
 import com.dinnertime.peaktime.domain.schedule.entity.Schedule;
 import com.dinnertime.peaktime.domain.schedule.repository.EmitterRepository;
 import com.dinnertime.peaktime.domain.schedule.repository.ScheduleRepository;
@@ -32,6 +34,7 @@ public class ScheduleService {
     private final GroupRepository groupRepository;
     private final UserGroupRepository userGroupRepository;
     private final EmitterRepository emitterRepository;
+    private final PresetRepository presetRepository;
 
     //연결 지속시간 한시간
     private static final long DEFAULT_TIMEOUT = 60L * 1000 * 60;
@@ -86,10 +89,17 @@ public class ScheduleService {
     public void send(Long groupId, int attentionTime) {
         Map<String, SseEmitter> sseEmitterList = emitterRepository.findEmitterByGroupId(groupId);
 
+        Group group = groupRepository.findByGroupIdAndIsDeleteFalse(groupId).orElseThrow(
+                () -> new CustomException(ErrorCode.GROUP_NOT_FOUND)
+        );
+
+        Preset preset = group.getPreset();
+
+
         sseEmitterList.forEach(
                 (key, emitter) -> {
                     //
-                    SendTimerResponseDto responseDto = SendTimerResponseDto.createSendTimerResponseDto(attentionTime);
+                    SendTimerResponseDto responseDto = SendTimerResponseDto.createSendTimerResponseDto(attentionTime, preset);
                     emitterRepository.saveEventCache(key, responseDto);
 
                     sendToClient(emitter, key, responseDto);
