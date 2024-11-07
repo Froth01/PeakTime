@@ -1,5 +1,6 @@
 package com.dinnertime.peaktime.domain.timer.service.facade;
 
+import com.dinnertime.peaktime.domain.group.service.dto.response.GroupDetailResponseDto;
 import com.dinnertime.peaktime.domain.schedule.entity.Schedule;
 import com.dinnertime.peaktime.domain.schedule.service.ScheduleService;
 import com.dinnertime.peaktime.domain.timer.entity.Timer;
@@ -26,7 +27,7 @@ public class TimerFacade {
     private final RedisService redisService;
 
     @Transactional
-    public void createTimer(TimerCreateRequestDto requestDto) {
+    public GroupDetailResponseDto createTimer(TimerCreateRequestDto requestDto) {
 
         //레디스 체크
         Long groupId = requestDto.getGroupId();
@@ -84,10 +85,12 @@ public class TimerFacade {
             redisService.addSchedule(schedule);
         }
 
+        return timerService.getTimerByGroupId(requestDto.getGroupId());
+
     }
 
     @Transactional
-    public void deleteTimer(Long timerId) {
+    public GroupDetailResponseDto deleteTimer(Long timerId) {
         //타이머 삭제
         Timer timer = timerService.deleteTimer(timerId);
 
@@ -110,6 +113,7 @@ public class TimerFacade {
         //스케쥴 삭제
         scheduleService.deleteSchedule(timer);
 
+        return timerService.getTimerByGroupId(timer.getGroup().getGroupId());
     }
 
 }
