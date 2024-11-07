@@ -27,7 +27,7 @@ public class TimerController {
     @Operation(summary = "그룹 타이머 생성", description = "그룹의 타이머 목록과 비교해서 겹치는 시간이 존재하지 않을 때 타이머를 생성합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "타이머 생성을 성공했습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+                    content = @Content(schema = @Schema(implementation = GroupDetailResponseDto.class))),
             @ApiResponse(responseCode = "409", description = "선택한 시간 범위가 다른 예약과 겹칩니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "500", description = "타이머를 생성하는 데 실패했습니다.",
