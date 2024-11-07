@@ -2,6 +2,8 @@ package com.dinnertime.peaktime.domain.timer.service;
 
 import com.dinnertime.peaktime.domain.group.entity.Group;
 import com.dinnertime.peaktime.domain.group.repository.GroupRepository;
+import com.dinnertime.peaktime.domain.group.service.GroupService;
+import com.dinnertime.peaktime.domain.schedule.service.ScheduleService;
 import com.dinnertime.peaktime.domain.group.service.dto.response.GroupDetailResponseDto;
 import com.dinnertime.peaktime.domain.timer.entity.Timer;
 import com.dinnertime.peaktime.domain.timer.repository.TimerRepository;
@@ -9,20 +11,25 @@ import com.dinnertime.peaktime.domain.timer.service.dto.request.TimerCreateReque
 import com.dinnertime.peaktime.domain.timer.service.dto.response.TimerItemResponseDto;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
-import jakarta.transaction.Transactional;
+import com.dinnertime.peaktime.global.util.RedisService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TimerService {
 
     private final TimerRepository timerRepository;
     private final GroupRepository groupRepository;
+    private final RedisService redisService;
+    private final ScheduleService scheduleService;
 
     @Transactional
     public GroupDetailResponseDto postTimer(TimerCreateRequestDto requestDto) {
@@ -54,21 +61,35 @@ public class TimerService {
     }
 
     @Transactional
-    public GroupDetailResponseDto deleteTimer(Long timerId) {
-        Timer timerSelected = timerRepository.findByTimerId(timerId)
+    public Timer deleteTimer(Long timerId) {
+            // is_repeat = false이고 repeat_day가 존재하지 않는 경우
+            // 타이머 실행 완료 후 실행
+        Timer timer = timerRepository.findByTimerId(timerId)
                 .orElseThrow(() -> new CustomException(ErrorCode.TIMER_NOT_FOUND));
 
-        Group group = timerSelected.getGroup();
+        Timer copyTimer = Timer.copyTimer(timer);
 
-        timerRepository.delete(timerSelected);
+        timerRepository.delete(timer);
+
+        Group group = timer.getGroup();
+
+        timerRepository.delete(timer);
+        return copyTimer;
+    }
+
+    @Transactional(readOnly = true)
+    public GroupDetailResponseDto getTimerByGroupId(Long groupId) {
+
+        Group group = groupRepository.findByGroupIdAndIsDeleteFalse(groupId).orElseThrow(
+                () -> new CustomException(ErrorCode.GROUP_NOT_FOUND)
+        );
 
         // 타이머 리스트 조회
-        List<TimerItemResponseDto> timerList = timerRepository.findByGroup_GroupId(group.getGroupId())
+        List<TimerItemResponseDto> timerList = timerRepository.findByGroup_GroupId(groupId)
                 .stream()
                 .map(TimerItemResponseDto::createTimeItemResponseDto)
                 .collect(Collectors.toList());
 
         return GroupDetailResponseDto.createGroupDetailResponseDto(group, timerList);
-
     }
 }

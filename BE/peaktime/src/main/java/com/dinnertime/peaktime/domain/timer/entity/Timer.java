@@ -2,7 +2,6 @@ package com.dinnertime.peaktime.domain.timer.entity;
 
 import com.dinnertime.peaktime.domain.group.entity.Group;
 import com.dinnertime.peaktime.domain.timer.service.dto.request.TimerCreateRequestDto;
-import io.hypersistence.utils.hibernate.type.array.IntArrayType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -60,6 +59,16 @@ public class Timer {
                 .attentionTime(requestDto.getAttentionTime())
                 .isRepeat(requestDto.getIsRepeat())
                 .repeatDay(requestDto.getRepeatDay())
+                .build();
+    }
+
+    public static Timer copyTimer(Timer timer) {
+        return Timer.builder()
+                .group(timer.getGroup())
+                .startTime(timer.getStartTime())
+                .attentionTime(timer.getAttentionTime())
+                .isRepeat(timer.getIsRepeat())
+                .repeatDay(timer.getRepeatDay())
                 .build();
     }
 }
