@@ -26,6 +26,10 @@ public class TimerFacade {
     private final ScheduleService scheduleService;
     private final RedisService redisService;
 
+    private static final int DAY = 7;
+    private static final int DAY_MINUTE = 1440;
+
+
     @Transactional
     public GroupDetailResponseDto createTimer(TimerCreateRequestDto requestDto) {
 
@@ -37,10 +41,10 @@ public class TimerFacade {
 
         int plusMinute = (startTime.getHour()*60) + startTime.getMinute();
 
-        for(int i=0; i<6;i++) {
+        for(int i=0; i<DAY;i++) {
             if((repeatDay & (1 << i)) != 0) {
                 //날짜를 일차원 배열로 만들기 위함
-                int start = 14400 * i + plusMinute;
+                int start = DAY_MINUTE * i + plusMinute;
                 int end = start + attentionTime;
                 boolean checkDuplicate = redisService.checkTimerByGroupId(groupId, start, end);
                 if(checkDuplicate) {
@@ -51,10 +55,10 @@ public class TimerFacade {
 
         log.info("중복 체크");
 
-        for(int i=0; i<6;i++) {
+        for(int i=0; i<DAY;i++) {
             if((repeatDay & (1 << i)) != 0) {
                 //날짜를 일차원 배열로 만들기 위함
-                int start = 14400 * i + plusMinute;
+                int start = DAY_MINUTE * i + plusMinute;
                 int end = start + attentionTime;
                 redisService.addTimerByGroupId(groupId, start, end);
             }
@@ -69,7 +73,7 @@ public class TimerFacade {
         List<Schedule> scheduleList = scheduleService.createSchedule(requestDto);
 
         //현재 시간 이후 내일 이전에 값이 존재하면 레디스에 저장
-        int todayDayOfWeek = 7 - LocalDateTime.now().getDayOfWeek().getValue();
+        int todayDayOfWeek = DAY - LocalDateTime.now().getDayOfWeek().getValue();
 
         LocalTime startLocalTime = startTime.toLocalTime();
 
@@ -101,10 +105,10 @@ public class TimerFacade {
 
         int plusMinute = (startTime.getHour()*60) + startTime.getMinute();
 
-        for(int i=0; i<6;i++) {
+        for(int i=0; i<DAY;i++) {
             if((repeatDay & (1 << i)) != 0) {
                 //날짜를 일차원 배열로 만들기 위함
-                int start = 14400 * i + plusMinute;
+                int start = DAY_MINUTE * i + plusMinute;
                 int end = start + attentionTime;
                 redisService.deleteTimerByGroupIdAndTime(timer.getGroup().getGroupId(), start, end);
             }
