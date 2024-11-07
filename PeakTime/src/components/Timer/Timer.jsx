@@ -212,7 +212,7 @@ function Timer() {
           setTimeout(() => {
             setExtenstionData([]);
             setElectronData([]);
-        }, 10000);
+        }, 2000);
         
 
           // 상태 업데이트
