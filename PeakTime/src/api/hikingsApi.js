@@ -12,11 +12,11 @@ const hikingsApi = axios.create({
 hikingsApi.interceptors.request.use(
   (config) => {
     // const state = store.getState();
-    // const accessToken = state.user.accessToken;
+    const accessToken = `${import.meta.env.VITE_ACCESS_TOKEN}`
 
-    // if (accessToken && accessToken !== "") {
-    //   config.headers.Authorization = `Bearer ${accessToken}`;
-    // }
+    if (accessToken && accessToken !== "") {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
 
     return config;
   },

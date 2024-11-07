@@ -9,8 +9,10 @@ function Timer() {
   const [isRunning, setIsRunning] = useState(false); // 타이머 시작 상태
 
   const [startedHikingId, setStartedHikingId] = useState(null); // 시작한 hikingId 정보
-  const [parsedData, setParsedData] = useState(null);
 
+  const [extenstionData, setExtenstionData] = useState(null); // extension hiking 데이터
+  const [electronData, setElectronData] = useState(null); // electron hiking 데이터
+  
   // 시작 상태, 남은 시간 변경시마다 적용
   useEffect(() => {
     if (remainTime && remainTime === 0) {
@@ -115,18 +117,77 @@ function Timer() {
   useEffect(() => {
     if (startedHikingId !== null) {
       console.log("시작한 하이킹 아이디:", startedHikingId);
+      // 차단 프로세스 시작
     }
   }, [startedHikingId]);
 
   // ipc 처리
   const handleExtensionMessage = async (data) => {
-    await setParsedData(data); // 받은 데이터를 상태로 저장
+
+    console.log(data.urlList)
+    setExtenstionData(data.urlList);// 받은 데이터를 상태로 저장
   };
+
+  const handleElectronMessage = async (data) => {
+
+    // 익스텍션에서 추가로 받은 리스트 저장
+    console.log(data)
+    setElectronData(data);
+  }
+  
   // onWebSocketMessage 이벤트 리스너 등록
   useEffect(() => {
     console.log("onHikingInfo 리스너 등록 중...");
     window.electronAPI.onHikingInfo(handleExtensionMessage);
+
+    console.log("onBlockHistory 리스너 등록 중");
+    window.electronAPI.onBlockHistory(handleElectronMessage);
+
   }, []);
+
+  useEffect(() => {
+    const updateHikingData = async () => {
+        if (extenstionData == null || electronData == null) {
+            return;
+        }
+
+        console.log("extenstionData", extenstionData);
+        console.log("electronData:", electronData);
+
+        // 현재 시간 포맷 생성
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth() + 1;
+        const day = now.getDate();
+        const hour = now.getHours();
+        const minute = now.getMinutes();
+        const second = now.getSeconds();
+
+        const format = `${year}-${("00" + month.toString()).slice(-2)}-${(
+          "00" + day.toString()
+        ).slice(-2)} ${("00" + hour.toString()).slice(-2)}:${(
+          "00" + minute.toString()
+        ).slice(-2)}:${("00" + second.toString()).slice(-2)}`;
+
+        const endHikingData = {
+          realEndTime: format,
+          contentList: [...electronData, ...extenstionData]
+        };
+        
+        console.log(endHikingData)
+        const response = await hikingsApi.put(
+            `${startedHikingId}`,
+            endHikingData
+        );
+        console.log("response:" , response.data);
+        setElectronData(null);
+        setExtenstionData(null);
+    };
+
+    updateHikingData();
+}, [extenstionData, electronData]);
+
+
 
   // 포기 버튼 누르기
   // 커스텀 이벤트
@@ -147,41 +208,12 @@ function Timer() {
           const endBtn = document.getElementById("giveup");
           endBtn.dispatchEvent(hikingEnd);
 
-          // 현재 시간 포맷 생성
-          const now = new Date();
-          const year = now.getFullYear();
-          const month = now.getMonth() + 1;
-          const day = now.getDate();
-          const hour = now.getHours();
-          const minute = now.getMinutes();
-          const second = now.getSeconds();
-
-          const format = `${year}-${("00" + month.toString()).slice(-2)}-${(
-            "00" + day.toString()
-          ).slice(-2)} ${("00" + hour.toString()).slice(-2)}:${(
-            "00" + minute.toString()
-          ).slice(-2)}:${("00" + second.toString()).slice(-2)}`;
-          const endHikingData = {
-            data: parsedData,
-          };
-          // const endHikingData = {
-          //   realEndTime: format,
-          //   contentList: [
-          //     {
-          //       contentName: "더미",
-          //       contentType: "site",
-          //       usingTime: 130,
-          //       isBlockContent: false,
-          //     },
-          //   ],
-          // };
-          console.log(endHikingData);
-
-          // API 요청
-          const responseEndHiking = await hikingsApi.put(
-            `${startedHikingId}`,
-            endHikingData
-          );
+          // API 요청 보내기
+          setTimeout(() => {
+            setExtenstionData([]);
+            setElectronData([]);
+        }, 2000);
+        
 
           // 상태 업데이트
           setTotalTime(0);

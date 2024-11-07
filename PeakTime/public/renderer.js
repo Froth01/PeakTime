@@ -10,6 +10,10 @@ document.addEventListener("hikingStart", () => {
       hikingId: 1,
     })
   );
+
+  // 차단 시스템 요청
+  const data =  { "Figma.exe": 0};
+  window.electronAPI.startBlockProgram(data);
 });
 
 //하이킹 종료
@@ -20,6 +24,8 @@ document.addEventListener("hikingEnd", () => {
       action: "end",
     })
   );
+
+  window.electronAPI.endBlockProgram();
 });
 
 let parsedMessage = null;
@@ -41,7 +47,7 @@ window.electronAPI.onWebSocketMessage((message) => {
   // JSON 파싱
   parsedMessage = JSON.parse(decodedMessage);
   isReceived = true;
-});
+}); 
 
 // 상태를 구독하여 처리하는 함수
 function checkMessageStatus() {

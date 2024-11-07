@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain } from "electron";
 import path from "path";
 import url from "url";
 import WebSocket, { WebSocketServer } from "ws";
+import { startWatcher, endWatcher } from "./processWatcher.js";
 
 const __dirname = path.resolve();
 
@@ -61,6 +62,7 @@ ipcMain.on("hikingInfo", (event, data) => {
 app.whenReady().then(() => {
   createWindow();
   console.log(__dirname);
+
   // WebSocket 서버 생성
   const port = 12345;
   wss = new WebSocketServer({ port }, () => {
@@ -95,4 +97,16 @@ app.whenReady().then(() => {
   wss.on("error", (err) => {
     console.error("WebSocket server error:", err);
   });
+});
+
+// 차단 프로그램 시작
+ipcMain.on("start-block-program", (event, data) => {
+  startWatcher(data);
+});
+
+// 차단 프로그램 종료
+ipcMain.on("end-block-program", (event) => {
+  const response = endWatcher();
+  // 전달
+  event.reply("blockHistoryResponse", response);
 });
