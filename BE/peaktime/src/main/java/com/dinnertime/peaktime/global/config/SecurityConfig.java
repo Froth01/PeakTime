@@ -64,7 +64,7 @@ public class SecurityConfig {
         return web ->
                 web.ignoring()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**")
-                        .requestMatchers("**","/timers/**","/schedules","/auth/login", "/auth/signup", "/auth/user-login-id", "/auth/email", "/auth/code/**", "/auth/reset-password", "/auth/token/reissue");
+                        .requestMatchers("/auth/login", "/auth/signup", "/auth/user-login-id", "/auth/email", "/auth/code/**", "/auth/reset-password", "/auth/token/reissue");
                         // 테스트가 끝나면 "/auth/login"을 추가해주세요.
     }
 
