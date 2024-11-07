@@ -53,6 +53,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/logout", "/users/**", "/children/**", "/groups/**", "/presets/**", "/hikings/**", "/summaries/**", "/memos/**").hasAuthority("root")
                         .requestMatchers("/auth/logout", "/hikings/**", "/summaries/**", "/memos/**").hasAuthority("child")
                         .requestMatchers(HttpMethod.GET, "/presets").hasAuthority("child")
+                        .requestMatchers(HttpMethod.GET, "/schedules").hasAuthority("child")
                         .anyRequest().denyAll())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable)
