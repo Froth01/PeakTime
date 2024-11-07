@@ -33,7 +33,7 @@ const protectedRoutes = [
 
 function App() {
   // 스토어에서 정보 가져오기
-  const { user, userActions } = useUserStore();
+  const user = localStorage.getItem("user");
   const { bg, bgActions } = useBackgroundStore();
 
   return (

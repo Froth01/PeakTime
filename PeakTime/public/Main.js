@@ -42,11 +42,14 @@ let wss;
 // 웹소켓 메세지 주고받기
 ipcMain.on("websocket-message", (event, action) => {
   if (wss && wss.clients) {
+    let count = 0;
     wss.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
         client.send(action);
+        count += 1;
       }
     });
+    console.log(count);
   }
 });
 
