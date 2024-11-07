@@ -147,7 +147,7 @@ public class GroupService {
 
     // 그룹 삭제
     @Transactional
-    public void deleteGroup(Long userId, Long groupId) {
+    public void deleteGroup(Long groupId) {
         Group groupSelected = groupRepository.findByGroupIdAndIsDeleteFalse(groupId)
                 .orElseThrow(() -> new CustomException(ErrorCode.GROUP_NOT_FOUND));
 

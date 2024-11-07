@@ -1,6 +1,7 @@
 package com.dinnertime.peaktime.domain.schedule.controller;
 
 import com.dinnertime.peaktime.domain.schedule.service.ScheduleService;
+import com.dinnertime.peaktime.global.auth.service.dto.security.UserPrincipal;
 import com.dinnertime.peaktime.global.util.CommonSwaggerResponse;
 import com.dinnertime.peaktime.global.util.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,11 +41,11 @@ public class ScheduleController {
     @CommonSwaggerResponse.CommonResponses
     @GetMapping(value = "", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribe(
-//            @AuthenticationPrincipal final Principal principal,
+            @AuthenticationPrincipal final UserPrincipal userPrincipal,
             @RequestHeader(value = "LAST-EVENT-ID", required = false, defaultValue = "") String lastEventId
     ) {
         log.info("구독");
         //구독 하기
-        return scheduleService.subScribe(2L, lastEventId);
+        return scheduleService.subScribe(userPrincipal.getUserId(), lastEventId);
     }
 }

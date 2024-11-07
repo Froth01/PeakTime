@@ -44,7 +44,7 @@ public class TimerController {
     @Operation(summary = "그룹 타이머 삭제", description = "선택한 그룹 타이머를 삭제합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "타이머 삭제를 성공했습니다.",
-                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+                    content = @Content(schema = @Schema(implementation = GroupDetailResponseDto.class))),
             @ApiResponse(responseCode = "500", description = "타이머 삭제를 실패했습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
