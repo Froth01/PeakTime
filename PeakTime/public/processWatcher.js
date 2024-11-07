@@ -1,6 +1,7 @@
 import { spawn } from "child_process";
 import { activeWindow }  from "active-win";
 
+
 // 차단할 프로세스 목록과 주기
 const interval = 2000;
 
@@ -89,12 +90,11 @@ async function getActiveProgram() {
 }
 
 export function startWatcher(processes){
- // 차단 프로세스 설정
-  blockProcesses = processes;
-  processHistory = {}; 
-  runngingGetActiveProgram = setInterval(getActiveProgram, interval);
-  runningCheckProcesses = setInterval(checkProcesses, interval);
- 
+    // 차단 프로세스 설정
+    blockProcesses = processes;
+    processHistory = {}; 
+    runngingGetActiveProgram = setInterval(getActiveProgram, interval);
+    runningCheckProcesses = setInterval(checkProcesses, interval);
 }
 
 export function endWatcher(){
@@ -114,6 +114,3 @@ export function endWatcher(){
     console.log(response);
     return response;
 }
-
-startWatcher(blockProcesses);
-setTimeout(endWatcher, 20000);
