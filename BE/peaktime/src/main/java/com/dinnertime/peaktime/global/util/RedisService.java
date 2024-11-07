@@ -24,6 +24,11 @@ public class RedisService {
         return (String) redisTemplate.opsForValue().get(key);
     }
 
+    public void removeRefreshToken(long userId) {
+        String key = "refreshToken:" + userId;
+        redisTemplate.delete(key);
+    }
+
     public Integer getGPTcount(Long userId) {
         String key = "gpt_usage_count: " + userId;
         Integer count = (Integer) redisTemplate.opsForValue().get(key);

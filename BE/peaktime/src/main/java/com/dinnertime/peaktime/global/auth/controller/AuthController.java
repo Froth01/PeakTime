@@ -2,10 +2,12 @@ package com.dinnertime.peaktime.global.auth.controller;
 
 import com.dinnertime.peaktime.global.auth.service.AuthService;
 import com.dinnertime.peaktime.global.auth.service.dto.request.LoginRequest;
+import com.dinnertime.peaktime.global.auth.service.dto.request.LogoutRequest;
 import com.dinnertime.peaktime.global.auth.service.dto.request.SignupRequest;
 import com.dinnertime.peaktime.global.auth.service.dto.response.IsDuplicatedResponse;
 import com.dinnertime.peaktime.global.auth.service.dto.response.LoginResponse;
 import com.dinnertime.peaktime.global.auth.service.dto.response.ReissueResponse;
+import com.dinnertime.peaktime.global.auth.service.dto.security.UserPrincipal;
 import com.dinnertime.peaktime.global.util.CommonSwaggerResponse;
 import com.dinnertime.peaktime.global.util.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -132,6 +135,30 @@ public class AuthController {
                 .status(HttpStatus.OK)
                 .body(ResultDto.res(HttpStatus.OK.value(),
                         "JWT가 재발급되었습니다.", response));
+    }
+
+    // 로그아웃
+    @Operation(summary = "로그아웃", description = "로그아웃하기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "로그아웃에 성공하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 형식의 요청입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "409", description = "비밀번호가 일치하지 않습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "500", description = "로그아웃에 실패하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+    })
+    @CommonSwaggerResponse.CommonResponses
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest, @AuthenticationPrincipal UserPrincipal userPrincipal, HttpServletResponse httpServletResponse) {
+        authService.logout(logoutRequest, userPrincipal, httpServletResponse);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResultDto.res(HttpStatus.OK.value(),
+                        "로그아웃에 성공하였습니다."));
     }
 
 }

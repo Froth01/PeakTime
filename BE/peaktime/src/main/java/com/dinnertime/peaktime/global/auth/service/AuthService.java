@@ -1,5 +1,7 @@
 package com.dinnertime.peaktime.global.auth.service;
 
+import com.dinnertime.peaktime.domain.group.entity.Group;
+import com.dinnertime.peaktime.domain.group.repository.GroupRepository;
 import com.dinnertime.peaktime.domain.preset.entity.Preset;
 import com.dinnertime.peaktime.domain.preset.repository.PresetRepository;
 import com.dinnertime.peaktime.domain.user.entity.User;
@@ -7,6 +9,7 @@ import com.dinnertime.peaktime.domain.user.repository.UserRepository;
 import com.dinnertime.peaktime.domain.usergroup.entity.UserGroup;
 import com.dinnertime.peaktime.domain.usergroup.repository.UserGroupRepository;
 import com.dinnertime.peaktime.global.auth.service.dto.request.LoginRequest;
+import com.dinnertime.peaktime.global.auth.service.dto.request.LogoutRequest;
 import com.dinnertime.peaktime.global.auth.service.dto.request.SignupRequest;
 import com.dinnertime.peaktime.global.auth.service.dto.response.IsDuplicatedResponse;
 import com.dinnertime.peaktime.global.auth.service.dto.response.LoginResponse;
@@ -52,6 +55,7 @@ public class AuthService {
     private final RedisService redisService;
     private final UserRepository userRepository;
     private final PresetRepository presetRepository;
+    private final GroupRepository groupRepository;
     private final UserGroupRepository userGroupRepository;
 
     // 회원가입
@@ -201,6 +205,25 @@ public class AuthService {
         return ReissueResponse.createReissueResponse(newAccessToken);
     }
 
+    // 로그아웃
+    @Transactional
+    public void logout(LogoutRequest logoutRequest, UserPrincipal userPrincipal, HttpServletResponse httpServletResponse) {
+        // 1. 클라이언트의 요청에서 rootUserPassword 추출하기
+        String rootUserPassword = logoutRequest.getRootUserPassword();
+        // 2. DB에 존재하는 비밀번호와 비교하기 위해 암호화 진행
+        String encodedRootUserPassword = passwordEncoder.encode(rootUserPassword);
+        // 3. DB에서 비밀번호 가져오기
+        String rootUserPasswordOnDatabase = this.getRootUserPasswordOnDatabase(userPrincipal);
+        // 4. 비밀번호 비교하기
+        if(!encodedRootUserPassword.equals(rootUserPasswordOnDatabase)) {
+            throw new CustomException(ErrorCode.INVALID_ROOT_PASSWORD);
+        }
+        // 5. Redis에서 해당 유저의 Refresh Token 삭제
+        redisService.removeRefreshToken(userPrincipal.getUserId());
+        // 6. 클라이언트의 Refresh Token 삭제
+        jwtService.letRefreshTokenRemoved(httpServletResponse);
+    }
+
     // 아이디 중복 검사 (유저 로그인 아이디로 검사. 이미 존재하면 true 반환)
     private boolean checkDuplicateUserLoginId(String userLoginId) {
         return userRepository.findByUserLoginId(userLoginId).isPresent();
@@ -209,6 +232,20 @@ public class AuthService {
     // 이메일 중복 검사 (이메일 주소로 검사. 이미 존재하면 true 반환)
     private boolean checkDuplicateEmail(String email) {
         return userRepository.findByEmail(email).isPresent();
+    }
+
+    // 데이터베이스에 존재하는 루트 계정 비밀번호 가져오기
+    private String getRootUserPasswordOnDatabase(UserPrincipal userPrincipal) {
+        if(userPrincipal.getAuthority().equals("child")) {
+            UserGroup userGroup = userGroupRepository.findByUser_UserId(userPrincipal.getUserId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.DO_NOT_HAVE_USERGROUP));
+            Group group = groupRepository.findByGroupId(userGroup.getGroup().getGroupId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.DO_NOT_HAVE_GROUP));
+            return group.getUser().getPassword();
+        }
+        User user = userRepository.findByUserId(userPrincipal.getUserId())
+                .orElseThrow(() -> new CustomException(ErrorCode.DO_NOT_HAVE_USER));
+        return user.getPassword();
     }
 
 }

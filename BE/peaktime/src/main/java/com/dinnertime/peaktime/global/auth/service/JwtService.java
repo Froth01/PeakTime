@@ -95,6 +95,16 @@ public class JwtService implements InitializingBean {
         httpServletResponse.addCookie(cookie);
     }
 
+    // 클라이언트의 Refresh Token 삭제
+    public void letRefreshTokenRemoved(HttpServletResponse httpServletResponse) {
+        Cookie cookie = new Cookie("refresh_token", "Arbitrary");
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        httpServletResponse.addCookie(cookie);
+    }
+
     // JWT 유효성 검사
     public boolean validateToken(String token) {
         try {

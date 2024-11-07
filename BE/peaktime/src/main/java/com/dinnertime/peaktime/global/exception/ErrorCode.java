@@ -32,7 +32,11 @@ public enum ErrorCode {
     TIMER_NOT_FOUND("존재하지 않는 타이머입니다.", HttpStatus.NOT_FOUND),
     TIME_SLOT_OVERLAP("선택한 시간 범위가 다른 예약과 겹칩니다.", HttpStatus.CONFLICT),
     INVALID_LOGIN_PROCESS("등록되지 않은 아이디이거나 아이디 또는 비밀번호를 잘못 입력했습니다.", HttpStatus.NOT_FOUND),
-    UNAUTHORIZED("유효하지 않은 토큰입니다.", HttpStatus.UNAUTHORIZED)
+    UNAUTHORIZED("유효하지 않은 토큰입니다.", HttpStatus.UNAUTHORIZED),
+    DO_NOT_HAVE_USERGROUP("child 계정이지만 소속된 group이 존재하지 않습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    DO_NOT_HAVE_USER("존재하지 않는 유저입니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    DO_NOT_HAVE_GROUP("존재하지 않는 그룹입니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    INVALID_ROOT_PASSWORD("비밀번호가 일치하지 않습니다.", HttpStatus.CONFLICT)
     ;
 
     private final String message;
