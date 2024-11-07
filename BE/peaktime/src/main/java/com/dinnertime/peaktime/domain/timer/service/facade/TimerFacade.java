@@ -33,6 +33,13 @@ public class TimerFacade {
     @Transactional
     public GroupDetailResponseDto createTimer(TimerCreateRequestDto requestDto) {
 
+        //1번 타이머 반복 하지 않는 경우
+        if(requestDto.getIsRepeat()) {
+
+        }
+
+        //2번 타이머 반복하는 경우
+
         //레디스 체크
         Long groupId = requestDto.getGroupId();
         LocalDateTime startTime = requestDto.getStartTime();
@@ -60,7 +67,7 @@ public class TimerFacade {
                 //날짜를 일차원 배열로 만들기 위함
                 int start = DAY_MINUTE * i + plusMinute;
                 int end = start + attentionTime;
-                redisService.addTimerByGroupId(groupId, start, end);
+//                redisService.addTimerByGroupId(groupId, start, end);
             }
         }
 
@@ -116,6 +123,8 @@ public class TimerFacade {
 
         //스케쥴 삭제
         scheduleService.deleteSchedule(timer);
+
+        //레디스 스케쥴러 삭제
 
         return timerService.getTimerByGroupId(timer.getGroup().getGroupId());
     }

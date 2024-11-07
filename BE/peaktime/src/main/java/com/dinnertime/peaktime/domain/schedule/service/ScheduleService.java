@@ -14,6 +14,7 @@ import com.dinnertime.peaktime.domain.usergroup.entity.UserGroup;
 import com.dinnertime.peaktime.domain.usergroup.repository.UserGroupRepository;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
+import com.dinnertime.peaktime.global.util.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,10 +36,12 @@ public class ScheduleService {
     private final GroupRepository groupRepository;
     private final UserGroupRepository userGroupRepository;
     private final EmitterRepository emitterRepository;
-    private final PresetRepository presetRepository;
+    private final RedisService redisService;
 
     //연결 지속시간 한시간
     private static final long DEFAULT_TIMEOUT = 60L * 1000 * 60;
+    private static final int DAY = 7;
+    private static final int DAY_MINUTE = 1440;
 
     public SseEmitter subScribe(Long userId, String lastEventId) {
         //그룹 가져오기
@@ -120,7 +124,7 @@ public class ScheduleService {
         List<Schedule> scheduleList = new ArrayList<>();
 
         //6이 월요일 0이 일요일
-        for(int day=0; day<6;day++) {
+        for(int day=0; day<DAY;day++) {
             if((repeatDay & (1 << day)) != 0) {
                 Schedule schedule = Schedule.createSchedule(day, startTime, attentionTime, group);
                 scheduleList.add(schedule);
@@ -134,7 +138,7 @@ public class ScheduleService {
 
     @Transactional(readOnly = true)
     public List<Schedule> getNowDaySchedule() {
-        int dayOfWeek = 7 - LocalDate.now().getDayOfWeek().getValue();
+        int dayOfWeek = DAY - LocalDate.now().getDayOfWeek().getValue();
         return scheduleRepository.findAllByDayOfWeek(dayOfWeek);
     }
 
@@ -145,13 +149,23 @@ public class ScheduleService {
 
         List<Integer> dayOfWeekList = new ArrayList<>();
 
-        for(int day=0; day<6;day++) {
+        for(int day=0; day<DAY;day++) {
             if((repeatDay & (1 << day)) != 0) {
                 dayOfWeekList.add(day);
             }
         }
 
-        scheduleRepository.deleteAllByGroup_groupIdAndDayOfWeekIsInAndStartTime(timer.getGroup().getGroupId(), dayOfWeekList, startTime);
+        scheduleRepository.deleteAllByGroup_GroupIdAndDayOfWeekInAndStartTime(timer.getGroup().getGroupId(), dayOfWeekList, startTime);
     }
 
+    public void saveTodayScheduleToRedis(List<Schedule> scheduleList, int repeatDay, LocalDateTime startTime) {
+        int todayDayOfWeek = DAY - LocalDateTime.now().getDayOfWeek().getValue();
+        LocalTime startLocalTime = startTime.toLocalTime();
+
+        //오늘날짜에 있으면
+        scheduleList.stream()
+                .filter(s -> s.getDayOfWeek() == todayDayOfWeek && (repeatDay & (1 << todayDayOfWeek)) != 0 && startLocalTime.isAfter(LocalTime.now()))
+                .findFirst()
+                .ifPresent(redisService::addSchedule);
+    }
 }

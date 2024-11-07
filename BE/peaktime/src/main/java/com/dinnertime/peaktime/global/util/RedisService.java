@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Service
@@ -83,14 +84,6 @@ public class RedisService {
 
             return (start < existingEnd && end > existingStart); // 겹치는지 조건 확인
         });
-
-    }
-
-    public void addTimerByGroupId(Long groupId, int start, int end) {
-        String key = "timer:"+groupId;
-        ZSetOperations<String, String> zSet = stringRedisTemplate.opsForZSet();
-        zSet.add(key, start + "-" + end+"-"+groupId, start);
-        log.info("타이머 추가: "+key);
 
     }
 
@@ -160,5 +153,33 @@ public class RedisService {
         log.info("첫 스케줄 추가 완료: " + cacheKey);
     }
 
+    private static final int DAY = 7;
+    private static final int DAY_MINUTE = 1440;
+
+    public void checkForDuplicateTimer(Long groupId, int repeatDay, int plusMinute, int attentionTime) {
+        IntStream.range(0, DAY)
+                .filter(i -> (repeatDay & (1 << i)) != 0)  // 해당 요일에 해당하는 비트가 1인 것들만 체크
+                .mapToObj(i -> new int[]{DAY_MINUTE * i + plusMinute, DAY_MINUTE * i + plusMinute + attentionTime})
+                .forEach(timeRange -> {
+                    if (checkTimerByGroupId(groupId, timeRange[0], timeRange[1])) {
+                        throw new CustomException(ErrorCode.TIME_SLOT_OVERLAP);
+                    }
+                });
+    }
+
+    public void addTimerList(Long groupId, int repeatDay, int plusMinute, int attentionTime) {
+        String key = "timer:" + groupId;
+        ZSetOperations<String, String> zSet = stringRedisTemplate.opsForZSet();
+
+        IntStream.range(0, DAY)
+                //반복 요일 필터링
+                .filter(i -> (repeatDay & (1 << i)) != 0)
+                .forEach(i -> {
+                    int start = DAY_MINUTE * i + plusMinute;
+                    int end = start + attentionTime;
+                    zSet.add(key, start + "-" + end + "-" + groupId, start);
+                    log.info("타이머 추가: " + key);
+                });
+    }
 
 }
