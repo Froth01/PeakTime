@@ -49,7 +49,7 @@ public class SecurityConfig {
         return http.cors(withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/logout", "/users/**", "/children/**", "/groups/**", "/presets/**", "/hikings/**", "timers/**", "/summaries/**", "/memos/**").hasAuthority("root")
+                        .requestMatchers("/auth/logout", "/users/**", "/children/**", "/groups/**", "/presets/**", "/hikings/**", "/timers/**", "/summaries/**", "/memos/**").hasAuthority("root")
                         .requestMatchers("/auth/logout", "/hikings/**", "/summaries/**", "/memos/**").hasAuthority("child")
                         .anyRequest().denyAll())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
