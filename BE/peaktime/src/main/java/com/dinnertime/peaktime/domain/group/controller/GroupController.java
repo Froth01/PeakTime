@@ -5,6 +5,7 @@ import com.dinnertime.peaktime.domain.group.service.dto.request.GroupCreateReque
 import com.dinnertime.peaktime.domain.group.service.dto.request.GroupPutRequestDto;
 import com.dinnertime.peaktime.domain.group.service.dto.response.GroupDetailResponseDto;
 import com.dinnertime.peaktime.domain.group.service.dto.response.GroupListResponseDto;
+import com.dinnertime.peaktime.global.auth.service.dto.security.UserPrincipal;
 import com.dinnertime.peaktime.global.util.CommonSwaggerResponse;
 import com.dinnertime.peaktime.global.util.ResultDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -36,9 +38,10 @@ public class GroupController {
     })
     @CommonSwaggerResponse.CommonResponses
     @GetMapping("")
-    public ResponseEntity<?> getGroupList() {
-        // 계정 설정 업데이트 시 접속한 ID로 조회하는 부분 추가
-        GroupListResponseDto groupListResponseDto = groupService.getGroupListResponseDto();
+    public ResponseEntity<?> getGroupList(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        Long userId = userPrincipal.getUserId();
+
+        GroupListResponseDto groupListResponseDto = groupService.getGroupListResponseDto(userId);
 
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "그룹 및 서브유저 전체 조회 성공했습니다.", groupListResponseDto));
     }
@@ -57,9 +60,12 @@ public class GroupController {
     })
     @CommonSwaggerResponse.CommonResponses
     @PostMapping("")
-    public ResponseEntity<?> postGroup(@RequestParam Long userId, @RequestBody @Valid GroupCreateRequestDto requestDto) {
+    public ResponseEntity<?> postGroup(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody @Valid GroupCreateRequestDto requestDto) {
+        Long userId = userPrincipal.getUserId();
+
         groupService.postGroup(userId, requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ResultDto.res(HttpStatus.CREATED.value(), "그룹을 생성하는 데 성공했습니다."));
+        GroupListResponseDto groupListResponseDto = groupService.getGroupListResponseDto(userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ResultDto.res(HttpStatus.CREATED.value(), "그룹을 생성하는 데 성공했습니다.", groupListResponseDto));
     }
 
 //    그룹 조회
@@ -75,7 +81,6 @@ public class GroupController {
     @CommonSwaggerResponse.CommonResponses
     @GetMapping("/{groupId}")
     public ResponseEntity<?> getGroupDetail(@PathVariable Long groupId) {
-        // 계정 설정 업데이트 시 접속한 ID로 조회하는 부분 추가 
         GroupDetailResponseDto groupDetailResponseDto = groupService.getGroupDetail(groupId);
 
         return ResponseEntity.status(HttpStatus.OK).body((ResultDto.res(HttpStatus.OK.value(), "그룹을 조회하는 데 성공했습니다.", groupDetailResponseDto)));
@@ -95,10 +100,13 @@ public class GroupController {
     })
     @CommonSwaggerResponse.CommonResponses
     @PutMapping("/{groupId}")
-    public ResponseEntity<?> putGroup(@RequestParam Long userId, @PathVariable Long groupId, @RequestBody @Valid GroupPutRequestDto requestDto) {
-        groupService.putGroup(userId, groupId, requestDto);
+    public ResponseEntity<?> putGroup(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long groupId, @RequestBody @Valid GroupPutRequestDto requestDto) {
+        Long userId = userPrincipal.getUserId();
 
-        return ResponseEntity.status(HttpStatus.OK).body((ResultDto.res(HttpStatus.OK.value(), "그룹 정보를 수정하는 데 성공했습니다.")));
+        groupService.putGroup(userId, groupId, requestDto);
+        GroupListResponseDto groupListResponseDto = groupService.getGroupListResponseDto(userId);
+
+        return ResponseEntity.status(HttpStatus.OK).body((ResultDto.res(HttpStatus.OK.value(), "그룹 정보를 수정하는 데 성공했습니다.", groupListResponseDto)));
     }
 
 //    그룹 삭제
@@ -113,9 +121,12 @@ public class GroupController {
     })
     @CommonSwaggerResponse.CommonResponses
     @DeleteMapping("/{groupId}")
-    public ResponseEntity<?> deleteGroup(@RequestParam Long userId, @PathVariable Long groupId) {
-        groupService.deleteGroup(userId, groupId);
+    public ResponseEntity<?> deleteGroup(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long groupId) {
+        Long userId = userPrincipal.getUserId();
 
-        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "그룹 정보를 삭제하는 데 성공했습니다."));
+        groupService.deleteGroup(userId, groupId);
+        GroupListResponseDto groupListResponseDto = groupService.getGroupListResponseDto(userId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "그룹 정보를 삭제하는 데 성공했습니다.", groupListResponseDto));
     }
 }

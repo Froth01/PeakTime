@@ -12,7 +12,7 @@ import org.hibernate.validator.constraints.Length;
 public class GroupCreateRequestDto {
 
     @NotBlank
-    @Length(max = 32, message = "프리셋 타이틀이 6자를 초과하거나 2자 미만일 수 없습니다.")
+    @Length(max = 32, message = "그룹명은 최대 32자를 초과할 수 없습니다.")
     private String title;
 
     @NotNull
