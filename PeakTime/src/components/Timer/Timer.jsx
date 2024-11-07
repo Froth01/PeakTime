@@ -9,7 +9,7 @@ function Timer() {
   const [isRunning, setIsRunning] = useState(false); // 타이머 시작 상태
 
   const [startedHikingId, setStartedHikingId] = useState(null); // 시작한 hikingId 정보
-  const [parsedData, setParsedData] = useState(null);
+  const [parsedData, setParsedData] = useState([]);
   const [isExistExtensionData, setIsExistExtensionData] = useState(false); // extension hiking 데이터
   const [isExistElectronData, setIsExistElectronData] = useState(false); // electron hiking 데이터
   
@@ -123,13 +123,15 @@ function Timer() {
 
   // ipc 처리
   const handleExtensionMessage = async (data) => {
-    setParsedData([...data]);// 받은 데이터를 상태로 저장
+    console.log(data.urlList)
+    setParsedData([...parsedData, ...data.urlList]);// 받은 데이터를 상태로 저장
     setIsExistExtensionData(true);
   };
 
   const handleProgramMessage = async (data) => {
     // 익스텍션에서 추가로 받은 리스트 저장
-    setParsedData([...data]);
+    console.log(data)
+    setParsedData([...parsedData, ...data]);
     setIsExistElectronData(true);
   }
   
@@ -167,7 +169,8 @@ function Timer() {
           realEndTime: format,
           contentList: parsedData
         };
-
+        
+        console.log(endHikingData)
         const response = await hikingsApi.put(
             `${startedHikingId}`,
             endHikingData
