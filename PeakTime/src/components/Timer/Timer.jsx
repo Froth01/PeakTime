@@ -9,9 +9,9 @@ function Timer() {
   const [isRunning, setIsRunning] = useState(false); // 타이머 시작 상태
 
   const [startedHikingId, setStartedHikingId] = useState(null); // 시작한 hikingId 정보
-  const [parsedData, setParsedData] = useState([]);
-  const [isExistExtensionData, setIsExistExtensionData] = useState(false); // extension hiking 데이터
-  const [isExistElectronData, setIsExistElectronData] = useState(false); // electron hiking 데이터
+
+  const [extenstionData, setExtenstionData] = useState(null); // extension hiking 데이터
+  const [electronData, setElectronData] = useState(null); // electron hiking 데이터
   
   // 시작 상태, 남은 시간 변경시마다 적용
   useEffect(() => {
@@ -123,16 +123,16 @@ function Timer() {
 
   // ipc 처리
   const handleExtensionMessage = async (data) => {
+
     console.log(data.urlList)
-    setParsedData([...parsedData, ...data.urlList]);// 받은 데이터를 상태로 저장
-    setIsExistExtensionData(true);
+    setExtenstionData(data.urlList);// 받은 데이터를 상태로 저장
   };
 
-  const handleProgramMessage = async (data) => {
+  const handleElectronMessage = async (data) => {
+
     // 익스텍션에서 추가로 받은 리스트 저장
     console.log(data)
-    setParsedData([...parsedData, ...data]);
-    setIsExistElectronData(true);
+    setElectronData(data);
   }
   
   // onWebSocketMessage 이벤트 리스너 등록
@@ -141,14 +141,18 @@ function Timer() {
     window.electronAPI.onHikingInfo(handleExtensionMessage);
 
     console.log("onBlockHistory 리스너 등록 중");
-    window.electronAPI.onBlockHistory(handleProgramMessage);
+    window.electronAPI.onBlockHistory(handleElectronMessage);
+
   }, []);
 
   useEffect(() => {
     const updateHikingData = async () => {
-        if (!(isExistExtensionData && isExistElectronData)) {
+        if (extenstionData == null || electronData == null) {
             return;
         }
+
+        console.log("extenstionData", extenstionData);
+        console.log("electronData:", electronData);
 
         // 현재 시간 포맷 생성
         const now = new Date();
@@ -167,7 +171,7 @@ function Timer() {
 
         const endHikingData = {
           realEndTime: format,
-          contentList: parsedData
+          contentList: [...electronData, ...extenstionData]
         };
         
         console.log(endHikingData)
@@ -176,12 +180,12 @@ function Timer() {
             endHikingData
         );
         console.log("response:" , response.data);
-        setIsExistElectronData(false);
-        setIsExistExtensionData(false);
+        setElectronData(null);
+        setExtenstionData(null);
     };
 
     updateHikingData();
-}, [isExistElectronData, isExistExtensionData, parsedData]);
+}, [extenstionData, electronData]);
 
 
 
@@ -206,9 +210,9 @@ function Timer() {
 
           // API 요청 보내기
           setTimeout(() => {
-            setIsExistElectronData(true);
-            setIsExistExtensionData(true);
-        }, 2000);
+            setExtenstionData([]);
+            setElectronData([]);
+        }, 10000);
         
 
           // 상태 업데이트
