@@ -11,5 +11,5 @@ import java.util.List;
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     List<Schedule> findAllByDayOfWeek(int dayOfWeek);
 
-    void deleteAllByGroup_groupIdAndDayOfWeekIsInAndStartTime(long group_id, List<Integer> dayOfWeek, LocalTime startTime);
+    void deleteAllByGroup_GroupIdAndDayOfWeekInAndStartTime(long group_id, List<Integer> dayOfWeek, LocalTime startTime);
 }
