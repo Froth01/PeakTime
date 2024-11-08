@@ -109,7 +109,7 @@ public class AuthController {
     })
     @CommonSwaggerResponse.CommonResponses
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpServletResponse httpServletResponse) {
+    public ResponseEntity<?> login(@RequestBody @Valid LoginRequest loginRequest, HttpServletResponse httpServletResponse) {
         LoginResponse response = authService.login(loginRequest, httpServletResponse);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -153,7 +153,7 @@ public class AuthController {
     })
     @CommonSwaggerResponse.CommonResponses
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestBody LogoutRequest logoutRequest, @AuthenticationPrincipal UserPrincipal userPrincipal, HttpServletResponse httpServletResponse) {
+    public ResponseEntity<?> logout(@RequestBody @Valid LogoutRequest logoutRequest, @AuthenticationPrincipal UserPrincipal userPrincipal, HttpServletResponse httpServletResponse) {
         authService.logout(logoutRequest, userPrincipal, httpServletResponse);
         return ResponseEntity
                 .status(HttpStatus.OK)
