@@ -183,7 +183,7 @@ function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
       }
     });
 
-    return selectedDays.join(", ") + "(반복)";
+    return selectedDays.join(", ");
   };
 
   const handleChangeTitle = (e) => {

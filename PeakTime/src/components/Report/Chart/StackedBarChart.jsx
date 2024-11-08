@@ -28,8 +28,7 @@ const StackedBarChart = ({ visitedSiteList, visitedProgramList }) => {
     (program.usingTime / 60).toFixed(1)
   );
 
-  const siteColors = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"];
-  const programColors = ["#FF9F40", "#FF6384", "#36A2EB", "#4BC0C0", "#FFCE56"];
+  const colors = ["#FF6384", "#FFCE56", "#03C777", "#36A2EB", "#9966FF"];
 
   const data = {
     labels: ["사이트", "프로그램"],
@@ -37,13 +36,13 @@ const StackedBarChart = ({ visitedSiteList, visitedProgramList }) => {
       ...visitedSiteList.map((site, idx) => ({
         label: `${site.name} 사용 시간`,
         data: [siteUsingTimes[idx], 0], // 사이트는 첫 번째 막대에 표시
-        backgroundColor: siteColors[idx], // 최대 5개까지 자료를 가져옴
+        backgroundColor: colors[idx], // 최대 5개까지 자료를 가져옴
         stack: "Stack 0",
       })),
       ...visitedProgramList.map((program, idx) => ({
         label: `${program.name} 사용 시간`,
         data: [0, programUsingTimes[idx]], // 프로그램은 두 번째 막대에 표시
-        backgroundColor: programColors[idx],
+        backgroundColor: colors[idx],
         stack: "Stack 1",
       })),
     ],
@@ -53,8 +52,8 @@ const StackedBarChart = ({ visitedSiteList, visitedProgramList }) => {
     responsive: true,
     plugins: {
       title: {
-        display: true,
-        text: "사이트 및 프로그램 사용 시간",
+        display: false,
+        // text: "가장 많이 사용한 사이트 및 프로그램",
       },
       tooltip: {
         callbacks: {
@@ -64,7 +63,7 @@ const StackedBarChart = ({ visitedSiteList, visitedProgramList }) => {
         },
       },
       legend: {
-        position: "top",
+        display: false,
       },
     },
     scales: {
@@ -81,7 +80,7 @@ const StackedBarChart = ({ visitedSiteList, visitedProgramList }) => {
     },
   };
 
-  return <Bar data={data} options={options} />;
+  return <Bar data={data} options={options} height={250} />;
 };
 
 StackedBarChart.propTypes = {

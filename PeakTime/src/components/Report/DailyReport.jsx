@@ -28,6 +28,8 @@ function DailyReport({ day, onCancel }) {
 
   // 하이킹 디테일 모달
   const openHikingDetail = (hikingId) => {
+    let root;
+
     Swal.fire({
       title: "하이킹 상세",
       html: `<div id="daily-report-detail" style="width: 100%; height: 100%; padding: 16px; overflow: auto;" />`,
@@ -35,23 +37,84 @@ function DailyReport({ day, onCancel }) {
         hikingsApi
           .get(`/${hikingId}`)
           .then((result) => {
-            const root = ReactDOM.createRoot(
+            root = ReactDOM.createRoot(
               document.getElementById("daily-report-detail")
             );
             root.render(<DailyReportDetail hikingDetail={result.data.data} />);
           })
           .catch(() => Swal.fire(ALERT_MESSAGE.failToGetDailHikingDetail));
+
+        // ////////////////////////////////////////////////////////////////////////
+        // root = ReactDOM.createRoot(
+        //   document.getElementById("daily-report-detail")
+        // );
+        // root.render(
+        //   <DailyReportDetail
+        //     hikingDetail={{
+        //       startTime: "2024-11-07 14:30:00",
+        //       endTime: "2024-11-07 16:30:00",
+        //       realEndTime: "2024-11-07 16:30:00",
+        //       blockedSiteCount: 3,
+        //       blockedProgramCount: 1,
+        //       visitedSiteList: [
+        //         {
+        //           name: "www.naver1.com",
+        //           usingTime: 600,
+        //         },
+        //         {
+        //           name: "www.naver2.com",
+        //           usingTime: 480,
+        //         },
+        //         {
+        //           name: "www.naver3.com",
+        //           usingTime: 360,
+        //         },
+        //         {
+        //           name: "www.naver4.com",
+        //           usingTime: 240,
+        //         },
+        //         {
+        //           name: "www.naver5.com",
+        //           usingTime: 120,
+        //         },
+        //       ],
+        //       visitedProgramList: [
+        //         {
+        //           name: "계산기1",
+        //           usingTime: 360,
+        //         },
+        //         {
+        //           name: "계산기2",
+        //           usingTime: 300,
+        //         },
+        //         {
+        //           name: "계산기3",
+        //           usingTime: 240,
+        //         },
+        //         {
+        //           name: "계산기4",
+        //           usingTime: 180,
+        //         },
+        //         {
+        //           name: "계산기5",
+        //           usingTime: 120,
+        //         },
+        //       ],
+        //     }}
+        //     ////////////////////////////////////////////////////////////////////////
+        //   />
+        // );
       },
       didClose: () => {
-        const root = ReactDOM.createRoot(
-          document.getElementById("daily-report-detail")
-        );
-        root.unmount();
+        if (root) {
+          root.unmount();
+        }
       },
       showConfirmButton: false,
       showCloseButton: true,
       customClass: {
-        popup: "w-[70vw] max-w-[800px] h-[80vh] max-h-[90vh]",
+        title: "leading-tight m-0",
+        popup: "w-[50vw] max-w-[1000px] h-[60vh] min-h-[500px]",
       },
     });
   };
@@ -91,6 +154,7 @@ function DailyReport({ day, onCancel }) {
     )}`;
   };
 
+  // 하이킹 캘린더 상세 조회
   useEffect(() => {
     hikingsApi
       .get(`/calendar/date/${day}`)
@@ -114,7 +178,14 @@ function DailyReport({ day, onCancel }) {
 
         {dailyHikingList?.length === 0 ? (
           // 내역이 없을 경우
-          <div>선택한 날짜의 사용 기록이 없습니다.</div>
+          <>
+            <div>선택한 날짜의 사용 기록이 없습니다.</div>
+            {/* /////////////////////////////////////////////////// */}
+            {/* <button onClick={() => openHikingDetail(1)} className="border">
+              더미
+            </button> */}
+            {/* /////////////////////////////////////////////////// */}
+          </>
         ) : (
           // 내역이 있을 경우
           dailyHikingList?.map((hiking) => (
