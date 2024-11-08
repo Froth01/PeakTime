@@ -13,10 +13,12 @@ hikingsApi.interceptors.request.use(
   (config) => {
     // const state = store.getState();
     // const accessToken = state.user.accessToken;
+    const accessToken =
+      "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEyLCJhdXRob3JpdHkiOiJyb290IiwiaWF0IjoxNzMxMDIyOTc2LCJleHAiOjE3MzEwMzAxNzZ9.uw21HJFJwtymCpoNcju2VAtYlDKXdP8nZSEpDqIC37I";
 
-    // if (accessToken && accessToken !== "") {
-    //   config.headers.Authorization = `Bearer ${accessToken}`;
-    // }
+    if (accessToken && accessToken !== "") {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
 
     return config;
   },

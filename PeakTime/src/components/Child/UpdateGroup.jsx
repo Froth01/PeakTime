@@ -248,7 +248,6 @@ function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
           .post("", timerSetting)
           .then((result) => {
             Swal.fire(ALERT_MESSAGE.successToCreateGroupTimer);
-            console.log(result);
             setGroupInfo(result.data.data);
             return true;
           })
@@ -396,5 +395,6 @@ function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
 UpdateGroup.propTypes = {
   groupId: PropTypes.number.isRequired,
   onChangeContent: PropTypes.func.isRequired,
+  onChangeGroupList: PropTypes.func.isRequired,
 };
 export default UpdateGroup;

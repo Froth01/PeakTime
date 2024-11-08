@@ -18,7 +18,10 @@ function ReportPage() {
 
   return (
     <>
-      <Calendar onDayClick={(day) => onDayClick(day)} />
+      <Calendar
+        selectedDay={selectedDay}
+        onDayClick={(day) => onDayClick(day)}
+      />
       {selectedDay && <DailyReport day={selectedDay} onCancel={onCancel} />}
     </>
   );
