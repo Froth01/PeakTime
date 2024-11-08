@@ -2,6 +2,7 @@ package com.dinnertime.peaktime.global.util;
 
 import com.dinnertime.peaktime.domain.schedule.entity.Schedule;
 import com.dinnertime.peaktime.domain.schedule.service.dto.RedisSchedule;
+import com.dinnertime.peaktime.domain.timer.entity.Timer;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,10 +26,12 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor
 public class RedisService {
 
-    private final RedisTemplate<String, Object> redisTemplate;
-    private static final int TTL = 24; // 하루 단위 gpt
     private final RedisTemplate<String, String> stringRedisTemplate;
     private final RedisTemplate<String, RedisSchedule> scheduleRedisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private static final int TTL = 24; // 하루 단위 gpt
+    private static final int DAY = 7;
+    private static final int DAY_MINUTE = 1440;
 
     public void saveRefreshToken(long userId, String refreshToken) {
         String key = "refreshToken:" + userId;
@@ -87,12 +89,34 @@ public class RedisService {
 
     }
 
-    public void deleteTimerByGroupIdAndTime(Long groupId, int start, int end) {
+    public void deleteTimerByTimer(Long groupId, int start, int end) {
         String key = "timer:"+groupId;
         ZSetOperations<String, String> zSet = stringRedisTemplate.opsForZSet();
         log.info("타이머 제거 "+key+" "+start);
 
         zSet.remove(key, start +"-"+end+"-"+groupId, String.valueOf(start));
+    }
+
+    public void deleteTimerByTimer(Timer timer) {
+        Long groupId = timer.getGroup().getGroupId();
+
+        String key = "timer:"+groupId;
+        ZSetOperations<String, String> zSet = stringRedisTemplate.opsForZSet();
+        //레디스에서 타이머 삭제
+        int repeatDay = timer.getRepeatDay();
+        LocalDateTime startTime = timer.getStartTime();
+        int attentionTime = timer.getAttentionTime();
+        int plusMinute = (startTime.getHour()*60) + startTime.getMinute();
+
+        IntStream.range(0, DAY)
+                //반복 요일 필터링
+                .filter(i -> (repeatDay & (1 << i)) != 0)
+                .forEach(i -> {
+                    int start = DAY_MINUTE * i + plusMinute;
+                    int end = start + attentionTime;
+                    zSet.remove(key, start +"-"+end+"-"+groupId, String.valueOf(start));
+                    log.info("타이머 삭제: {}", key);
+                });
     }
 
     //현재 시간을 가져와서 보내주기
@@ -117,44 +141,42 @@ public class RedisService {
     }
 
     public void addSchedule(Schedule schedule) {
-        String cacheKey = "schedule:" + LocalDate.now();
-        log.info("오늘 스케줄 추가: " + cacheKey);
+        String key = "schedule:" + LocalDate.now();
+        log.info("오늘 스케줄 추가: {}", key);
 
+        //레디스에 저장할 객체 생성
         RedisSchedule saveSchedule = RedisSchedule.createRedisSchedule(schedule);
 
         ListOperations<String, RedisSchedule> listOps = scheduleRedisTemplate.opsForList();
-        Long ttl = scheduleRedisTemplate.getExpire(cacheKey);
+        Long ttl = scheduleRedisTemplate.getExpire(key);
 
-        listOps.rightPush(cacheKey, saveSchedule);
+        listOps.rightPush(key, saveSchedule);
 
         // 만료 시간 설정
         if (ttl == null || ttl <= 0) {
             LocalDateTime midnight = LocalDate.now().plusDays(1).atStartOfDay();
             ttl = Duration.between(LocalDateTime.now(), midnight).getSeconds();
-            scheduleRedisTemplate.expire(cacheKey, ttl, TimeUnit.SECONDS);
+            scheduleRedisTemplate.expire(key, ttl, TimeUnit.SECONDS);
         }
     }
 
     public void addFirstSchedule(List<Schedule> scheduleList) {
-        String cacheKey = "schedule:" + LocalDate.now();
+        String key = "schedule:" + LocalDate.now();
 
         List<RedisSchedule> redisScheduleList = scheduleList.stream()
                 .map(RedisSchedule::createRedisSchedule)
                 .toList();
 
         ListOperations<String, RedisSchedule> listOps = scheduleRedisTemplate.opsForList();
-        listOps.rightPushAll(cacheKey, redisScheduleList);
+        listOps.rightPushAll(key, redisScheduleList);
 
         // 자정까지 남은 시간으로 만료 설정
         LocalDateTime midnight = LocalDate.now().plusDays(1).atStartOfDay();
-        Long ttl = Duration.between(LocalDateTime.now(), midnight).getSeconds();
-        scheduleRedisTemplate.expire(cacheKey, ttl, TimeUnit.SECONDS);
+        long ttl = Duration.between(LocalDateTime.now(), midnight).getSeconds();
+        scheduleRedisTemplate.expire(key, ttl, TimeUnit.SECONDS);
 
-        log.info("첫 스케줄 추가 완료: " + cacheKey);
+        log.info("첫 스케줄 추가 완료: {}", key);
     }
-
-    private static final int DAY = 7;
-    private static final int DAY_MINUTE = 1440;
 
     public void checkForDuplicateTimer(Long groupId, int repeatDay, int plusMinute, int attentionTime) {
         IntStream.range(0, DAY)
@@ -167,7 +189,9 @@ public class RedisService {
                 });
     }
 
-    public void addTimerList(Long groupId, int repeatDay, int plusMinute, int attentionTime) {
+    public void addTimerList(Timer timer, int repeatDay, int plusMinute, int attentionTime) {
+        Long groupId = timer.getGroup().getGroupId();
+
         String key = "timer:" + groupId;
         ZSetOperations<String, String> zSet = stringRedisTemplate.opsForZSet();
 
@@ -177,9 +201,12 @@ public class RedisService {
                 .forEach(i -> {
                     int start = DAY_MINUTE * i + plusMinute;
                     int end = start + attentionTime;
-                    zSet.add(key, start + "-" + end + "-" + groupId, start);
-                    log.info("타이머 추가: " + key);
+                    zSet.add(key, start + "-" + end + "-" + groupId+"-"+timer.getTimerId(), start);
+                    log.info("타이머 추가: {}", key);
                 });
     }
 
+    public void deleteScheduleByGroupId(Long groupId) {
+
+    }
 }

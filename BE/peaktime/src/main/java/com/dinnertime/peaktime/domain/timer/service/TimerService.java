@@ -32,7 +32,7 @@ public class TimerService {
     private final ScheduleService scheduleService;
 
     @Transactional
-    public GroupDetailResponseDto postTimer(TimerCreateRequestDto requestDto) {
+    public Timer postTimer(TimerCreateRequestDto requestDto) {
         Long groupId = requestDto.getGroupId();
         LocalDateTime startTime = requestDto.getStartTime();
         int attentionTime = requestDto.getAttentionTime();
@@ -51,13 +51,7 @@ public class TimerService {
         Timer timer = Timer.createTimer(group, requestDto);
         timerRepository.save(timer);
 
-        // 타이머 리스트 조회
-        List<TimerItemResponseDto> timerList = timerRepository.findByGroup_GroupId(groupId)
-                .stream()
-                .map(TimerItemResponseDto::createTimeItemResponseDto)
-                .collect(Collectors.toList());
-
-        return GroupDetailResponseDto.createGroupDetailResponseDto(group, timerList);
+        return timer;
     }
 
     @Transactional
@@ -71,9 +65,6 @@ public class TimerService {
 
         timerRepository.delete(timer);
 
-        Group group = timer.getGroup();
-
-        timerRepository.delete(timer);
         return copyTimer;
     }
 

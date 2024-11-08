@@ -74,10 +74,10 @@ public class TimerFacade {
         log.info("저장");
 
         //타이머 서비스에서 postTimer 사용하여 저장
-        timerService.postTimer(requestDto);
+        Timer timer = timerService.postTimer(requestDto);
 
         //스케쥴링 저장
-        List<Schedule> scheduleList = scheduleService.createSchedule(requestDto);
+        List<Schedule> scheduleList = scheduleService.createSchedule(requestDto, timer);
 
         //현재 시간 이후 내일 이전에 값이 존재하면 레디스에 저장
         int todayDayOfWeek = DAY - LocalDateTime.now().getDayOfWeek().getValue();
@@ -117,7 +117,7 @@ public class TimerFacade {
                 //날짜를 일차원 배열로 만들기 위함
                 int start = DAY_MINUTE * i + plusMinute;
                 int end = start + attentionTime;
-                redisService.deleteTimerByGroupIdAndTime(timer.getGroup().getGroupId(), start, end);
+                redisService.deleteTimerByTimer(timer.getGroup().getGroupId(), start, end);
             }
         }
 

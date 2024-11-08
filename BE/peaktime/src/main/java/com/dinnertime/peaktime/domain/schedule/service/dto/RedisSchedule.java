@@ -46,7 +46,7 @@ public class RedisSchedule implements Serializable {
                 .dayOfWeek(schedule.getDayOfWeek())
                 .startTime(String.valueOf(schedule.getStartTime()))
                 .attentionTime(schedule.getAttentionTime())
-                .groupId(schedule.getGroup().getGroupId())
+                .groupId(schedule.getTimer().getGroup().getGroupId())
                 .build();
     }
 }

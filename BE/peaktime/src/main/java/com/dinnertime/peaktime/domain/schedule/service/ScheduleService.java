@@ -3,7 +3,6 @@ package com.dinnertime.peaktime.domain.schedule.service;
 import com.dinnertime.peaktime.domain.group.entity.Group;
 import com.dinnertime.peaktime.domain.group.repository.GroupRepository;
 import com.dinnertime.peaktime.domain.preset.entity.Preset;
-import com.dinnertime.peaktime.domain.preset.repository.PresetRepository;
 import com.dinnertime.peaktime.domain.schedule.entity.Schedule;
 import com.dinnertime.peaktime.domain.schedule.repository.EmitterRepository;
 import com.dinnertime.peaktime.domain.schedule.repository.ScheduleRepository;
@@ -63,7 +62,7 @@ public class ScheduleService {
         emitter.onTimeout(() -> emitterRepository.deleteById(emitterId));
 
         //최초 연결시 메시지를 안보낼 경우 503에러 발생 하므로 데미 데이터 전송
-        sendToClient(emitter, emitterId, "EventStream. ["+groupId+"-"+userId+"]");
+        sendToClient(emitter, emitterId, "start");
         
         //lastEventId 이게 있으면 연결이 종료 되었다는 뜻 연결 지속시간
         //남아 있는 모든 데이터를 전송
@@ -112,21 +111,17 @@ public class ScheduleService {
     }
 
     @Transactional
-    public List<Schedule> createSchedule(TimerCreateRequestDto requestDto) {
+    public List<Schedule> createSchedule(TimerCreateRequestDto requestDto, Timer timer) {
         int repeatDay = requestDto.getRepeatDay();
         int attentionTime = requestDto.getAttentionTime();
         LocalTime startTime = requestDto.getStartTime().toLocalTime();
-
-        Group group = groupRepository.findByGroupIdAndIsDeleteFalse(requestDto.getGroupId()).orElseThrow(
-                () -> new CustomException(ErrorCode.GROUP_NOT_FOUND)
-        );
 
         List<Schedule> scheduleList = new ArrayList<>();
 
         //6이 월요일 0이 일요일
         for(int day=0; day<DAY;day++) {
             if((repeatDay & (1 << day)) != 0) {
-                Schedule schedule = Schedule.createSchedule(day, startTime, attentionTime, group);
+                Schedule schedule = Schedule.createSchedule(day, startTime, attentionTime, timer);
                 scheduleList.add(schedule);
             }
         }
@@ -144,18 +139,36 @@ public class ScheduleService {
 
     @Transactional
     public void deleteSchedule(Timer timer) {
-        int repeatDay = timer.getRepeatDay();
-        LocalTime startTime = timer.getStartTime().toLocalTime();
+//        int repeatDay = timer.getRepeatDay();
+//        LocalTime startTime = timer.getStartTime().toLocalTime();
+//
+//        List<Integer> dayOfWeekList = new ArrayList<>();
+//
+//        for(int day=0; day<DAY;day++) {
+//            if((repeatDay & (1 << day)) != 0) {
+//                dayOfWeekList.add(day);
+//            }
+//        }
+//
+//        scheduleRepository.deleteAllByTimer_TimerIdAndDayOfWeekInAndStartTime(timer.getTimerId(), dayOfWeekList, startTime);
+        scheduleRepository.deleteAllByTimer_TimerId(timer.getTimerId());
+    }
 
-        List<Integer> dayOfWeekList = new ArrayList<>();
-
-        for(int day=0; day<DAY;day++) {
-            if((repeatDay & (1 << day)) != 0) {
-                dayOfWeekList.add(day);
-            }
-        }
-
-        scheduleRepository.deleteAllByGroup_GroupIdAndDayOfWeekInAndStartTime(timer.getGroup().getGroupId(), dayOfWeekList, startTime);
+    @Transactional
+    public void deleteSchedule(Long timerId) {
+//        int repeatDay = timer.getRepeatDay();
+//        LocalTime startTime = timer.getStartTime().toLocalTime();
+//
+//        List<Integer> dayOfWeekList = new ArrayList<>();
+//
+//        for(int day=0; day<DAY;day++) {
+//            if((repeatDay & (1 << day)) != 0) {
+//                dayOfWeekList.add(day);
+//            }
+//        }
+//
+//        scheduleRepository.deleteAllByTimer_TimerIdAndDayOfWeekInAndStartTime(timer.getTimerId(), dayOfWeekList, startTime);
+        scheduleRepository.deleteAllByTimer_TimerId(timerId);
     }
 
     public void saveTodayScheduleToRedis(List<Schedule> scheduleList, int repeatDay, LocalDateTime startTime) {

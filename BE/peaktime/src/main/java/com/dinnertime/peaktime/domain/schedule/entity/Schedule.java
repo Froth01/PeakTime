@@ -1,6 +1,7 @@
 package com.dinnertime.peaktime.domain.schedule.entity;
 
 import com.dinnertime.peaktime.domain.group.entity.Group;
+import com.dinnertime.peaktime.domain.timer.entity.Timer;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -31,24 +32,24 @@ public class Schedule {
     private int attentionTime;
 
     @ManyToOne
-    @JoinColumn(name = "group_id", nullable = false)
-    private Group group;
+    @JoinColumn(name = "timer_id", nullable = false)
+    private Timer timer;
 
     @Builder
-    private Schedule(int dayOfWeek, LocalTime startTime, int attentionTime, Group group) {
+    private Schedule(int dayOfWeek, LocalTime startTime, int attentionTime, Timer timer) {
         this.dayOfWeek = dayOfWeek;
         this.startTime = startTime;
         this.attentionTime = attentionTime;
-        this.group = group;
+        this.timer = timer;
     }
 
 
-    public static Schedule createSchedule(int dayOfWeek, LocalTime startTime, int attentionTime, Group group) {
+    public static Schedule createSchedule(int dayOfWeek, LocalTime startTime, int attentionTime, Timer timer) {
         return Schedule.builder()
                 .dayOfWeek(dayOfWeek)
                 .startTime(startTime)
                 .attentionTime(attentionTime)
-                .group(group)
+                .timer(timer)
                 .build();
     }
 }
