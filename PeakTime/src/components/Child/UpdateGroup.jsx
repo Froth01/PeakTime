@@ -218,15 +218,14 @@ function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
 
   // 그룹 타이머 추가 모달
   const openTimeSetModal = (groupId) => {
+    let root;
     let timerSetting = {};
 
     Swal.fire({
       title: "그룹 타이머 추가",
       html: `<div id="add-group-timer" />`,
       willOpen: () => {
-        const root = ReactDOM.createRoot(
-          document.getElementById("add-group-timer")
-        );
+        root = ReactDOM.createRoot(document.getElementById("add-group-timer"));
 
         const onSave = (saveFunction) => {
           timerSetting = saveFunction();
@@ -264,10 +263,9 @@ function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
           });
       },
       didClose: () => {
-        const root = ReactDOM.createRoot(
-          document.getElementById("add-group-timer")
-        );
-        root.unmount();
+        if (root) {
+          root.unmount();
+        }
       },
       confirmButtonColor: "#03C777",
       confirmButtonText: "저장",
