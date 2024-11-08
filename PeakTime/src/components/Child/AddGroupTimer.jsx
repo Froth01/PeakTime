@@ -1,9 +1,9 @@
+import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 
 function AddGroupTimer({ groupId, onSave }) {
   const [startTime, setStartTime] = useState("00:00");
   const [attentionTime, setAttentionTime] = useState(0);
-  const [isRepeat, setIsRepeat] = useState(false);
   const [repeatDay, setRepeatDay] = useState(0);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -31,7 +31,6 @@ function AddGroupTimer({ groupId, onSave }) {
       groupId,
       startTime: formattedStartTime,
       attentionTime: attentionTime || 0,
-      isRepeat,
       repeatDay,
     };
   };
@@ -55,11 +54,6 @@ function AddGroupTimer({ groupId, onSave }) {
         break;
     }
   };
-
-  useEffect(() => {
-    // 요일이 하나 이상 선택되면 반복 true로 설정
-    setIsRepeat(repeatDay > 0);
-  }, [repeatDay]);
 
   useEffect(() => {
     onSave(handleSave);
@@ -143,5 +137,10 @@ function AddGroupTimer({ groupId, onSave }) {
     </div>
   );
 }
+
+AddGroupTimer.propTypes = {
+  groupId: PropTypes.number.isRequired,
+  onSave: PropTypes.func.isRequired,
+};
 
 export default AddGroupTimer;
