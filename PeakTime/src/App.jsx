@@ -17,6 +17,7 @@ import PresetSettingPage from "./pages/PresetSettingPage"; // 프리셋 설정
 import ReportPage from "./pages/ReportPage"; // 내역 페이지
 import ChildPage from "./pages/ChildPage"; // 차일드 관리
 import MemoPage from "./pages/MemoPage"; // 메모 페이지
+import { useEffect, useState } from "react";
 
 // 로그인 필요한 페이지
 const protectedRoutes = [
@@ -33,8 +34,20 @@ const protectedRoutes = [
 
 function App() {
   // 스토어에서 정보 가져오기
-  const user = localStorage.getItem("user");
+  const { user, userActions } = useUserStore();
+
+  const [localUser, setLocalUser] = useState(
+    JSON.parse(localStorage.getItem("user"))
+  );
   const { bg, bgActions } = useBackgroundStore();
+
+  useEffect(() => {
+    if (!user) {
+      if (localUser) {
+        userActions.setuser(localUser);
+      }
+    }
+  }, [user, localUser]);
 
   return (
     <div className="relative">
