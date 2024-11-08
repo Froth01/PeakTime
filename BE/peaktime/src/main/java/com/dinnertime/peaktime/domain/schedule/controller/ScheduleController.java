@@ -41,7 +41,7 @@ public class ScheduleController {
     @CommonSwaggerResponse.CommonResponses
     @GetMapping(value = "", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribe(
-            @AuthenticationPrincipal final UserPrincipal userPrincipal,
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestHeader(value = "LAST-EVENT-ID", required = false, defaultValue = "") String lastEventId
     ) {
         log.info("구독");

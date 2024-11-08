@@ -23,7 +23,7 @@ public class Timer {
     @Column(name = "timer_id")
     private Long timerId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id", nullable = false)
     private Group group;
 

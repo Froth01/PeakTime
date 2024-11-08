@@ -21,6 +21,7 @@ public class TimerCreateRequestDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime startTime;
 
+    @Min(30)
     @Max(240)
     private int attentionTime;
 
