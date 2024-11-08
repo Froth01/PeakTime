@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface MemoRepository extends JpaRepository<Memo, Long> {
 
     // 메모리스트 조회시 사용
-    List<Memo> findAllByUser_UserIdOrderByMemoIdASC(Long userId);
+    List<Memo> findAllByUser_UserIdOrderByMemoIdAsc(Long userId);
 
     // 메모 상세 조회, 메모 삭제에 사용
     Optional<Memo> findByMemoId(Long memoId);
