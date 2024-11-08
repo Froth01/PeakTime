@@ -155,5 +155,6 @@ function AddGroup({ onChangeContent, onChangeGroupList }) {
 // props validation 추가
 AddGroup.propTypes = {
   onChangeContent: PropTypes.func.isRequired,
+  onChangeGroupList: PropTypes.func.isRequired,
 };
 export default AddGroup;
