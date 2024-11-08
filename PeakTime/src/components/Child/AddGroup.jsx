@@ -92,6 +92,7 @@ function AddGroup({ onChangeContent, onChangeGroupList }) {
     }
 
     const fetchCreateGroup = async () => {
+      console.log(presetId);
       groupsApi
         .post("", { title, presetId })
         .then((result) => {

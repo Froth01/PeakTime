@@ -25,7 +25,7 @@ function AddGroupTimer({ groupId, onSave }) {
     const hours = String(targetDate.getHours()).padStart(2, "0");
     const minutes = String(targetDate.getMinutes()).padStart(2, "0");
 
-    const formattedStartTime = `${year}-${month}-${day}T${hours}:${minutes}:00`;
+    const formattedStartTime = `${year}-${month}-${day} ${hours}:${minutes}:00`;
 
     return {
       groupId,
