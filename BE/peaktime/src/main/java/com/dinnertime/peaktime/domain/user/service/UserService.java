@@ -64,7 +64,7 @@ public class UserService {
         // 2. 이어서 root 계정 탈퇴처리
         User user = userRepository.findByUserId(userPrincipal.getUserId())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        user.setIsDelete(true);
+        user.deleteUser();
         userRepository.save(user);
         // 3. root 계정과 이 root 계정에 종속된 child 계정의 User PK를 추출하여 Redis에 저장된 Refresh Token 삭제하기 (고도화)
     }

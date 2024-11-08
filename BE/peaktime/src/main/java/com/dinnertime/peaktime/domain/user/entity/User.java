@@ -32,7 +32,6 @@ public class User {
     @Column(name = "is_root", nullable = false)
     private Boolean isRoot; // 루트 유저 여부
 
-    @Setter
     @Column(name = "is_delete", nullable = false)
     private Boolean isDelete; // 삭제 여부
 
@@ -76,7 +75,7 @@ public class User {
         this.password = password;
     }
 
-    public void deleteUser(){
+    public void deleteUser() {
         this.email = null;
         this.isDelete = true;
     }
