@@ -50,10 +50,10 @@ public class SecurityConfig {
         return http.cors(withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/logout", "/users/**", "/children/**", "/groups/**", "/presets/**", "/hikings/**", "/timers/**", "/summaries/**", "/memos/**").hasAuthority("root")
-                        .requestMatchers("/auth/logout", "/hikings/**", "/summaries/**", "/memos/**").hasAuthority("child")
-                        .requestMatchers(HttpMethod.GET, "/presets").hasAuthority("child")
+                        .requestMatchers(HttpMethod.GET, "/presets").hasAnyAuthority("root","child")
                         .requestMatchers(HttpMethod.GET, "/schedules").hasAuthority("child")
+                        .requestMatchers("/auth/logout","/hikings/**","/summaries/**", "/memos/**").hasAnyAuthority("root", "child")
+                        .requestMatchers("/users/**", "/children/**", "/groups/**", "/presets/**", "/timers/**").hasAuthority("root")
                         .anyRequest().denyAll())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable)
