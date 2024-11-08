@@ -72,6 +72,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 //버튼 클릭시 전체 url 보내기
                 chrome.runtime.sendMessage({ action: "addUrl", url: fullUrl });
             });
+
+            chrome.tabs.reload(tabs[0].id);
         }
     }
 
