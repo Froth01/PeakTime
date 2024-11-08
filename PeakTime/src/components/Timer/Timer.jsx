@@ -12,11 +12,26 @@ function Timer() {
 
   const [extenstionData, setExtenstionData] = useState(null); // extension hiking 데이터
   const [electronData, setElectronData] = useState(null); // electron hiking 데이터
-  
+
+  //현재 시간
+  let [now, setNow] = useState(new Date());
+  let nowInterval = null;
+
+  const startNow = () => {
+    nowInterval = setInterval(() => {
+      setNow(new Date());
+      console.log(now);
+    }, 5000);
+  };
+  const stopNow = () => {
+    clearInterval(nowInterval);
+  };
+
   // 시작 상태, 남은 시간 변경시마다 적용
   useEffect(() => {
     if (remainTime && remainTime === 0) {
       setIsRunning(false);
+      startNow();
     }
 
     const interval = setInterval(() => {
@@ -95,6 +110,8 @@ function Timer() {
           setTotalTime(time);
           setRemainTime(time * 60 - 1); // 분 단위로 받은 시간을 초로 변환
           setIsRunning(true);
+          stopNow();
+
           const startBtn = document.getElementById("start");
           startBtn.dispatchEvent(hikingStart);
         } catch (err) {
@@ -123,18 +140,16 @@ function Timer() {
 
   // ipc 처리
   const handleExtensionMessage = async (data) => {
-
-    console.log(data.urlList)
-    setExtenstionData(data.urlList);// 받은 데이터를 상태로 저장
+    console.log(data.urlList);
+    setExtenstionData(data.urlList); // 받은 데이터를 상태로 저장
   };
 
   const handleElectronMessage = async (data) => {
-
     // 익스텍션에서 추가로 받은 리스트 저장
-    console.log(data)
+    console.log(data);
     setElectronData(data);
-  }
-  
+  };
+
   // onWebSocketMessage 이벤트 리스너 등록
   useEffect(() => {
     console.log("onHikingInfo 리스너 등록 중...");
@@ -143,51 +158,50 @@ function Timer() {
     console.log("onBlockHistory 리스너 등록 중");
     window.electronAPI.onBlockHistory(handleElectronMessage);
 
+    startNow();
   }, []);
 
   useEffect(() => {
     const updateHikingData = async () => {
-        if (extenstionData == null || electronData == null) {
-            return;
-        }
+      if (extenstionData == null || electronData == null) {
+        return;
+      }
 
-        console.log("extenstionData", extenstionData);
-        console.log("electronData:", electronData);
+      console.log("extenstionData", extenstionData);
+      console.log("electronData:", electronData);
 
-        // 현재 시간 포맷 생성
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = now.getMonth() + 1;
-        const day = now.getDate();
-        const hour = now.getHours();
-        const minute = now.getMinutes();
-        const second = now.getSeconds();
+      // 현재 시간 포맷 생성
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth() + 1;
+      const day = now.getDate();
+      const hour = now.getHours();
+      const minute = now.getMinutes();
+      const second = now.getSeconds();
 
-        const format = `${year}-${("00" + month.toString()).slice(-2)}-${(
-          "00" + day.toString()
-        ).slice(-2)} ${("00" + hour.toString()).slice(-2)}:${(
-          "00" + minute.toString()
-        ).slice(-2)}:${("00" + second.toString()).slice(-2)}`;
+      const format = `${year}-${("00" + month.toString()).slice(-2)}-${(
+        "00" + day.toString()
+      ).slice(-2)} ${("00" + hour.toString()).slice(-2)}:${(
+        "00" + minute.toString()
+      ).slice(-2)}:${("00" + second.toString()).slice(-2)}`;
 
-        const endHikingData = {
-          realEndTime: format,
-          contentList: [...electronData, ...extenstionData]
-        };
-        
-        console.log(endHikingData)
-        const response = await hikingsApi.put(
-            `${startedHikingId}`,
-            endHikingData
-        );
-        console.log("response:" , response.data);
-        setElectronData(null);
-        setExtenstionData(null);
+      const endHikingData = {
+        realEndTime: format,
+        contentList: [...electronData, ...extenstionData],
+      };
+
+      console.log(endHikingData);
+      const response = await hikingsApi.put(
+        `${startedHikingId}`,
+        endHikingData
+      );
+      console.log("response:", response.data);
+      setElectronData(null);
+      setExtenstionData(null);
     };
 
     updateHikingData();
-}, [extenstionData, electronData]);
-
-
+  }, [extenstionData, electronData]);
 
   // 포기 버튼 누르기
   // 커스텀 이벤트
@@ -212,8 +226,7 @@ function Timer() {
           setTimeout(() => {
             setExtenstionData([]);
             setElectronData([]);
-        }, 2000);
-        
+          }, 2000);
 
           // 상태 업데이트
           setTotalTime(0);
@@ -338,8 +351,8 @@ function Timer() {
           <div className="absolute top-[70%] left-[50%] translate-x-[-50%] remain text-3xl">
             {isRunning
               ? formatTime(remainTime)
-              : `${("00" + new Date().getHours().toString()).slice(-2)}:${(
-                  "00" + new Date().getMinutes().toString()
+              : `${("00" + now.getHours().toString()).slice(-2)}:${(
+                  "00" + now.getMinutes().toString()
                 ).slice(-2)}`}
           </div>
           {!isRunning && (
