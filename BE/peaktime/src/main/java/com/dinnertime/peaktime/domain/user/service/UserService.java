@@ -80,15 +80,15 @@ public class UserService {
         if(!updatePasswordRequest.getNewPassword().equals(updatePasswordRequest.getConfirmNewPassword())) {
             throw new CustomException(ErrorCode.NOT_EQUAL_PASSWORD);
         }
-        // 3. 비밀번호 암호화
-        String encodedPassword = passwordEncoder.encode(updatePasswordRequest.getNewPassword());
-        // 4. 현재 유저 엔티티 불러오기
+        // 3. 현재 유저 엔티티 불러오기
         User user = userRepository.findByUserId(userPrincipal.getUserId())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        // 5. 비밀번호 중복 검사 (현재 유저의 비밀번호와 비교하기)
-        if(encodedPassword.equals(user.getPassword())) {
+        // 4. 비밀번호 중복 검사 (현재 유저의 비밀번호와 비교하기) -> matches 메서드는 첫 번째 인자로 평문 비밀번호 필요
+        if(passwordEncoder.matches(updatePasswordRequest.getNewPassword(), user.getPassword())) {
             throw new CustomException(ErrorCode.DUPLICATED_PASSWORD);
         }
+        // 5. 비밀번호 암호화
+        String encodedPassword = passwordEncoder.encode(updatePasswordRequest.getNewPassword());
         // 6. 유저 엔티티에 새로운 비밀번호 집어넣기
         user.setPassword(encodedPassword);
         // 7. Save User

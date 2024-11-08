@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -31,6 +32,17 @@ public class GlobalExceptionHandler {
     // 회원 정보 불일치
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<?> handleBadCredentialsException(final BadCredentialsException ex) {
+        ResultDto<Object> response = ResultDto.res(
+                HttpStatus.NOT_FOUND.value(),
+                "등록되지 않은 아이디이거나 아이디 또는 비밀번호를 잘못 입력했습니다."
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
+    // 회원탈퇴한 유저로 로그인 시도시
+    @ExceptionHandler(InternalAuthenticationServiceException.class)
+    public ResponseEntity<?> handleInternalAuthenticationServiceException(final InternalAuthenticationServiceException ex) {
         ResultDto<Object> response = ResultDto.res(
                 HttpStatus.NOT_FOUND.value(),
                 "등록되지 않은 아이디이거나 아이디 또는 비밀번호를 잘못 입력했습니다."
