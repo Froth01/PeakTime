@@ -1,20 +1,91 @@
 import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
+import hikingsApi from "../../api/hikingsApi";
+import Swal from "sweetalert2";
 
-function Calendar({ onDayClick }) {
+function Calendar({ selectedDay, onDayClick }) {
+  const ALERT_MESSAGE = {
+    failtToGetHikingList: {
+      title: "내역 목록 조회 실패",
+      text: "이용내역 목록 조회에 실패했습니다. 잠시 후 다시 시도해주세요.",
+      icon: "error",
+      confirmButtonText: "확인",
+      confirmButtonColor: "#03C777",
+    },
+  };
+
+  const colorPalette = (totalMinute) => {
+    const RANGE_ARRAY = [0, 60, 120, 180, 240];
+
+    switch (totalMinute) {
+      case totalMinute > RANGE_ARRAY[0] && totalMinute <= RANGE_ARRAY[1]:
+        return "#A1C7E7";
+      case totalMinute > RANGE_ARRAY[1] && totalMinute <= RANGE_ARRAY[2]:
+        return "#82B5E2";
+      case totalMinute > RANGE_ARRAY[2] && totalMinute <= RANGE_ARRAY[3]:
+        return "#66AADF";
+      case totalMinute > RANGE_ARRAY[3] && totalMinute <= RANGE_ARRAY[4]:
+        return "#4D90D8";
+      case totalMinute > RANGE_ARRAY[4]:
+        return "#3476D0";
+      default:
+        return "#C5C5C5";
+    }
+  };
+
+  const [month, setMonth] = useState("");
+  const [year, setYear] = useState("");
+  const [hikingList, setHikingList] = useState([]);
+
   // 날짜 클릭
   const handleDay = (day) => {
     onDayClick(day);
   };
 
+  useEffect(() => {
+    hikingsApi
+      .get("/calendar")
+      .then((result) => {
+        setHikingList(result.data.data.hikingList);
+        setYear(new Date(result.data.data.hikingList[0].date).getFullYear());
+        setMonth(new Date(result.data.data.hikingList[0].date).getMonth() + 1);
+      })
+      .catch(() => Swal.fire(ALERT_MESSAGE.failtToGetHikingList));
+  }, []);
+
   return (
-    <div className="absolute left-[10vw] w-[30vw] h-[100vh] bg-green-200">
-      Calendar
-      <button onClick={() => handleDay(1)}>날짜</button>
+    <div
+      className="absolute left-[10vw] w-[30vw] h-[100vh]"
+      style={{ backgroundColor: "#66AADF" }}
+    >
+      <h2 className="text-[50px] text-white">Calender</h2>
+
+      <div>
+        <span className="text-[50px] text-white mr-5">{month}월</span>
+        <span className="text-[25px] text-white">{year}년</span>
+      </div>
+
+      <div className="inline-grid grid-cols-5 gap-1 justify-items-center items-center">
+        {hikingList.map((item, idx) => (
+          <button
+            key={idx + 1}
+            onClick={() => handleDay(item.date)}
+            className={`text-white rounded-lg w-[5vw] h-[5vw] ${
+              item.date === selectedDay ? "border-4 border-white" : ""
+            }`}
+            style={{
+              backgroundColor: colorPalette(item.totalMinute),
+            }}
+          />
+        ))}
+      </div>
     </div>
   );
 }
 // props validation 추가
 Calendar.propTypes = {
+  selectedDay: PropTypes.oneOfType([PropTypes.string, PropTypes.oneOf([null])]),
   onDayClick: PropTypes.func.isRequired,
 };
+
 export default Calendar;

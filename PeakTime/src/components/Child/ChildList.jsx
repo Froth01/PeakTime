@@ -47,11 +47,13 @@ function ChildList({ onChangeContent, groupList }) {
       </div>
       <div className="self-start mt-3">
         {groupList.length < 5 ? (
-          <button onClick={handleAddGroup} className="text-white font-bold">
-            +그룹 추가
-          </button>
+          <>
+            <button onClick={handleAddGroup} className="text-white font-bold">
+              +그룹 추가
+            </button>
+            <span className="px-4" />
+          </>
         ) : null}
-        <span className="px-4" />
         <button onClick={handleAddChild} className="text-white font-bold">
           +계정 추가
         </button>

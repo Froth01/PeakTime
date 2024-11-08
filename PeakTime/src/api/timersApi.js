@@ -1,7 +1,8 @@
 import axios from "axios";
-// useSelector 사용 못하니까 직접 스토어 가져오기
-// import { store } from "./../stores/store";
-// import { setAccessToken } from "../stores/userSlice";
+import { useUserStore } from "../stores/UserStore";
+
+// zustand 스토어에서 상태 가져오기
+const getUserState = useUserStore.getState;
 
 // axios 객체 만들기
 const timersApi = axios.create({
@@ -11,12 +12,12 @@ const timersApi = axios.create({
 // axios 객체에 요청 인터셉터 추가하기 (헤더에 JWT Token 삽입하기)
 timersApi.interceptors.request.use(
   (config) => {
-    // const state = store.getState();
-    // const accessToken = state.user.accessToken;
+    const { user } = getUserState();
+    const accessToken = user.accessToken;
 
-    // if (accessToken && accessToken !== "") {
-    //   config.headers.Authorization = `Bearer ${accessToken}`;
-    // }
+    if (accessToken && accessToken !== "") {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
 
     return config;
   },

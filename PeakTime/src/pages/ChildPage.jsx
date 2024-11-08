@@ -31,7 +31,7 @@ function ChildPage() {
   // 페이지 진입 시 그룹 전체 조회 API 호출
   useEffect(() => {
     groupsApi
-      .get("", { params: { userId: 1 } })
+      .get("")
       .then((result) => setGroupList(result.data.data.groupList))
       .catch((err) => console.log(err));
   }, []);
