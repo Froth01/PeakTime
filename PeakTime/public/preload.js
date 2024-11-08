@@ -15,4 +15,18 @@ contextBridge.exposeInMainWorld("electronAPI", {
       console.log("onHikingInfo 발동 : ", data);
       callback(data);
     }),
+  startBlockProgram: (data) => {
+    ipcRenderer.send("start-block-program", data);
+  },
+  
+  endBlockProgram: () => {
+    ipcRenderer.send("end-block-program")
+  },
+
+  onBlockHistory: (callback) => {
+    ipcRenderer.on("blockHistoryResponse", (event, data) => {
+      console.log("차단 히스토리 조회");
+      callback(data);
+    });
+  }
 });
