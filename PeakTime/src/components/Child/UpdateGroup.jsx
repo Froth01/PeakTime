@@ -99,6 +99,14 @@ function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
       confirmButtonText: "확인",
       confirmButtonColor: "#03C777",
     },
+    // 그룹 타이머 요일 선택 조건 불만족
+    notSelectedRepeatDayError: {
+      title: "요일 선택 오류",
+      text: "요일을 하나 이상 선택해야 합니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+      confirmButtonColor: "#03C777",
+    },
     // 그룹 타이머 중복 오류
     duplicateGroupTimerError: {
       title: "타이머 중복",
@@ -234,12 +242,16 @@ function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
         root.render(<AddGroupTimer groupId={groupId} onSave={onSave} />);
       },
       preConfirm: () => {
-        // attentionTime이 30분에서 240분 사이가 아니라면 경고 모달 띄우고 false 반환
         if (
           timerSetting.attentionTime < 30 ||
           timerSetting.attentionTime > 240
         ) {
+          // attentionTime이 30분에서 240분 사이가 아니라면 경고 모달 띄우고 false 반환
           Swal.fire(ALERT_MESSAGE.attentionTimeOutOfRangeError);
+          return false;
+        } else if (timerSetting.repeatDay <= 0) {
+          // 요일을 선택하지 않았다면 경고 모달 띄우고 false 반환
+          Swal.fire(ALERT_MESSAGE.notSelectedRepeatDayError);
           return false;
         }
 
