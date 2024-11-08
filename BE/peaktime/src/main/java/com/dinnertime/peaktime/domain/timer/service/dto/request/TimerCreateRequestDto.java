@@ -24,9 +24,6 @@ public class TimerCreateRequestDto {
     @Max(240)
     private int attentionTime;
 
-    @NotNull
-    private Boolean isRepeat;
-
     @Min(0)
     @Max(127)
     private int repeatDay;

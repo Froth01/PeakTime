@@ -32,7 +32,6 @@ public class SchedulerService {
     @Scheduled(cron = "0 0/1 * * * *")
     public void send() {
         LocalDateTime now = LocalDateTime.now();
-        log.info(now.toString());
         int day = 7 - now.getDayOfWeek().getValue();
         int hour = now.getHour();
         int minute = now.getMinute();
@@ -44,6 +43,8 @@ public class SchedulerService {
         if(timerList == null || timerList.isEmpty()) {
             return;
         }
+
+        log.info(now.toString());
 
         timerList.forEach(timer -> {
             String[] split = timer.split("-");
