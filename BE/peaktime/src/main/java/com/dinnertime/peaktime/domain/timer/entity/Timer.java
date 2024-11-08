@@ -23,7 +23,7 @@ public class Timer {
     @Column(name = "timer_id")
     private Long timerId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id", nullable = false)
     private Group group;
 
@@ -35,20 +35,16 @@ public class Timer {
     @Max(240)
     private int attentionTime;
 
-    @Column(name = "is_repeat", nullable = false)
-    private Boolean isRepeat;
-
     @Column(name = "repeat_day", nullable = false)
     @Min(0)
     @Max(127)
     private int repeatDay;
 
     @Builder
-    private Timer(Group group, LocalDateTime startTime, int attentionTime, Boolean isRepeat, int repeatDay) {
+    private Timer(Group group, LocalDateTime startTime, int attentionTime, int repeatDay) {
         this.group = group;
         this.startTime = startTime;
         this.attentionTime = attentionTime;
-        this.isRepeat = isRepeat;
         this.repeatDay = repeatDay;
     }
 
@@ -57,7 +53,6 @@ public class Timer {
                 .group(group)
                 .startTime(requestDto.getStartTime())
                 .attentionTime(requestDto.getAttentionTime())
-                .isRepeat(requestDto.getIsRepeat())
                 .repeatDay(requestDto.getRepeatDay())
                 .build();
     }
@@ -67,7 +62,6 @@ public class Timer {
                 .group(timer.getGroup())
                 .startTime(timer.getStartTime())
                 .attentionTime(timer.getAttentionTime())
-                .isRepeat(timer.getIsRepeat())
                 .repeatDay(timer.getRepeatDay())
                 .build();
     }

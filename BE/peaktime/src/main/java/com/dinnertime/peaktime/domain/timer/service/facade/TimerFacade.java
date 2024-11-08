@@ -69,6 +69,8 @@ public class TimerFacade {
         //타이머 서비스에서 postTimer 사용하여 저장
         timerService.postTimer(requestDto);
 
+        log.info("스케쥴링 저장");
+
         //스케쥴링 저장
         List<Schedule> scheduleList = scheduleService.createSchedule(requestDto);
 
