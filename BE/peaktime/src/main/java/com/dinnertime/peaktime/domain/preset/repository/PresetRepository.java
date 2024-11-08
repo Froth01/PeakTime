@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface PresetRepository extends JpaRepository<Preset, Long> {
 
-    List<Preset> findAllByUser_UserIdOrderbyPresetIdASC(Long  userId);
+    List<Preset> findAllByUser_UserIdOrderByPresetIdAsc(Long  userId);
 
     Optional<Preset> findByPresetId(Long presetId);
 }

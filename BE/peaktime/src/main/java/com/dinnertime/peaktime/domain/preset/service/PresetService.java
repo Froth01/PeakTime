@@ -62,7 +62,7 @@ public class PresetService {
             return PresetWrapperResponseDto.buildPresetResponseDto(preset);
         }
         
-        List<Preset> presets = presetRepository.findAllByUser_UserIdOrderbyPresetIdASC(userId);
+        List<Preset> presets = presetRepository.findAllByUser_UserIdOrderByPresetIdAsc(userId);
 
         // userId를 뺀 나머지 데이터 Wrapper해서 적용
         return PresetWrapperResponseDto.buildPresetResponseDto(presets);
