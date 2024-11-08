@@ -36,7 +36,7 @@ public class Timer {
     private int attentionTime;
 
     @Column(name = "repeat_day", nullable = false)
-    @Min(0)
+    @Min(1)
     @Max(127)
     private int repeatDay;
 
