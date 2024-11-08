@@ -30,7 +30,7 @@ function AddGroupTimer({ groupId, onSave }) {
     return {
       groupId,
       startTime: formattedStartTime,
-      attentionTime: attentionTime,
+      attentionTime,
       repeatDay,
     };
   };

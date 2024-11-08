@@ -43,67 +43,6 @@ function DailyReport({ day, onCancel }) {
             root.render(<DailyReportDetail hikingDetail={result.data.data} />);
           })
           .catch(() => Swal.fire(ALERT_MESSAGE.failToGetDailHikingDetail));
-
-        // ////////////////////////////////////////////////////////////////////////
-        // root = ReactDOM.createRoot(
-        //   document.getElementById("daily-report-detail")
-        // );
-        // root.render(
-        //   <DailyReportDetail
-        //     hikingDetail={{
-        //       startTime: "2024-11-07 14:30:00",
-        //       endTime: "2024-11-07 16:30:00",
-        //       realEndTime: "2024-11-07 16:30:00",
-        //       blockedSiteCount: 3,
-        //       blockedProgramCount: 1,
-        //       visitedSiteList: [
-        //         {
-        //           name: "www.naver1.com",
-        //           usingTime: 600,
-        //         },
-        //         {
-        //           name: "www.naver2.com",
-        //           usingTime: 480,
-        //         },
-        //         {
-        //           name: "www.naver3.com",
-        //           usingTime: 360,
-        //         },
-        //         {
-        //           name: "www.naver4.com",
-        //           usingTime: 240,
-        //         },
-        //         {
-        //           name: "www.naver5.com",
-        //           usingTime: 120,
-        //         },
-        //       ],
-        //       visitedProgramList: [
-        //         {
-        //           name: "계산기1",
-        //           usingTime: 360,
-        //         },
-        //         {
-        //           name: "계산기2",
-        //           usingTime: 300,
-        //         },
-        //         {
-        //           name: "계산기3",
-        //           usingTime: 240,
-        //         },
-        //         {
-        //           name: "계산기4",
-        //           usingTime: 180,
-        //         },
-        //         {
-        //           name: "계산기5",
-        //           usingTime: 120,
-        //         },
-        //       ],
-        //     }}
-        //     ////////////////////////////////////////////////////////////////////////
-        //   />
-        // );
       },
       didClose: () => {
         if (root) {
@@ -178,14 +117,7 @@ function DailyReport({ day, onCancel }) {
 
         {dailyHikingList?.length === 0 ? (
           // 내역이 없을 경우
-          <>
-            <div>선택한 날짜의 사용 기록이 없습니다.</div>
-            {/* /////////////////////////////////////////////////// */}
-            {/* <button onClick={() => openHikingDetail(1)} className="border">
-              더미
-            </button> */}
-            {/* /////////////////////////////////////////////////// */}
-          </>
+          <div>선택한 날짜의 사용 기록이 없습니다.</div>
         ) : (
           // 내역이 있을 경우
           dailyHikingList?.map((hiking) => (
