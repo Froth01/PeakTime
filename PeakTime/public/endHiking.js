@@ -1,6 +1,6 @@
-import hikingsApi from "../src/api/hikingsApi.js";
+import { hikingsApi, setBaseUrl } from "../src/api/hikingsApi.js";
 
-export function endHikingProcess(sumData, startedHikingId) {
+export async function endHikingProcess(sumData, startedHikingId) {
   //현재 시간 포맷 생성
   const now = new Date();
   const year = now.getFullYear();
@@ -21,8 +21,9 @@ export function endHikingProcess(sumData, startedHikingId) {
     realEndTime: format,
     contentList: sumData,
   };
+  await setBaseUrl();
 
-  hikingsApi.put(`${startedHikingId}`,
+  return hikingsApi.put(`${startedHikingId}`,
     endHikingData
   ).then(
     response => {
@@ -30,7 +31,7 @@ export function endHikingProcess(sumData, startedHikingId) {
       return 'done'
     }
   ).catch((error) => {
-    throw error
+    console.log(error)
   })
 
 }

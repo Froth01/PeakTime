@@ -100,10 +100,14 @@ app.whenReady().then(() => {
 
 
 // 하이킹 정보 받기
-ipcMain.on("hikingInfo", (event, data) => {
-  const response = data.urlList;
-  siteProcess(response);
-  checkDone(event, data.hikingId);
+ipcMain.on("hikingInfo", async (event, data) => {
+  try {
+    const response = data.urlList;
+    await siteProcess(response);  // 비동기 처리 완료 기다리
+    checkDone(event, data.hikingId);
+  } catch (error) {
+    console.error('하이킹 정보 처리 중 오류:', error);
+  }
 });
 
 // 차단 프로그램 시작
@@ -113,8 +117,12 @@ ipcMain.on("start-block-program", (event, data) => {
 });
 
 // 차단 프로그램 종료
-ipcMain.on("end-block-program", (event, data) => {
-  const response = endWatcher();
-  programProcess(response);
-  checkDone(event, data);
+ipcMain.on("end-block-program", async (event, data) => {
+  try {
+    const response = endWatcher();
+    await programProcess(response);  // 비동기 처리 완료 기다리기
+    checkDone(event, event.detail.startedHikingId);
+  } catch (error) {
+    console.error('프로그램 차단 정보 처리 중 오류:', error);
+  }
 });

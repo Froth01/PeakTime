@@ -6,13 +6,13 @@ const getUserState = useUserStore.getState;
 
 // axios 객체 만들기
 const hikingsApi = axios.create({
-  baseURL: ``,
+  baseURL: `${import.meta.env.VITE_BACK_URL}/api/v1/hikings`,
 });
 
 // ipcRenderer로 값을 받아오기
-async function setBaseUrl() {
+export async function setBaseUrl() {
   try {
-    const backUrl = await window.electron.getBackUrl(); // 메인 프로세스로부터 값 받기
+    const backUrl = await window.electronAPI.getBackUrl(); // 메인 프로세스로부터 값 받기
     hikingsApi.defaults.baseURL = `${backUrl}/api/v1/hikings`; // API URL 설정
   } catch (error) {
     console.error(error)
@@ -20,13 +20,12 @@ async function setBaseUrl() {
   }
 }
 
-setBaseUrl(); // URL 설정 함수 호출
 
 // axios 객체에 요청 인터셉터 추가하기 (헤더에 JWT Token 삽입하기)
 hikingsApi.interceptors.request.use(
   (config) => {
     const { user } = getUserState();
-    const accessToken = user.accessToken;
+    const accessToken = user?.accessToken;
 
     if (accessToken && accessToken !== "") {
       config.headers.Authorization = `Bearer ${accessToken}`;
@@ -45,7 +44,6 @@ hikingsApi.interceptors.response.use(
   (error) => {
     //권한 오류 발생 시
     console.error("요청 응답 오류", error);
-    console.log("error", error.response.data);
     const status = error.response.status;
 
     // 사용자 인증이 실패한 경우, 로그인 페이지로 리다이렉트
