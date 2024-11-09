@@ -28,8 +28,6 @@ public class TimerService {
 
     private final TimerRepository timerRepository;
     private final GroupRepository groupRepository;
-    private final RedisService redisService;
-    private final ScheduleService scheduleService;
 
     @Transactional
     public Timer postTimer(TimerCreateRequestDto requestDto) {
@@ -55,17 +53,13 @@ public class TimerService {
     }
 
     @Transactional
-    public Timer deleteTimer(Long timerId) {
+    public void deleteTimer(Long timerId) {
             // is_repeat = false이고 repeat_day가 존재하지 않는 경우
             // 타이머 실행 완료 후 실행
         Timer timer = timerRepository.findByTimerId(timerId)
                 .orElseThrow(() -> new CustomException(ErrorCode.TIMER_NOT_FOUND));
 
-        Timer copyTimer = Timer.copyTimer(timer);
-
         timerRepository.delete(timer);
-
-        return copyTimer;
     }
 
     @Transactional(readOnly = true)
@@ -82,5 +76,12 @@ public class TimerService {
                 .collect(Collectors.toList());
 
         return GroupDetailResponseDto.createGroupDetailResponseDto(group, timerList);
+    }
+
+    @Transactional(readOnly = true)
+    public Timer getTimer(Long timerId) {
+        return timerRepository.findByTimerId(timerId).orElseThrow(
+                () -> new CustomException(ErrorCode.TIMER_NOT_FOUND)
+        );
     }
 }

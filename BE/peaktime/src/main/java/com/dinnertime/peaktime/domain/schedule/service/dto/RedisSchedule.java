@@ -33,12 +33,15 @@ public class RedisSchedule implements Serializable {
 
     private Long groupId;
 
+    private Long timerId;
+
     @Builder
-    private RedisSchedule(int dayOfWeek, String startTime, int attentionTime, Long groupId) {
+    private RedisSchedule(int dayOfWeek, String startTime, int attentionTime, Long groupId, Long timerId) {
         this.dayOfWeek = dayOfWeek;
         this.startTime = startTime;
         this.attentionTime = attentionTime;
         this.groupId = groupId;
+        this.timerId = timerId;
     }
 
     public static RedisSchedule createRedisSchedule(Schedule schedule) {
@@ -47,6 +50,7 @@ public class RedisSchedule implements Serializable {
                 .startTime(String.valueOf(schedule.getStartTime()))
                 .attentionTime(schedule.getAttentionTime())
                 .groupId(schedule.getTimer().getGroup().getGroupId())
+                .timerId(schedule.getTimer().getTimerId())
                 .build();
     }
 }

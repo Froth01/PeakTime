@@ -12,6 +12,8 @@ import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import java.time.Duration;
@@ -20,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Slf4j
@@ -115,7 +118,7 @@ public class RedisService {
                 .forEach(i -> {
                     int start = DAY_MINUTE * i + plusMinute;
                     int end = start + attentionTime;
-                    zSet.remove(key, start +"-"+end+"-"+groupId, String.valueOf(start));
+                    zSet.remove(key, start +"-"+end+"-"+groupId+"-"+ timer.getTimerId(), String.valueOf(start));
                     log.info("타이머 삭제: {}", key);
                 });
     }
@@ -179,23 +182,6 @@ public class RedisService {
         log.info("첫 스케줄 추가 완료: {}", key);
     }
 
-    public void checkForDuplicateTimer(TimerCreateRequestDto requestDto) {
-        Long groupId = requestDto.getGroupId();
-        LocalDateTime startTime = requestDto.getStartTime();
-        int attentionTime = requestDto.getAttentionTime();
-        int repeatDay = requestDto.getRepeatDay();
-        int plusMinute = (startTime.getHour() * 60) + startTime.getMinute();
-
-        IntStream.range(0, DAY)
-                .filter(i -> (repeatDay & (1 << i)) != 0)  // 해당 요일에 해당하는 비트가 1인 것들만 체크
-                .mapToObj(i -> new int[]{DAY_MINUTE * i + plusMinute, DAY_MINUTE * i + plusMinute + attentionTime})
-                .forEach(timeRange -> {
-                    if (checkTimerByGroupId(groupId, timeRange[0], timeRange[1])) {
-                        throw new CustomException(ErrorCode.TIME_SLOT_OVERLAP);
-                    }
-                });
-    }
-
     public void addTimerList(Timer timer, int repeatDay, int plusMinute, int attentionTime) {
         Long groupId = timer.getGroup().getGroupId();
 
@@ -215,10 +201,24 @@ public class RedisService {
 
     public void deleteScheduleByTimer(Timer timer) {
         String key = "schedule:" + LocalDate.now();
-        log.info("오늘 스케줄 추가: {}", key);
+        log.info("오늘 스케줄 삭제: {}", key);
 
         ListOperations<String, RedisSchedule> listOps = scheduleRedisTemplate.opsForList();
 
         List<RedisSchedule> existingSchedules = listOps.range(key, 0, -1);
+
+        if(existingSchedules==null) return;
+        
+        // 특정 타이머 ID가 아닌 항목만 필터링
+        List<RedisSchedule> filteredSchedules = existingSchedules.stream()
+                .filter(redisSchedule -> !Objects.equals(redisSchedule.getTimerId(), timer.getTimerId()))
+                .collect(Collectors.toList());
+        // 기존 키 삭제
+        scheduleRedisTemplate.delete(key);
+
+        // 필터링된 스케줄 다시 저장
+        if (!filteredSchedules.isEmpty()) {
+            listOps.rightPushAll(key, filteredSchedules);
+        }
     }
 }

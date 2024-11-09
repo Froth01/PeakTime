@@ -31,9 +31,6 @@ public class TimerFacade {
         int repeatDay = requestDto.getRepeatDay();
         int plusMinute = (startTime.getHour() * 60) + startTime.getMinute();
 
-        // 중복 체크
-        redisService.checkForDuplicateTimer(requestDto);
-
         // 타이머와 스케줄 db 저장
         Timer timer = timerService.postTimer(requestDto);
         List<Schedule> scheduleList = scheduleService.createSchedule(requestDto, timer);
@@ -50,17 +47,22 @@ public class TimerFacade {
 
     @Transactional
     public GroupDetailResponseDto deleteTimer(Long timerId) {
-        //스케쥴 삭제
-        scheduleService.deleteSchedule(timerId);
 
-        //타이머 삭제 db삭제
-        Timer timer = timerService.deleteTimer(timerId);
+        //타이머 찾기
+        Timer timer = timerService.getTimer(timerId);
+
+        //생성의 역순
+        //레디스 스케쥴 삭제 -> 오늘 있을 경우
+        redisService.deleteScheduleByTimer(timer);
 
         //레디스 타이머 삭제
         redisService.deleteTimerByTimer(timer);
 
-        //레디스 스케쥴 삭제 -> 오늘 있을 경우
-        redisService.deleteScheduleByTimer(timer);
+        //스케쥴 삭제
+        scheduleService.deleteSchedule(timerId);
+
+        //타이머 삭제 db삭제
+        timerService.deleteTimer(timerId);
 
         //반환
         return timerService.getTimerByGroupId(timer.getGroup().getGroupId());

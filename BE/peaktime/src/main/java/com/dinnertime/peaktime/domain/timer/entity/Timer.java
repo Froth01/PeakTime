@@ -56,13 +56,4 @@ public class Timer {
                 .repeatDay(requestDto.getRepeatDay())
                 .build();
     }
-
-    public static Timer copyTimer(Timer timer) {
-        return Timer.builder()
-                .group(timer.getGroup())
-                .startTime(timer.getStartTime())
-                .attentionTime(timer.getAttentionTime())
-                .repeatDay(timer.getRepeatDay())
-                .build();
-    }
 }

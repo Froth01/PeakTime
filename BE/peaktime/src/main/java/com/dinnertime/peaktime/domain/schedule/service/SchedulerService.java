@@ -36,7 +36,7 @@ public class SchedulerService {
         int hour = now.getHour();
         int minute = now.getMinute();
 
-        int start = day * 14400 + hour * 60 + minute;
+        int start = day * 1440 + hour * 60 + minute;
 
         List<String> timerList = redisService.findTimerByStart(start);
 
