@@ -31,7 +31,7 @@ public class Schedule {
     @Column(name = "attention_time", nullable = false)
     private int attentionTime;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "timer_id", nullable = false)
     private Timer timer;
 
