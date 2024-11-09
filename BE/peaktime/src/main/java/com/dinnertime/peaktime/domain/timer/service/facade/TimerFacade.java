@@ -53,6 +53,14 @@ public class TimerFacade {
             }
         }
 
+        log.info("저장");
+
+        //타이머 서비스에서 postTimer 사용하여 저장
+        Timer timer = timerService.postTimer(requestDto);
+
+        //스케쥴링 저장
+        List<Schedule> scheduleList = scheduleService.createSchedule(requestDto, timer);
+
         log.info("중복 체크");
 
         for(int i=0; i<DAY;i++) {
@@ -64,15 +72,7 @@ public class TimerFacade {
             }
         }
 
-        log.info("저장");
-
-        //타이머 서비스에서 postTimer 사용하여 저장
-        timerService.postTimer(requestDto);
-
         log.info("스케쥴링 저장");
-
-        //스케쥴링 저장
-        List<Schedule> scheduleList = scheduleService.createSchedule(requestDto);
 
         //현재 시간 이후 내일 이전에 값이 존재하면 레디스에 저장
         int todayDayOfWeek = DAY - LocalDateTime.now().getDayOfWeek().getValue();

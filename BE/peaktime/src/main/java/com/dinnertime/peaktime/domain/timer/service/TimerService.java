@@ -32,7 +32,7 @@ public class TimerService {
     private final ScheduleService scheduleService;
 
     @Transactional
-    public void postTimer(TimerCreateRequestDto requestDto) {
+    public Timer postTimer(TimerCreateRequestDto requestDto) {
         Long groupId = requestDto.getGroupId();
         LocalDateTime startTime = requestDto.getStartTime();
         int attentionTime = requestDto.getAttentionTime();
@@ -50,6 +50,8 @@ public class TimerService {
         // 타이머 생성 및 저장
         Timer timer = Timer.createTimer(group, requestDto);
         timerRepository.save(timer);
+
+        return timer;
     }
 
     @Transactional

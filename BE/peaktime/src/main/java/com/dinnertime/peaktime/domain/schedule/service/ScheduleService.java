@@ -108,7 +108,7 @@ public class ScheduleService {
     }
 
     @Transactional
-    public List<Schedule> createSchedule(TimerCreateRequestDto requestDto) {
+    public List<Schedule> createSchedule(TimerCreateRequestDto requestDto, Timer timer) {
         int repeatDay = requestDto.getRepeatDay();
         int attentionTime = requestDto.getAttentionTime();
         LocalTime startTime = requestDto.getStartTime().toLocalTime();
@@ -122,7 +122,7 @@ public class ScheduleService {
         //6이 월요일 0이 일요일
         for(int day=0; day<6;day++) {
             if((repeatDay & (1 << day)) != 0) {
-                Schedule schedule = Schedule.createSchedule(day, startTime, attentionTime, group);
+                Schedule schedule = Schedule.createSchedule(day, startTime, attentionTime, timer);
                 scheduleList.add(schedule);
             }
         }
@@ -151,7 +151,7 @@ public class ScheduleService {
             }
         }
 
-        scheduleRepository.deleteAllByGroup_groupIdAndDayOfWeekIsInAndStartTime(timer.getGroup().getGroupId(), dayOfWeekList, startTime);
+        scheduleRepository.deleteAllByTimer_TimerIdAndDayOfWeekInAndStartTime(timer.getGroup().getGroupId(), dayOfWeekList, startTime);
     }
 
 }
