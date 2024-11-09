@@ -149,7 +149,7 @@ public class HikingController {
 
         HikingStatisticResponseDto responseDto = hikingService.getHikingStatistic(userPrincipal.getUserId(),childUserId);
 
-        log.info(responseDto.toString());
+//        log.info(responseDto.toString());
 
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "하이킹 내역 상세를 조회하는데 성공하였습니다.", responseDto));
     }

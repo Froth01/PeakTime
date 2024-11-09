@@ -161,7 +161,7 @@ public class HikingService {
 
         HikingStatisticQueryDto hikingStatistic = hikingRepository.getHikingStatistic(findUserId);
 
-        if(hikingStatistic==null) return null;
+        if(hikingStatistic==null) return HikingStatisticResponseDto.createNoHiking(findUser.getNickname());
         //전체 차단 접근 횟수
         Long totalBlockedCount = hikingRepository.getTotalBlockedCount(findUserId);
         //사이트 리스트 조회
@@ -171,7 +171,7 @@ public class HikingService {
         //선호 시간 조회
         Integer preferTime = hikingRepository.getPreferTimeByUserId(findUserId);
 
-        log.info(hikingStatistic.toString());
+//        log.info(hikingStatistic.toString());
 
         return HikingStatisticResponseDto.createHikingStatisticResponseDto(hikingStatistic, totalBlockedCount, findUser.getNickname(), siteList, programList, preferTime);
 

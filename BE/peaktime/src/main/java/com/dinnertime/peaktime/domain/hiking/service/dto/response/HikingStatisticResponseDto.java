@@ -2,14 +2,16 @@ package com.dinnertime.peaktime.domain.hiking.service.dto.response;
 
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.UsingInfo;
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingStatisticQueryDto;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class HikingStatisticResponseDto {
 
     private String nickname;
@@ -50,6 +52,19 @@ public class HikingStatisticResponseDto {
                 .preferTimeZone(preferTimeZone)
                 .mostSiteList(mostSiteList)
                 .mostProgramList(mostProgramList)
+                .build();
+    }
+
+    public static HikingStatisticResponseDto createNoHiking(String nickname) {
+        return HikingStatisticResponseDto.builder()
+                .nickname(nickname)
+                .totalHikingTime(0)
+                .totalHikingCount(0L)
+                .totalSuccessCount(0)
+                .totalBlockedCount(0L)
+                .preferTimeZone(0)
+                .mostSiteList(null)
+                .mostProgramList(null)
                 .build();
     }
 }
