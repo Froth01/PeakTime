@@ -1,4 +1,10 @@
-const DataFormat = (title, data, unit, data2 = null, unit2 = null) => {
+import PropTypes from "prop-types";
+import CircleChart from "./Chart/CircleChart";
+import CircleChartByChartJS from "./Chart/CircleChartByChartJS";
+import HorizontalBarChart from "./Chart/HorizontalBarChart";
+import ScatterPlotChart from "./Chart/ScatterPlotChart";
+
+const DataFormat = ({ title, data, unit, data2 = null, unit2 = null }) => {
   return (
     <div>
       <h2 className="">{title}</h2>
@@ -17,64 +23,14 @@ const DataFormat = (title, data, unit, data2 = null, unit2 = null) => {
   );
 };
 
-const StatisticsReport = () => {
-  //////////////////////////////////////
-  // dummy data
-  const data = {
-    nickname: "test",
-    totalHikingTime: 1520,
-    totalHikingCount: 65,
-    totalSuccessCount: 2,
-    totalBlockedCount: 13,
-    preferTimeZone: 10,
-    mostSiteList: [
-      {
-        usingTime: 6760,
-        name: "더미",
-      },
-      {
-        usingTime: 40,
-        name: "string",
-      },
-    ],
-    mostProgramList: [
-      {
-        usingTime: 52,
-        name: "chrome.exe",
-      },
-      {
-        usingTime: 40,
-        name: "string",
-      },
-      {
-        usingTime: 14,
-        name: "electron.exe",
-      },
-      {
-        usingTime: 0,
-        name: "Figma.exe",
-      },
-    ],
-  };
-  //////////////////////////////////////
+const StatisticsReport = ({ data }) => {
 
-  const {
-    nickname,
-    totalHikingTime,
-    totalHikingCount,
-    totalSuccessCount,
-    totalBlockedCount,
-    preferTimeZone,
-    mostSiteList,
-    mostProgramList,
-  } = data;
-
-  const rateToSuccess = (100 * (totalSuccessCount / totalHikingCount)).toFixed(
+  const rateToSuccess = (100 * (data.totalSuccessCount / data.totalHikingCount)).toFixed(
     1
   );
-  const avgHikingTime = (totalHikingTime / totalHikingCount).toFixed(1);
-  const avgBlockedByHiking = (totalBlockedCount / totalHikingCount).toFixed(1);
-  const avgBlockedByHour = (totalBlockedCount / (totalHikingTime / 60)).toFixed(
+  const avgHikingTime = (data.totalHikingTime / data.totalHikingCount).toFixed(1);
+  const avgBlockedByHiking = (data.totalBlockedCount / data.totalHikingCount).toFixed(1);
+  const avgBlockedByHour = (data.totalBlockedCount / (data.totalHikingTime / 60)).toFixed(
     1
   );
 
@@ -84,17 +40,17 @@ const StatisticsReport = () => {
         <div className="flex">
           <DataFormat
             title={"총 하이킹 시간"}
-            data={totalHikingTime}
+            data={data.totalHikingTime}
             unit={"분"}
           />
           <DataFormat
             title={"총 하이킹 횟수"}
-            data={totalHikingCount}
+            data={data.totalHikingCount}
             unit={"회"}
           />
           <DataFormat
             title={"성공 횟수 / 성공률"}
-            data={totalSuccessCount}
+            data={data.totalSuccessCount}
             unit={"회"}
             data2={rateToSuccess}
             unit2={"%"}
@@ -119,23 +75,60 @@ const StatisticsReport = () => {
           />
         </div>
 
-        <div className="flex flex-col">
+        <div className="flex flex-col text-left">
           <DataFormat
             title={"가장 많이 접속한 사이트"}
-            data={mostSiteList.length > 0 ? mostSiteList[0].site : ""}
+            data={data.mostSiteList.length > 0 ? data.mostSiteList[0].name : ""}
             unit={""}
           />
           <DataFormat
             title={"가장 많이 사용한 프로그램"}
-            data={mostProgramList.length > 0 ? mostProgramList[0].program : ""}
+            data={data.mostProgramList.length > 0 ? data.mostProgramList[0].name : ""}
             unit={""}
           />
         </div>
       </div>
 
       {/* 차트 */}
+      <div>
+        <CircleChart startTimeList={data.startTimeList} />
+        <CircleChartByChartJS startTimeList={data.startTimeList} />
+        <HorizontalBarChart startTimeList={data.startTimeList} />
+        <ScatterPlotChart startTimeList={data.startTimeList} />
+    </div>
     </div>
   );
+};
+
+DataFormat.propTypes = {
+  title: PropTypes.string.isRequired,
+  data: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  unit: PropTypes.string,
+  data2: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  unit2: PropTypes.string,
+}
+
+StatisticsReport.propTypes = {
+  data: PropTypes.shape({
+    nickname: PropTypes.string.isRequired,
+    totalHikingTime: PropTypes.number.isRequired,
+    totalHikingCount: PropTypes.number.isRequired,
+    totalSuccessCount: PropTypes.number.isRequired,
+    totalBlockedCount: PropTypes.number.isRequired,
+    startTimeList: PropTypes.arrayOf(PropTypes.string).isRequired,
+    mostSiteList: PropTypes.arrayOf(
+      PropTypes.shape({
+        usingTime: PropTypes.number.isRequired,
+        name: PropTypes.string.isRequired,
+      })
+    ).isRequired, // 객체 배열
+    mostProgramList: PropTypes.arrayOf(
+      PropTypes.shape({
+        usingTime: PropTypes.number.isRequired,
+        name: PropTypes.string.isRequired,
+      })
+    ).isRequired, // 객체 배열
+  }).isRequired,
 };
 
 export default StatisticsReport;
