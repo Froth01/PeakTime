@@ -139,35 +139,11 @@ public class ScheduleService {
 
     @Transactional
     public void deleteSchedule(Timer timer) {
-//        int repeatDay = timer.getRepeatDay();
-//        LocalTime startTime = timer.getStartTime().toLocalTime();
-//
-//        List<Integer> dayOfWeekList = new ArrayList<>();
-//
-//        for(int day=0; day<DAY;day++) {
-//            if((repeatDay & (1 << day)) != 0) {
-//                dayOfWeekList.add(day);
-//            }
-//        }
-//
-//        scheduleRepository.deleteAllByTimer_TimerIdAndDayOfWeekInAndStartTime(timer.getTimerId(), dayOfWeekList, startTime);
         scheduleRepository.deleteAllByTimer_TimerId(timer.getTimerId());
     }
 
     @Transactional
     public void deleteSchedule(Long timerId) {
-//        int repeatDay = timer.getRepeatDay();
-//        LocalTime startTime = timer.getStartTime().toLocalTime();
-//
-//        List<Integer> dayOfWeekList = new ArrayList<>();
-//
-//        for(int day=0; day<DAY;day++) {
-//            if((repeatDay & (1 << day)) != 0) {
-//                dayOfWeekList.add(day);
-//            }
-//        }
-//
-//        scheduleRepository.deleteAllByTimer_TimerIdAndDayOfWeekInAndStartTime(timer.getTimerId(), dayOfWeekList, startTime);
         scheduleRepository.deleteAllByTimer_TimerId(timerId);
     }
 
