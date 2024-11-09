@@ -19,7 +19,7 @@ public class SchedulerService {
     private final RedisService redisService;
 
     //매일 0시에 실행
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
     public void addScheduling() {
         //오늘 날짜 기준으로 가져오기
         List<Schedule> scheduleList = scheduleService.getNowDaySchedule();
@@ -36,7 +36,7 @@ public class SchedulerService {
         int hour = now.getHour();
         int minute = now.getMinute();
 
-        int start = day * 14400 + hour * 60 + minute;
+        int start = day * 1440 + hour * 60 + minute;
 
         List<String> timerList = redisService.findTimerByStart(start);
 
@@ -44,7 +44,7 @@ public class SchedulerService {
             return;
         }
 
-        log.info(now.toString());
+        log.info("exist timer: "+ now);
 
         timerList.forEach(timer -> {
             String[] split = timer.split("-");

@@ -12,4 +12,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     List<Schedule> findAllByDayOfWeek(int dayOfWeek);
 
     void deleteAllByTimer_TimerIdAndDayOfWeekInAndStartTime(long timerId, List<Integer> dayOfWeek, LocalTime startTime);
+
+    void deleteAllByTimer_TimerId(long timerId);
 }
