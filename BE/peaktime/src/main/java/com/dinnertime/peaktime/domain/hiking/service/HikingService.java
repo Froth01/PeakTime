@@ -2,8 +2,6 @@ package com.dinnertime.peaktime.domain.hiking.service;
 
 import com.dinnertime.peaktime.domain.content.entity.Content;
 import com.dinnertime.peaktime.domain.content.repository.ContentRepository;
-import com.dinnertime.peaktime.domain.group.entity.Group;
-import com.dinnertime.peaktime.domain.group.repository.GroupRepository;
 import com.dinnertime.peaktime.domain.hiking.entity.Hiking;
 import com.dinnertime.peaktime.domain.hiking.repository.HikingRepository;
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.UsingInfo;
@@ -26,11 +24,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -168,12 +168,14 @@ public class HikingService {
         List<UsingInfo> siteList = contentRepository.getTopUsingInfoListByUserId("site", findUserId);
         //프로그램 리스트 조회
         List<UsingInfo> programList = contentRepository.getTopUsingInfoListByUserId("program", findUserId);
-        //선호 시간 조회
-        Integer preferTime = hikingRepository.getPreferTimeByUserId(findUserId);
+        //시작 시간 리스트 조회
+        List<LocalDateTime> startDateTimeList = hikingRepository.getStartTimeListByUserId(findUserId);
 
-//        log.info(hikingStatistic.toString());
+        List<String> startTimeList = startDateTimeList.stream()
+                .map(localDateTime -> localDateTime.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")))
+                .collect(Collectors.toList());
 
-        return HikingStatisticResponseDto.createHikingStatisticResponseDto(hikingStatistic, totalBlockedCount, findUser.getNickname(), siteList, programList, preferTime);
+        return HikingStatisticResponseDto.createHikingStatisticResponseDto(hikingStatistic, totalBlockedCount, findUser.getNickname(), siteList, programList, startTimeList);
 
     }
 }
