@@ -35,7 +35,7 @@ public class Preset {
     @Column(name="block_program_array", nullable=false, columnDefinition = "jsonb")
     private List<String> blockProgramArray;
 
-    @ManyToOne(fetch= FetchType.LAZY) // 지연 로딩
+    @ManyToOne(fetch=FetchType.LAZY) // 지연 로딩
     @JoinColumn(name="user_id", nullable=false)
     private User user;
 

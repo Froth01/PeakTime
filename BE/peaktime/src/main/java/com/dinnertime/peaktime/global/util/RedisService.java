@@ -3,6 +3,7 @@ package com.dinnertime.peaktime.global.util;
 import com.dinnertime.peaktime.domain.schedule.entity.Schedule;
 import com.dinnertime.peaktime.domain.schedule.service.dto.RedisSchedule;
 import com.dinnertime.peaktime.domain.timer.entity.Timer;
+import com.dinnertime.peaktime.domain.timer.service.dto.request.TimerCreateRequestDto;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -178,7 +179,13 @@ public class RedisService {
         log.info("첫 스케줄 추가 완료: {}", key);
     }
 
-    public void checkForDuplicateTimer(Long groupId, int repeatDay, int plusMinute, int attentionTime) {
+    public void checkForDuplicateTimer(TimerCreateRequestDto requestDto) {
+        Long groupId = requestDto.getGroupId();
+        LocalDateTime startTime = requestDto.getStartTime();
+        int attentionTime = requestDto.getAttentionTime();
+        int repeatDay = requestDto.getRepeatDay();
+        int plusMinute = (startTime.getHour() * 60) + startTime.getMinute();
+
         IntStream.range(0, DAY)
                 .filter(i -> (repeatDay & (1 << i)) != 0)  // 해당 요일에 해당하는 비트가 1인 것들만 체크
                 .mapToObj(i -> new int[]{DAY_MINUTE * i + plusMinute, DAY_MINUTE * i + plusMinute + attentionTime})
@@ -206,7 +213,12 @@ public class RedisService {
                 });
     }
 
-    public void deleteScheduleByGroupId(Long groupId) {
+    public void deleteScheduleByTimer(Timer timer) {
+        String key = "schedule:" + LocalDate.now();
+        log.info("오늘 스케줄 추가: {}", key);
 
+        ListOperations<String, RedisSchedule> listOps = scheduleRedisTemplate.opsForList();
+
+        List<RedisSchedule> existingSchedules = listOps.range(key, 0, -1);
     }
 }
