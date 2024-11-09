@@ -62,7 +62,7 @@ public class HikingStatisticResponseDto {
                 .totalHikingCount(0L)
                 .totalSuccessCount(0)
                 .totalBlockedCount(0L)
-                .preferTimeZone(0)
+                .preferTimeZone(-1)
                 .mostSiteList(null)
                 .mostProgramList(null)
                 .build();
