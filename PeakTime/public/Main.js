@@ -3,6 +3,9 @@ import path from "path";
 import url from "url";
 import WebSocket, { WebSocketServer } from "ws";
 import { startWatcher, endWatcher } from "./processWatcher.js";
+import { checkDone, programProcess, resetProcess, siteProcess } from "./process.js";
+import dotenv from 'dotenv';
+dotenv.config();
 
 const __dirname = path.resolve();
 
@@ -14,6 +17,7 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, "public", "preload.js"),
       contextIsolation: true,
+      nodeIntegration: false, // 보안 상 비활성화
       sandbox: true,
       enableRemoteModule: false,
     },
@@ -52,14 +56,6 @@ ipcMain.on("websocket-message", (event, action) => {
     });
     console.log(count);
   }
-});
-
-// 하이킹 정보 받기
-ipcMain.on("hikingInfo", (event, data) => {
-  console.log("메인 프로세스에서 받은 하이킹 정보:", data);
-
-  // 하이킹 정보를 렌더러로 응답으로 보내기
-  event.reply("hikingInfoResponse", data);
 });
 
 app.whenReady().then(() => {
@@ -102,14 +98,23 @@ app.whenReady().then(() => {
   });
 });
 
+
+// 하이킹 정보 받기
+ipcMain.on("hikingInfo", (event, data) => {
+  const response = data.urlList;
+  siteProcess(response);
+  checkDone(event, data.hikingId);
+});
+
 // 차단 프로그램 시작
 ipcMain.on("start-block-program", (event, data) => {
   startWatcher(data);
+  resetProcess();
 });
 
 // 차단 프로그램 종료
-ipcMain.on("end-block-program", (event) => {
+ipcMain.on("end-block-program", (event, data) => {
   const response = endWatcher();
-  // 전달
-  event.reply("blockHistoryResponse", response);
+  programProcess(response);
+  checkDone(event, data);
 });

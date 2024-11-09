@@ -1,6 +1,7 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("electronAPI", {
+  getBackUrl: () => process.env.VITE_BACK_URL,
   sendWebSocketMessage: (message) =>
     ipcRenderer.send("websocket-message", message),
   onWebSocketMessage: (callback) =>
@@ -10,23 +11,16 @@ contextBridge.exposeInMainWorld("electronAPI", {
     console.log("sendHikingInfo :", data);
     ipcRenderer.send("hikingInfo", data);
   },
-  onHikingInfo: (callback) =>
-    ipcRenderer.on("hikingInfoResponse", (event, data) => {
-      console.log("onHikingInfo 발동 : ", data);
-      callback(data);
-    }),
+  // 프로그램 차단 시작
   startBlockProgram: (data) => {
     ipcRenderer.send("start-block-program", data);
   },
-  
-  endBlockProgram: () => {
-    ipcRenderer.send("end-block-program")
+  // 프로그램 차단 종료
+  endBlockProgram: (data) => {
+    ipcRenderer.send("end-block-program", data)
   },
-
-  onBlockHistory: (callback) => {
-    ipcRenderer.on("blockHistoryResponse", (event, data) => {
-      console.log("차단 히스토리 조회");
-      callback(data);
-    });
+  // 하이킹종료 프로세스 모두 완료시
+  onAllDone: (callback) => {
+    ipcRenderer.on('all-done', (event, data) => callback(data))
   }
 });

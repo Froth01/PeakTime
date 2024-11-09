@@ -1,13 +1,26 @@
 import axios from "axios";
-import { useUserStore } from "../stores/UserStore";
+import { useUserStore } from "../stores/UserStore.js";
 
 // zustand 스토어에서 상태 가져오기
 const getUserState = useUserStore.getState;
 
 // axios 객체 만들기
 const hikingsApi = axios.create({
-  baseURL: `${import.meta.env.VITE_BACK_URL}/api/v1/hikings`,
-}); // BASE_URL/api/vi/directories?category={category}
+  baseURL: ``,
+});
+
+// ipcRenderer로 값을 받아오기
+async function setBaseUrl() {
+  try {
+    const backUrl = await window.electron.getBackUrl(); // 메인 프로세스로부터 값 받기
+    hikingsApi.defaults.baseURL = `${backUrl}/api/v1/hikings`; // API URL 설정
+  } catch (error) {
+    console.error(error)
+    hikingsApi.defaults.baseURL = `${import.meta.env.VITE_BACK_URL}/api/v1/hikings`
+  }
+}
+
+setBaseUrl(); // URL 설정 함수 호출
 
 // axios 객체에 요청 인터셉터 추가하기 (헤더에 JWT Token 삽입하기)
 hikingsApi.interceptors.request.use(
