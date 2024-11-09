@@ -51,6 +51,8 @@ public class JwtFilter extends GenericFilterBean {
         long userId = jwtService.getUserId(jwt);
         String authority = jwtService.getAuthority(jwt);
 
+        log.info(authority);
+
         // 4. SecurityContextHolder의 Authentication의 Principal에 저장할 객체 생성 (개발자용)
         UserPrincipal userPrincipal = UserPrincipal.createUserPrincipal(userId, null, authority);
 

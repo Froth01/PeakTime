@@ -25,11 +25,11 @@ public class Group {
     @Column(name = "is_delete", nullable = false)
     private Boolean isDelete = false;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "preset_id", nullable = false)
     private Preset preset;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "root_user_id", nullable = false)
     private User user;
 

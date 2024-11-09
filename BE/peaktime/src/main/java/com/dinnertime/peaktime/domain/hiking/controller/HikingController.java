@@ -46,6 +46,9 @@ public class HikingController {
     @CommonSwaggerResponse.CommonResponses
     @PostMapping
     public ResponseEntity<?> startHiking(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody @Valid StartHikingRequestDto requestDto) {
+        
+        log.info("하이킹 시작");
+        
         StartHikingResponseDto responseDto = hikingService.startHiking(userPrincipal.getUserId(),  requestDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(), "하이킹을 시작하는데 성공하였습니다.", responseDto));

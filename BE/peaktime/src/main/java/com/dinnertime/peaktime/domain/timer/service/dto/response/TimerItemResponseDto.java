@@ -15,15 +15,13 @@ public class TimerItemResponseDto {
     private Long timerId;
     private LocalDateTime startTime;
     private int attentionTime;
-    private Boolean isRepeat;
     private int repeatDay;
 
     @Builder
-    private TimerItemResponseDto(Long timerId, LocalDateTime startTime, int attentionTime, Boolean isRepeat, int repeatDay) {
+    private TimerItemResponseDto(Long timerId, LocalDateTime startTime, int attentionTime, int repeatDay) {
         this.timerId = timerId;
         this.startTime = startTime;
         this.attentionTime = attentionTime;
-        this.isRepeat = isRepeat;
         this.repeatDay = repeatDay;
     }
 
@@ -32,7 +30,6 @@ public class TimerItemResponseDto {
                 .timerId(timer.getTimerId())
                 .startTime(timer.getStartTime())
                 .attentionTime(timer.getAttentionTime())
-                .isRepeat(timer.getIsRepeat())
                 .repeatDay(timer.getRepeatDay())
                 .build();
     }

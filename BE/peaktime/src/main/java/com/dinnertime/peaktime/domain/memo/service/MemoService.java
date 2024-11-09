@@ -37,7 +37,7 @@ public class MemoService {
     @Transactional(readOnly = true)
     public MemoWrapperResponseDto getMemos(Long userId) {
 
-        List<Memo> memos = memoRepository.findAllByUser_UserId(userId);
+        List<Memo> memos = memoRepository.findAllByUser_UserIdOrderByMemoIdAsc(userId);
 
         // redis에서 임시 저장되어있는 요약 횟수 가져오기
         Integer count = redisService.getGPTcount(userId);
