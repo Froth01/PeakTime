@@ -30,7 +30,7 @@ public class Schedule {
     @Column(name = "attention_time", nullable = false)
     private int attentionTime;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id", nullable = false)
     private Group group;
 
