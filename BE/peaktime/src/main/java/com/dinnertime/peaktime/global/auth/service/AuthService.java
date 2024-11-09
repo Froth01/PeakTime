@@ -6,6 +6,7 @@ import com.dinnertime.peaktime.domain.preset.entity.Preset;
 import com.dinnertime.peaktime.domain.preset.repository.PresetRepository;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
+import com.dinnertime.peaktime.domain.user.service.dto.request.SendCodeRequest;
 import com.dinnertime.peaktime.domain.usergroup.entity.UserGroup;
 import com.dinnertime.peaktime.domain.usergroup.repository.UserGroupRepository;
 import com.dinnertime.peaktime.global.auth.service.dto.request.LoginRequest;
@@ -18,12 +19,18 @@ import com.dinnertime.peaktime.global.auth.service.dto.security.UserPrincipal;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
 import com.dinnertime.peaktime.global.util.AuthUtil;
+import com.dinnertime.peaktime.global.util.EmailService;
 import com.dinnertime.peaktime.global.util.RedisService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -36,6 +43,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -53,6 +61,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final RedisService redisService;
+    private final EmailService emailService;
     private final UserRepository userRepository;
     private final PresetRepository presetRepository;
     private final GroupRepository groupRepository;
@@ -224,6 +233,24 @@ public class AuthService {
         jwtService.letRefreshTokenRemoved(httpServletResponse);
     }
 
+    // 인증 코드 전송
+    @Async
+    @Retryable(retryFor = { CustomException.class, RedisConnectionFailureException.class }, backoff = @Backoff(delay = 1500))
+    public void sendCode(SendCodeRequest sendCodeRequest) {
+        // 1. 인증 코드 생성
+        String code = this.generateCode();
+        // 2. 클라이언트에게 받은 이메일 주소로 인증 코드 보내기
+        emailService.sendCode(sendCodeRequest.getEmail(), code);
+        // 3. Redis에 Key가 emailCode라는 prefix와 이메일 주소로 이루어져 있고, Value가 랜덤 인증 코드인 정보를 저장하기
+        redisService.saveEmailCode(sendCodeRequest.getEmail(), code);
+    }
+
+    // @Retryable의 기본 시도 횟수 3회 실패 시 실행되는 메서드
+    @Recover
+    public void recover() {
+        throw new CustomException(ErrorCode.FAILED_SEND_EMAIL);
+    }
+
     // 아이디 중복 검사 (유저 로그인 아이디로 검사. 이미 존재하면 true 반환)
     private boolean checkDuplicateUserLoginId(String userLoginId) {
         return userRepository.findByUserLoginId(userLoginId).isPresent();
@@ -246,6 +273,16 @@ public class AuthService {
         User user = userRepository.findByUserId(userPrincipal.getUserId())
                 .orElseThrow(() -> new CustomException(ErrorCode.DO_NOT_HAVE_USER));
         return user.getPassword();
+    }
+
+    // 인증 코드 생성
+    private String generateCode() {
+        SecureRandom secureRandom = new SecureRandom();
+        StringBuilder sb = new StringBuilder(6);
+        for(int i = 0; i < 6; i++) {
+            sb.append(secureRandom.nextInt(10));
+        }
+        return sb.toString();
     }
 
 }

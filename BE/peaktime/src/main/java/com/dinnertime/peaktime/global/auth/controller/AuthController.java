@@ -1,5 +1,6 @@
 package com.dinnertime.peaktime.global.auth.controller;
 
+import com.dinnertime.peaktime.domain.user.service.dto.request.SendCodeRequest;
 import com.dinnertime.peaktime.global.auth.service.AuthService;
 import com.dinnertime.peaktime.global.auth.service.dto.request.LoginRequest;
 import com.dinnertime.peaktime.global.auth.service.dto.request.LogoutRequest;
@@ -159,6 +160,26 @@ public class AuthController {
                 .status(HttpStatus.OK)
                 .body(ResultDto.res(HttpStatus.OK.value(),
                         "로그아웃에 성공하였습니다."));
+    }
+
+    // 인증 코드 전송
+    @Operation(summary = "인증 코드 전송", description = "인증 코드 전송하기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "인증 코드 전송에 성공하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 형식의 요청입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "500", description = "이메일을 전송하는데 실패했습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+    })
+    @CommonSwaggerResponse.CommonResponses
+    @PostMapping("/code/send")
+    public ResponseEntity<?> sendCode(@RequestBody @Valid SendCodeRequest sendCodeRequest) {
+        authService.sendCode(sendCodeRequest);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResultDto.res(HttpStatus.OK.value(),
+                        "인증 코드 전송에 성공하였습니다."));
     }
 
 }

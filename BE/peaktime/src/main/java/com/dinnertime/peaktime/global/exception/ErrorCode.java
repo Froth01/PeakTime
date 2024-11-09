@@ -39,7 +39,8 @@ public enum ErrorCode {
     DO_NOT_HAVE_GROUP("존재하지 않는 그룹입니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_ROOT_PASSWORD("비밀번호가 일치하지 않습니다.", HttpStatus.CONFLICT),
     DUPLICATED_NICKNAME("현재와 동일한 닉네임입니다.", HttpStatus.CONFLICT),
-    DUPLICATED_PASSWORD("현재와 동일한 비밀번호입니다.", HttpStatus.CONFLICT)
+    DUPLICATED_PASSWORD("현재와 동일한 비밀번호입니다.", HttpStatus.CONFLICT),
+    FAILED_SEND_EMAIL("이메일을 전송하는데 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR)
     ;
 
     private final String message;
