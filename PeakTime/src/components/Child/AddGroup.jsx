@@ -133,11 +133,21 @@ function AddGroup({ onChangeContent, onChangeGroupList }) {
 
       <div>
         <label htmlFor="title">그룹명</label>
-        <input id="title" name="title" onChange={handleChangeTitle} />
+        <input
+          id="title"
+          name="title"
+          value={title}
+          onChange={handleChangeTitle}
+        />
       </div>
       <div>
         <label htmlFor="presetId">차단 프리셋 선택</label>
-        <select id="presetId" name="presetId" onChange={handleChangePresetId}>
+        <select
+          id="presetId"
+          name="presetId"
+          value={presetId}
+          onChange={handleChangePresetId}
+        >
           <option value="">프리셋을 선택하세요.</option>
           {presetList.map((preset) => (
             <option key={preset.presetId} value={preset.presetId}>
