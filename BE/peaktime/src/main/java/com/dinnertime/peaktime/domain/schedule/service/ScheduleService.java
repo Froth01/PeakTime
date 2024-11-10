@@ -27,6 +27,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -91,6 +92,7 @@ public class ScheduleService {
         }
     }
 
+    @Transactional(readOnly = true)
     public void send(Long groupId, int attentionTime) {
         Map<String, SseEmitter> sseEmitterList = emitterRepository.findEmitterByGroupId(groupId);
 
@@ -100,17 +102,15 @@ public class ScheduleService {
 
         Preset preset = group.getPreset();
 
-
         sseEmitterList.forEach(
-                (key, emitter) -> {
-                    //
+                (key, emitter) -> CompletableFuture.runAsync(() -> {
                     SendTimerResponseDto responseDto = SendTimerResponseDto.createSendTimerResponseDto(attentionTime, preset);
                     emitterRepository.saveEventCache(key, responseDto);
-
                     sendToClient(emitter, key, responseDto);
-                }
+                })
         );
     }
+
 
     @Transactional
     public List<Schedule> createSchedule(TimerCreateRequestDto requestDto, Timer timer) {
