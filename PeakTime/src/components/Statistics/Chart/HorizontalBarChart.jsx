@@ -1,99 +1,98 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import PropTypes from "prop-types";
-import { Chart, BarController, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
+import {
+  Chart,
+  BarController,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels"; // 플러그인 임포트
 
-Chart.register(BarController, CategoryScale, LinearScale, BarElement, Tooltip, Legend);
+Chart.register(
+  BarController,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Tooltip,
+  Legend,
+  ChartDataLabels // 플러그인 등록
+);
 
-const HorizontalBarChart = ({ startTimeList }) => {
-  const canvasRef = useRef(null);
+const HorizontalBarChart = ({ listArray }) => {
+  const chartRef = useRef(null);
+  const colors = ["#FF6384", "#FFCE56", "#03C777", "#36A2EB", "#9966FF"];
+
+  const dataArray = [...listArray, ...Array(5).fill(0)].slice(0, 5);
 
   useEffect(() => {
-    const totalMinutes = 12 * 60;
-    const AMTimes = [];
-    const PMTimes = [];
-
-    // AM과 PM 시간대 분리
-    startTimeList.forEach(time => {
-      const [hour, minute] = time.split(":");
-      const timeToMinutes = Number(hour) * 60 + Number(minute);
-      timeToMinutes < totalMinutes ? AMTimes.push(timeToMinutes) : PMTimes.push(timeToMinutes);
-    });
-
-    // 15분 단위 x축 레이블 생성 (0:00 ~ 11:45까지 15분 간격)
-    const labels = Array.from({ length: 48 }, (_, i) => `${Math.floor(i / 4)}:${(i % 4) * 15}`.padStart(4, '0').padEnd(5, '0'));
-
-    // AM 및 PM 시간대 데이터: 15분 단위로 카운트
-    const amData = Array(48).fill(0);
-    const pmData = Array(48).fill(0);
-
-    AMTimes.forEach(minutes => {
-      const index = Math.floor(minutes / 15); // 15분 단위 인덱스
-      amData[index] += 1;
-    });
-
-    PMTimes.forEach(minutes => {
-      const index = Math.floor((minutes - totalMinutes) / 15); // PM 시간대의 15분 단위 인덱스
-      pmData[index] += 1;
-    });
-
-    const chart = new Chart(canvasRef.current, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [
-          {
-            label: '오전',
-            data: amData,
-            backgroundColor: 'rgba(255, 69, 0, 0.6)',
-            borderColor: '#FF4500',
-            borderWidth: 0,
-          },
-          {
-            label: '오후',
-            data: pmData.map(value => -value), // PM 데이터는 음수로 변환하여 아래쪽에 표시
-            backgroundColor: 'rgba(52, 118, 208, 0.6)',
-            borderColor: '#3476D0',
-            borderWidth: 0,
-          }
-        ]
-      },
-      options: {
-        scales: {
-          x: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: 'Time of Day (15-minute intervals)'
-            }
-          },
-          y: {
-            beginAtZero: true,
-            suggestedMin: -Math.max(...pmData), // PM 데이터가 아래로 표시되도록 최소값 설정
-            title: {
-              display: true,
-              text: 'Tic Count'
-            }
-          }
+    if (chartRef.current) {
+      const chartInstance = new Chart(chartRef.current, {
+        type: "bar",
+        data: {
+          labels: dataArray.map((item) => item?.name || ""),
+          datasets: [
+            {
+              label: "사용 시간 (분)",
+              data: dataArray.map((item) => item.usingTime),
+              backgroundColor: colors.slice(0, dataArray.length),
+              borderColor: colors.slice(0, dataArray.length),
+              borderWidth: 1,
+            },
+          ],
         },
-        plugins: {
-          legend: {
-            display: true,
-            position: 'top'
-          }
-        }
-      }
-    });
+        options: {
+          indexAxis: "y",
+          responsive: false,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              beginAtZero: true,
+              min: 0,
+              title: {
+                display: true,
+                text: "시간 (분)", // x축 라벨
+              },
+            },
+            y: {
+              ticks: {
+                display: false,
+              },
+            },
+          },
+          plugins: {
+            legend: {
+              display: false,
+            },
+            datalabels: {
+              anchor: "end", // 데이터 레이블 위치 설정
+              align: "start",
+              color: "white",
+              formatter: (value, context) =>
+                context.chart.data.labels[context.dataIndex], // 막대 안에 name 표시
+            },
+          },
+        },
+      });
 
-    return () => {
-      chart.destroy();
-    };
-  }, [startTimeList]);
+      return () => {
+        chartInstance.destroy();
+      };
+    }
+  }, [listArray]);
 
-  return <canvas ref={canvasRef} />;
+  return <canvas ref={chartRef} className="" />;
 };
 
 HorizontalBarChart.propTypes = {
-  startTimeList: PropTypes.arrayOf(PropTypes.string).isRequired,
+  listArray: PropTypes.arrayOf(
+    PropTypes.shape({
+      usingTime: PropTypes.number.isRequired,
+      name: PropTypes.string.isRequired,
+    })
+  ).isRequired,
 };
 
 export default HorizontalBarChart;

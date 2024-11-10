@@ -5,14 +5,6 @@ import groupsApi from "../api/groupsApi";
 import StatisticsReport from "../components/Statistics/StatisticsReport";
 
 function StatisticPage() {
-  // // 라우팅 설정
-  // const navigate = useNavigate();
-
-  // // 뒤로가기
-  // const goBack = () => {
-  //   navigate(-1);
-  // };
-
   // root인지 sub인지 파악
   const user = JSON.parse(localStorage.getItem("user"));
 
@@ -34,20 +26,110 @@ function StatisticPage() {
     totalSuccessCount: 2,
     totalBlockedCount: 13,
     startTimeList: [
-      "09:30", "09:26", "09:28", "09:39", "09:38", "09:29", "09:36", "09:31", "09:37", "09:21",
-      "09:31", "09:39", "09:26", "09:39", "09:24", "09:22", "09:30", "09:33", "09:24", "09:23",
-      "09:25", "09:33", "09:26", "09:40", "09:31", "09:29", "09:24", "09:20", "09:21", "09:38",
-      "09:35", "09:24", "09:26", "09:35", "09:32", "14:05", "14:05", "14:06", "14:00", "14:01",
-      "14:15", "14:19", "14:20", "14:04", "14:15", "14:11", "14:01", "14:13", "14:17", "14:01",
-      "14:05", "14:06", "14:02", "14:15", "14:13", "14:09", "14:20", "14:10", "14:14", "14:14",
-      "14:00", "14:07", "14:01", "14:05", "14:11", "14:08", "14:11", "14:16", "14:18", "14:14",
-      "09:05", "01:18", "10:14", "11:20", "05:35", "16:50", "05:57", "04:49", "23:21", "12:05",
-      "08:18", "20:03", "23:25", "16:26", "13:42", "02:11", "08:00", "06:32", "06:39", "18:43",
-      "13:49", "04:24", "23:04", "07:31", "10:27", "19:38", "12:03", "16:51", "10:10", "09:47"
+      "09:30",
+      "09:26",
+      "09:28",
+      "09:39",
+      "09:38",
+      "09:29",
+      "09:36",
+      "09:31",
+      "09:37",
+      "09:21",
+      "09:31",
+      "09:39",
+      "09:26",
+      "09:39",
+      "09:24",
+      "09:22",
+      "09:30",
+      "09:33",
+      "09:24",
+      "09:23",
+      "09:25",
+      "09:33",
+      "09:26",
+      "09:40",
+      "09:31",
+      "09:29",
+      "09:24",
+      "09:20",
+      "09:21",
+      "09:38",
+      "09:35",
+      "09:24",
+      "09:26",
+      "09:35",
+      "09:32",
+      "14:05",
+      "14:05",
+      "14:06",
+      "14:00",
+      "14:01",
+      "14:15",
+      "14:19",
+      "14:20",
+      "14:04",
+      "14:15",
+      "14:11",
+      "14:01",
+      "14:13",
+      "14:17",
+      "14:01",
+      "14:05",
+      "14:06",
+      "14:02",
+      "14:15",
+      "14:13",
+      "14:09",
+      "14:20",
+      "14:10",
+      "14:14",
+      "14:14",
+      "14:00",
+      "14:07",
+      "14:01",
+      "14:05",
+      "14:11",
+      "14:08",
+      "14:11",
+      "14:16",
+      "14:18",
+      "14:14",
+      "09:05",
+      "01:18",
+      "10:14",
+      "11:20",
+      "05:35",
+      "16:50",
+      "05:57",
+      "04:49",
+      "23:21",
+      "12:05",
+      "08:18",
+      "20:03",
+      "23:25",
+      "16:26",
+      "13:42",
+      "02:11",
+      "08:00",
+      "06:32",
+      "06:39",
+      "18:43",
+      "13:49",
+      "04:24",
+      "23:04",
+      "07:31",
+      "10:27",
+      "19:38",
+      "12:03",
+      "16:51",
+      "10:10",
+      "09:47",
     ],
     mostSiteList: [
       {
-        usingTime: 6760,
+        usingTime: 296,
         name: "더미",
       },
       {
@@ -136,7 +218,7 @@ function StatisticPage() {
               onChange={handleChangeGroupId}
             >
               <option value="">{user.nickname}</option>
-              <option disabled>========</option>
+              <option disabled>==== 그룹 ====</option>
               {groupList?.map((group) => (
                 <option key={group.groupId} value={group.groupId}>
                   {group.groupTitle}
@@ -151,19 +233,25 @@ function StatisticPage() {
               onChange={handleChangeSubUserId}
               disabled={!selectedGroupId}
             >
-              {!selectedGroupId ? (
-                <option disabled value="">
-                  ========
-                </option>
-              ) : (
-                (
-                  groupList.find((group) => group.groupId === selectedGroupId)
-                    ?.childList || []
-                ).map((user) => (
-                  <option key={user.userId} value={user.userId}>
-                    {user.nickname}
+              {selectedGroupId ? (
+                groupList.find((group) => group.groupId === selectedGroupId)
+                  ?.childList?.length > 0 ? (
+                  groupList
+                    .find((group) => group.groupId === selectedGroupId)
+                    ?.childList.map((user) => (
+                      <option key={user.userId} value={user.userId}>
+                        {user.nickname}
+                      </option>
+                    ))
+                ) : (
+                  <option disabled value="">
+                    등록된 유저가 없습니다.
                   </option>
-                ))
+                )
+              ) : (
+                <option disabled value="">
+                  그룹을 선택하세요
+                </option>
               )}
             </select>
           </div>

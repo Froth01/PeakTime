@@ -8,7 +8,7 @@ function HomePage() {
   const { messages, setMessages } = useState([]);
 
   const handleLogout = () => {
-    userActions.setuser(null);
+    userActions.setUser(null);
     localStorage.removeItem("user");
   };
 
