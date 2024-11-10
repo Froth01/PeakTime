@@ -6,12 +6,9 @@ import com.dinnertime.peaktime.domain.preset.entity.Preset;
 import com.dinnertime.peaktime.domain.preset.repository.PresetRepository;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
-import com.dinnertime.peaktime.domain.user.service.dto.request.SendCodeRequest;
+import com.dinnertime.peaktime.global.auth.service.dto.request.*;
 import com.dinnertime.peaktime.domain.usergroup.entity.UserGroup;
 import com.dinnertime.peaktime.domain.usergroup.repository.UserGroupRepository;
-import com.dinnertime.peaktime.global.auth.service.dto.request.LoginRequest;
-import com.dinnertime.peaktime.global.auth.service.dto.request.LogoutRequest;
-import com.dinnertime.peaktime.global.auth.service.dto.request.SignupRequest;
 import com.dinnertime.peaktime.global.auth.service.dto.response.IsDuplicatedResponse;
 import com.dinnertime.peaktime.global.auth.service.dto.response.LoginResponse;
 import com.dinnertime.peaktime.global.auth.service.dto.response.ReissueResponse;
@@ -25,7 +22,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
@@ -40,16 +37,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -235,7 +225,7 @@ public class AuthService {
 
     // 인증 코드 전송
     @Async
-    @Retryable(retryFor = { CustomException.class, RedisConnectionFailureException.class }, backoff = @Backoff(delay = 1500))
+    @Retryable(retryFor = { CustomException.class, RedisConnectionFailureException.class, DataAccessException.class }, backoff = @Backoff(delay = 1500))
     public void sendCode(SendCodeRequest sendCodeRequest) {
         // 1. 인증 코드 생성
         String code = this.generateCode();
@@ -249,6 +239,26 @@ public class AuthService {
     @Recover
     public void recover() {
         throw new CustomException(ErrorCode.FAILED_SEND_EMAIL);
+    }
+
+    // 인증 코드 확인
+    @Transactional
+    public void checkCode(CheckCodeRequest checkCodeRequest) {
+        // 1. 클라이언트의 요청에서 email과 code를 추출하기
+        String email = checkCodeRequest.getEmail();
+        String code = checkCodeRequest.getCode();
+        // 2. 클라이언트에게 받은 email에 대응하는 Redis 데이터를 조회하고 비교하기
+        String redisEmailCode = redisService.getEmailCode(email);
+        if(redisEmailCode == null) {
+            throw new CustomException(ErrorCode.EMAIL_CODE_NOT_FOUND);
+        }
+        if(!code.equals(redisEmailCode)) {
+            throw new CustomException(ErrorCode.NOT_EQUAL_EMAIL_CODE);
+        }
+        // 3. 인증 코드가 일치하면, 우선 Redis에서 필요없는 데이터 삭제하기
+        redisService.removeEmailCode(email);
+        // 4. Redis에 Key가 emailAuthentication이라는 prefix와 이메일 주소로 이루어져 있고, Value가 "Authenticated"인 정보를 저장하기 (만료시간 X)
+        redisService.saveEmailAuthentication(email);
     }
 
     // 아이디 중복 검사 (유저 로그인 아이디로 검사. 이미 존재하면 true 반환)

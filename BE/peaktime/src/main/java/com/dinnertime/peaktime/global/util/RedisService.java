@@ -51,6 +51,21 @@ public class RedisService {
         redisTemplate.expire(key, 180, TimeUnit.SECONDS);
     }
 
+    public String getEmailCode(String email) {
+        String key = "emailCode:" + email;
+        return (String) redisTemplate.opsForValue().get(key);
+    }
+
+    public void removeEmailCode(String email) {
+        String key = "emailCode:" + email;
+        redisTemplate.delete(key);
+    }
+
+    public void saveEmailAuthentication(String email) {
+        String key = "emailAuthentication:" + email;
+        redisTemplate.opsForValue().set(key, "Authenticated");
+    }
+
     public Integer getGPTcount(Long userId) {
         String key = "gpt_usage_count: " + userId;
         Integer count = (Integer) redisTemplate.opsForValue().get(key);

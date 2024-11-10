@@ -40,7 +40,9 @@ public enum ErrorCode {
     INVALID_ROOT_PASSWORD("비밀번호가 일치하지 않습니다.", HttpStatus.CONFLICT),
     DUPLICATED_NICKNAME("현재와 동일한 닉네임입니다.", HttpStatus.CONFLICT),
     DUPLICATED_PASSWORD("현재와 동일한 비밀번호입니다.", HttpStatus.CONFLICT),
-    FAILED_SEND_EMAIL("이메일을 전송하는데 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR)
+    FAILED_SEND_EMAIL("이메일을 전송하는데 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    EMAIL_CODE_NOT_FOUND("인증시간이 만료되었거나 인증코드를 발급받지 않으셨습니다. 다시 시도해주세요.", HttpStatus.NOT_FOUND),
+    NOT_EQUAL_EMAIL_CODE("인증 코드가 일치하지 않습니다.", HttpStatus.CONFLICT)
     ;
 
     private final String message;

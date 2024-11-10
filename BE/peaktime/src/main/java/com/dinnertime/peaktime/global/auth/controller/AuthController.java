@@ -1,10 +1,7 @@
 package com.dinnertime.peaktime.global.auth.controller;
 
-import com.dinnertime.peaktime.domain.user.service.dto.request.SendCodeRequest;
+import com.dinnertime.peaktime.global.auth.service.dto.request.*;
 import com.dinnertime.peaktime.global.auth.service.AuthService;
-import com.dinnertime.peaktime.global.auth.service.dto.request.LoginRequest;
-import com.dinnertime.peaktime.global.auth.service.dto.request.LogoutRequest;
-import com.dinnertime.peaktime.global.auth.service.dto.request.SignupRequest;
 import com.dinnertime.peaktime.global.auth.service.dto.response.IsDuplicatedResponse;
 import com.dinnertime.peaktime.global.auth.service.dto.response.LoginResponse;
 import com.dinnertime.peaktime.global.auth.service.dto.response.ReissueResponse;
@@ -180,6 +177,30 @@ public class AuthController {
                 .status(HttpStatus.OK)
                 .body(ResultDto.res(HttpStatus.OK.value(),
                         "인증 코드 전송에 성공하였습니다."));
+    }
+
+    // 인증 코드 확인
+    @Operation(summary = "인증 코드 확인", description = "인증 코드 확인하기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "인증 코드 확인 요청에 성공하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 형식의 요청입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "404", description = "인증시간이 만료되었거나 인증코드를 발급받지 않으셨습니다. 다시 시도해주세요.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "409", description = "인증 코드가 일치하지 않습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "500", description = "인증 코드 확인 요청에 실패하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+    })
+    @CommonSwaggerResponse.CommonResponses
+    @PostMapping("/code/check")
+    public ResponseEntity<?> checkCode(@RequestBody @Valid CheckCodeRequest checkCodeRequest) {
+        authService.checkCode(checkCodeRequest);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResultDto.res(HttpStatus.OK.value(),
+                        "인증 코드 확인 요청에 성공하였습니다."));
     }
 
 }

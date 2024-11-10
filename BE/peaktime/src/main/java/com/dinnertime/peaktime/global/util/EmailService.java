@@ -24,7 +24,7 @@ public class EmailService {
     private final JavaMailSender javaMailSender;
 
     // 랜덤 인증 코드 보내기
-    public void sendCode(String email, String code) {
+    public void sendCode(String rx, String code) {
         LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(3);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH:mm");
         String formattedExpirationTime = expirationTime.format(formatter);
@@ -34,16 +34,16 @@ public class EmailService {
                         "<br><br>" + "인증 코드는 " + code + "입니다." +
                         "<br><br>" + "인증 코드는 " + formattedExpirationTime + "까지 유효합니다.";
 
-        this.send(email, title, content);
+        this.send(rx, title, content);
     }
 
     // 실제로 전송하는 메서드
-    private void send(String email, String title, String content) {
+    private void send(String rx, String title, String content) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "utf-8");
             helper.setFrom(this.tx);
-            helper.setTo(email);
+            helper.setTo(rx);
             helper.setSubject(title);
             helper.setText(content, true);
             javaMailSender.send(mimeMessage);
