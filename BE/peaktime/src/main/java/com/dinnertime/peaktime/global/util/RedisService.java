@@ -45,38 +45,40 @@ public class RedisService {
         redisTemplate.delete(key);
     }
 
-    public void saveEmailCode(String email, String code) {
-        String key = "emailCode:" + email;
+    public void saveEmailCode(String lowerEmail, String code) {
+        // 이미 이메일이 소문자로 변환되었다고 가정
+        String key = "emailCode:" + lowerEmail;
         redisTemplate.opsForValue().set(key, code);
         redisTemplate.expire(key, 180, TimeUnit.SECONDS);
     }
 
-    public String getEmailCode(String email) {
-        String key = "emailCode:" + email;
+    public String getEmailCode(String lowerEmail) {
+        // 이미 이메일이 소문자로 변환되었다고 가정
+        String key = "emailCode:" + lowerEmail;
         return (String) redisTemplate.opsForValue().get(key);
     }
 
-    public void removeEmailCode(String email) {
-        String key = "emailCode:" + email;
+    public void removeEmailCode(String lowerEmail) {
+        // 이미 이메일이 소문자로 변환되었다고 가정
+        String key = "emailCode:" + lowerEmail;
         redisTemplate.delete(key);
     }
 
-    public void saveEmailAuthentication(String email) {
-        // 이메일 주소를 소문자로 변환
-        String lowerEmail = AuthUtil.convertUpperToLower(email);
+    public void saveEmailAuthentication(String lowerEmail) {
+        // 이미 이메일이 소문자로 변환되었다고 가정
         String key = "emailAuthentication:" + lowerEmail;
         redisTemplate.opsForValue().set(key, "Authenticated");
     }
 
-    public String getEmailAuthentication(String email) {
+    public String getEmailAuthentication(String lowerEmail) {
         // 이미 이메일이 소문자로 변환되었다고 가정
-        String key = "emailAuthentication:" + email;
+        String key = "emailAuthentication:" + lowerEmail;
         return (String) redisTemplate.opsForValue().get(key);
     }
 
-    public void removeEmailAuthentication(String email) {
+    public void removeEmailAuthentication(String lowerEmail) {
         // 이미 이메일이 소문자로 변환되었다고 가정
-        String key = "emailAuthentication:" + email;
+        String key = "emailAuthentication:" + lowerEmail;
         redisTemplate.delete(key);
     }
 

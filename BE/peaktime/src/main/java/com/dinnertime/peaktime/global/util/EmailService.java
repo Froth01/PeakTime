@@ -1,6 +1,7 @@
 package com.dinnertime.peaktime.global.util;
 
 import com.dinnertime.peaktime.global.exception.CustomException;
+import com.dinnertime.peaktime.global.exception.EmailServerException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,13 @@ public class EmailService {
         this.send(rx, title, content);
     }
 
+    // 랜덤 비밀번호 보내기
+    public void sendPassword(String rx, String password) {
+        String title = "Peaktime 임시 비밀번호 발급 메일입니다!";
+        String content = "회원님의 임시 비밀번호는 " + password + "입니다.";
+        this.send(rx, title, content);
+    }
+
     // 실제로 전송하는 메서드
     private void send(String rx, String title, String content) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
@@ -48,7 +56,7 @@ public class EmailService {
             helper.setText(content, true);
             javaMailSender.send(mimeMessage);
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.FAILED_SEND_EMAIL);
+            throw new EmailServerException();
         }
     }
 

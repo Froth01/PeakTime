@@ -106,25 +106,34 @@ public class UserService {
             throw new CustomException(ErrorCode.INVALID_EMAIL_FORMAT);
         }
         // 2. 이메일 소문자로 변환
-        String email = AuthUtil.convertUpperToLower(updateEmailRequest.getEmail());
-        // 3. 현재 유저 엔티티 불러오기
-        User user = userRepository.findByUserId(userPrincipal.getUserId())
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        // 4. 이메일 중복 검사 (현재 이메일 주소와 비교하기) -> 둘 다 소문자 변환
-        if(email.equals(user.getEmail())) {
+        String lowerEmail = AuthUtil.convertUpperToLower(updateEmailRequest.getEmail());
+        // 3. 이메일 중복 검사
+        if(this.checkDuplicateEmail(lowerEmail)) {
             throw new CustomException(ErrorCode.DUPLICATED_EMAIL);
         }
-        // 5. 이메일 인증여부 검사
-        String redisEmailAuthentication = redisService.getEmailAuthentication(email);
+        // 4. 현재 유저 엔티티 불러오기
+        User user = userRepository.findByUserId(userPrincipal.getUserId())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        // 5. 현재 이메일 주소와 비교하기 -> 둘 다 소문자 변환 완료
+        if(lowerEmail.equals(user.getEmail())) {
+            throw new CustomException(ErrorCode.SAME_EMAIL);
+        }
+        // 6. 이메일 인증여부 검사
+        String redisEmailAuthentication = redisService.getEmailAuthentication(lowerEmail);
         if(redisEmailAuthentication == null || !redisEmailAuthentication.equals("Authenticated")) {
             throw new CustomException(ErrorCode.INVALID_EMAIL_AUTHENTICATION);
         }
-        // 6. 유저 엔티티에 새로운 이메일 집어넣기
-        user.setEmail(email);
-        // 7. Save User
+        // 7. 유저 엔티티에 새로운 이메일 집어넣기
+        user.setEmail(lowerEmail);
+        // 8. Save User
         userRepository.save(user);
-        // 8. Redis에서 emailAuthentication prefix 데이터 삭제
-        redisService.removeEmailAuthentication(email);
+        // 9. Redis에서 emailAuthentication prefix 데이터 삭제
+        redisService.removeEmailAuthentication(lowerEmail);
+    }
+
+    // 이메일 중복 검사 (이메일 주소로 검사. 이미 존재하면 true 반환)
+    private boolean checkDuplicateEmail(String lowerEmail) {
+        return userRepository.findByEmail(lowerEmail).isPresent();
     }
 
 }

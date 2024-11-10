@@ -205,4 +205,30 @@ public class AuthController {
                         "인증 코드 확인 요청에 성공하였습니다."));
     }
 
+    // 비밀번호 재발급
+    @Operation(summary = "비밀번호 재발급", description = "비밀번호 재발급하기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "비밀번호가 재발급되었습니다. 이메일을 확인해주세요.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 형식의 요청입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "403", description = "서브 계정은 비밀번호 재발급 기능을 이용할 수 없습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 아이디입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "409", description = "아이디에 해당하는 이메일 주소가 아닙니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "500", description = "이메일을 전송하는데 실패했습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+    })
+    @CommonSwaggerResponse.CommonResponses
+    @PutMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody @Valid ResetPasswordRequest resetPasswordRequest) {
+        authService.resetPassword(resetPasswordRequest);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResultDto.res(HttpStatus.OK.value(),
+                        "비밀번호가 재발급되었습니다. 이메일을 확인해주세요."));
+    }
+
 }
