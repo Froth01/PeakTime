@@ -3,6 +3,18 @@ import path from "path";
 import url from "url";
 import WebSocket, { WebSocketServer } from "ws";
 import { startWatcher, endWatcher } from "./processWatcher.js";
+import {
+  checkDone,
+  programProcess,
+  resetProcess,
+  siteProcess,
+} from "./process.js";
+
+import Store from "electron-store";
+import dotenv from "dotenv";
+
+dotenv.config();
+const store = new Store();
 
 const __dirname = path.resolve();
 
@@ -14,6 +26,7 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, "public", "preload.js"),
       contextIsolation: true,
+      nodeIntegration: false, // 보안 상 비활성화
       sandbox: true,
       enableRemoteModule: false,
     },
@@ -54,14 +67,6 @@ ipcMain.on("websocket-message", (event, action) => {
   }
 });
 
-// 하이킹 정보 받기
-ipcMain.on("hikingInfo", (event, data) => {
-  console.log("메인 프로세스에서 받은 하이킹 정보:", data);
-
-  // 하이킹 정보를 렌더러로 응답으로 보내기
-  event.reply("hikingInfoResponse", data);
-});
-
 app.whenReady().then(() => {
   createWindow();
   console.log(__dirname);
@@ -82,8 +87,6 @@ app.whenReady().then(() => {
       BrowserWindow.getAllWindows().forEach((win) => {
         win.webContents.send("websocket-message", message);
       });
-      // 클라이언트에게 응답 보내기
-      ws.send(JSON.stringify({ website: "mashable.com" }));
     });
 
     // 클라이언트 연결 종료
@@ -102,14 +105,50 @@ app.whenReady().then(() => {
   });
 });
 
+// 하이킹 정보 받기
+ipcMain.on("hikingInfo", async (event, data) => {
+  try {
+    console.log("hikingInfo Main on");
+    const accessToken = await store.get("accessToken");
+    console.log("store accessToken : ", accessToken);
+
+    const response = data.urlList;
+    await siteProcess(response); // 비동기 처리 완료 기다리
+    console.log("siteProcess :", response);
+    checkDone(event, data.hikingId, accessToken);
+  } catch (error) {
+    console.error("hikingInfo error :", error);
+  }
+});
+
 // 차단 프로그램 시작
 ipcMain.on("start-block-program", (event, data) => {
   startWatcher(data);
+  resetProcess();
+});
+
+// .env에서 로드된 환경 변수 반환
+ipcMain.handle("getBackUrl", (event) => {
+  return process.env.BACK_URL; // .env에서 로드한 BACK_URL 반환
+});
+
+//토큰 받기
+ipcMain.on("sendAccessToken", (event, token) => {
+  console.log("Received access token:", token);
+  store.set("accessToken", token);
 });
 
 // 차단 프로그램 종료
-ipcMain.on("end-block-program", (event) => {
-  const response = endWatcher();
-  // 전달
-  event.reply("blockHistoryResponse", response);
+ipcMain.on("end-block-program", async (event, data) => {
+  try {
+    console.log("program end Main on");
+    const accessToken = await store.get("accessToken");
+    console.log("store accessToken : ", accessToken);
+    const response = endWatcher();
+    await programProcess(response); // 비동기 처리 완료 기다리기
+    console.log("programProcess :", response);
+    checkDone(event, data, accessToken);
+  } catch (error) {
+    console.error("program error:", error);
+  }
 });
