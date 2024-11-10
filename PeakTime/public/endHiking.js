@@ -1,6 +1,6 @@
-import { hikingsApi, setBaseUrl } from "../src/api/hikingsApi.js";
+import hikingsApi, { setBaseUrl } from "../src/api/hikingsApi.js";
 
-export async function endHikingProcess(sumData, startedHikingId) {
+export async function endHikingProcess(sumData, startedHikingId, accessToken) {
   //현재 시간 포맷 생성
   const now = new Date();
   const year = now.getFullYear();
@@ -23,16 +23,21 @@ export async function endHikingProcess(sumData, startedHikingId) {
   };
   await setBaseUrl();
 
-  return hikingsApi.put(`${startedHikingId}`,
-    endHikingData
-  ).then(
-    response => {
-      console.log('끝내기 api 결과 : ', response)
-      return 'done'
-    }
-  ).catch((error) => {
-    console.log(error)
-  })
-
+  return hikingsApi
+    .put(
+      `${process.env.VITE_BACK_URL}/api/v1/hikings/${startedHikingId}`,
+      endHikingData,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    )
+    .then((response) => {
+      console.log("끝내기 api 결과 : ", response);
+      return "done";
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 }
-

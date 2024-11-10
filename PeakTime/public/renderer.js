@@ -1,6 +1,16 @@
 //하이킹 시작
 document.addEventListener("hikingStart", (event) => {
   console.log("스타트 커스텀 이벤트 발생, event정보 :", event.detail);
+  if (typeof window !== "undefined" && window.electronAPI) {
+    // 상태를 Electron 메인 프로세스로 보내기
+    const user = JSON.parse(localStorage.getItem("user"));
+    const accessToken = user?.accessToken;
+    console.log("renderer.js userinfo : ", user);
+    if (accessToken) {
+      window.electronAPI.sendAccessToken(accessToken); // IPC 채널로 토큰 전달
+      console.log("send accessToken info", accessToken);
+    }
+  }
   window.electronAPI.sendWebSocketMessage(
     JSON.stringify({
       action: "start",
@@ -71,6 +81,3 @@ function handleParsedMessage(parsedMessage) {
     window.electronAPI.sendHikingInfo(parsedMessage);
   }
 }
-
-// 정보 다 받았을때
-// window.electronAPI.onAllDone(() => )

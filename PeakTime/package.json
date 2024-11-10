@@ -19,6 +19,7 @@
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.7",
     "dotenv": "^16.4.5",
+    "electron-store": "^10.0.0",
     "flowbite-react": "^0.10.2",
     "gsap": "^3.12.5",
     "postcss": "^8.4.47",

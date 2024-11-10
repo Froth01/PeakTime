@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import hikingsApi from "../../api/hikingsApi.js";
+import hikingsApi, { setBaseUrl } from "../../api/hikingsApi.js";
 
 function Timer() {
   const [inputTime, setInputTime] = useState(""); // 사용자 입력 시간 (분 단위)
@@ -110,7 +110,10 @@ function Timer() {
           stopNow();
 
           // 커스텀 이벤트
-          const hikingStart = new CustomEvent("hikingStart", { bubbles: true, detail: { startedHikingId: responseStartHiking.data.data.hikingId } });
+          const hikingStart = new CustomEvent("hikingStart", {
+            bubbles: true,
+            detail: { startedHikingId: responseStartHiking.data.data.hikingId },
+          });
           const startBtn = document.getElementById("start");
           startBtn.dispatchEvent(hikingStart);
         } catch (err) {
@@ -160,6 +163,7 @@ function Timer() {
     console.log("onBlockHistory 리스너 등록 중");
     window.electronAPI.onAllDone(allDone);
 
+    setBaseUrl();
     startNow();
   }, []);
 
@@ -219,11 +223,12 @@ function Timer() {
           console.log("취소 로직 작동");
 
           // 종료 커스텀 이벤트 발생시키기
-          const hikingEnd = new CustomEvent("hikingEnd", { bubbles: true, detail: { startedHikingId } });
+          const hikingEnd = new CustomEvent("hikingEnd", {
+            bubbles: true,
+            detail: { startedHikingId },
+          });
           const endBtn = document.getElementById("giveup");
           endBtn.dispatchEvent(hikingEnd);
-
-
 
           // 상태 업데이트
           setTotalTime(0);
@@ -246,18 +251,19 @@ function Timer() {
   };
   // 다 됐을떄
   const allDone = (data) => {
-    console.log('야진짜 다됐다', data)
-  }
+    console.log("야진짜 다됐다", data);
+  };
   return (
     <>
       <style>
         {/* 타이머 시계 css */}
         {`
           .timer {
-            background: ${isRunning
-            ? "-webkit-linear-gradient(left, #eee 50%, red 50%)"
-            : "#eee"
-          };
+            background: ${
+              isRunning
+                ? "-webkit-linear-gradient(left, #eee 50%, red 50%)"
+                : "#eee"
+            };
             border-radius: 100%;
             position: relative;
             height: 100%;
@@ -351,8 +357,8 @@ function Timer() {
             {isRunning
               ? formatTime(remainTime)
               : `${("00" + now.getHours().toString()).slice(-2)}:${(
-                "00" + now.getMinutes().toString()
-              ).slice(-2)}`}
+                  "00" + now.getMinutes().toString()
+                ).slice(-2)}`}
           </div>
           {!isRunning && (
             <>
