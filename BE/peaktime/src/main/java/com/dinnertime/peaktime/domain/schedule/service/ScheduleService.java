@@ -6,6 +6,7 @@ import com.dinnertime.peaktime.domain.preset.entity.Preset;
 import com.dinnertime.peaktime.domain.schedule.entity.Schedule;
 import com.dinnertime.peaktime.domain.schedule.repository.EmitterRepository;
 import com.dinnertime.peaktime.domain.schedule.repository.ScheduleRepository;
+import com.dinnertime.peaktime.domain.schedule.service.dto.RedisSchedule;
 import com.dinnertime.peaktime.domain.schedule.service.dto.response.SendTimerResponseDto;
 import com.dinnertime.peaktime.domain.timer.entity.Timer;
 import com.dinnertime.peaktime.domain.timer.service.dto.request.TimerCreateRequestDto;
@@ -26,6 +27,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -132,9 +134,14 @@ public class ScheduleService {
     }
 
     @Transactional(readOnly = true)
-    public List<Schedule> getNowDaySchedule() {
+    public List<RedisSchedule> getNowDaySchedule() {
         int dayOfWeek = DAY - LocalDate.now().getDayOfWeek().getValue();
-        return scheduleRepository.findAllByDayOfWeek(dayOfWeek);
+
+        List<Schedule> scheduleList = scheduleRepository.findAllByDayOfWeek(dayOfWeek);
+
+        return scheduleList.stream()
+                .map(RedisSchedule::createRedisSchedule)
+                .toList();
     }
 
     @Transactional

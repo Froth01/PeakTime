@@ -164,15 +164,11 @@ public class RedisService {
         }
     }
 
-    public void addFirstSchedule(List<Schedule> scheduleList) {
+    public void addFirstSchedule(List<RedisSchedule> scheduleList) {
         String key = "schedule:" + LocalDate.now();
 
-        List<RedisSchedule> redisScheduleList = scheduleList.stream()
-                .map(RedisSchedule::createRedisSchedule)
-                .toList();
-
         ListOperations<String, RedisSchedule> listOps = scheduleRedisTemplate.opsForList();
-        listOps.rightPushAll(key, redisScheduleList);
+        listOps.rightPushAll(key, scheduleList);
 
         // 자정까지 남은 시간으로 만료 설정
         LocalDateTime midnight = LocalDate.now().plusDays(1).atStartOfDay();
