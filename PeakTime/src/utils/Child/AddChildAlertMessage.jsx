@@ -78,7 +78,7 @@ const defaultMessage = {
   confirmButtonColor: "#03C777",
 };
 
-const handle404Messagae = (message) => {
+const handle404Message = (message) => {
   switch (message) {
     case "존재하지 않는 그룹입니다.":
       return groupNotFound;
@@ -105,7 +105,7 @@ export const Add_Child_ALERT_MESSAGE = (error = null) => {
       case 422:
         return limitExceeded;
       case 404:
-        return handle404Messagae(error.message);
+        return handle404Message(error.message);
       case 400:
         return emptyFieldWarning;
       default:
