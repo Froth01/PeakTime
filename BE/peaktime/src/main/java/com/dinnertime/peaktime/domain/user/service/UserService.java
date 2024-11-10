@@ -4,6 +4,7 @@ import com.dinnertime.peaktime.domain.group.entity.Group;
 import com.dinnertime.peaktime.domain.group.repository.GroupRepository;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
+import com.dinnertime.peaktime.domain.user.service.dto.request.UpdateEmailRequest;
 import com.dinnertime.peaktime.domain.user.service.dto.request.UpdateNicknameRequest;
 import com.dinnertime.peaktime.domain.user.service.dto.request.UpdatePasswordRequest;
 import com.dinnertime.peaktime.domain.user.service.dto.response.GetProfileResponse;
@@ -13,6 +14,7 @@ import com.dinnertime.peaktime.global.auth.service.dto.security.UserPrincipal;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
 import com.dinnertime.peaktime.global.util.AuthUtil;
+import com.dinnertime.peaktime.global.util.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +29,7 @@ import java.util.List;
 public class UserService {
 
     private final PasswordEncoder passwordEncoder;
+    private final RedisService redisService;
     private final UserRepository userRepository;
 
     // 프로필 조회
@@ -93,6 +96,35 @@ public class UserService {
         user.setPassword(encodedPassword);
         // 7. Save User
         userRepository.save(user);
+    }
+
+    // 이메일 변경
+    @Transactional
+    public void updateEmail(UpdateEmailRequest updateEmailRequest, UserPrincipal userPrincipal) {
+        // 1. 이메일 형식 검사
+        if(!AuthUtil.checkFormatValidationEmail(updateEmailRequest.getEmail())) {
+            throw new CustomException(ErrorCode.INVALID_EMAIL_FORMAT);
+        }
+        // 2. 이메일 소문자로 변환
+        String email = AuthUtil.convertUpperToLower(updateEmailRequest.getEmail());
+        // 3. 현재 유저 엔티티 불러오기
+        User user = userRepository.findByUserId(userPrincipal.getUserId())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        // 4. 이메일 중복 검사 (현재 이메일 주소와 비교하기) -> 둘 다 소문자 변환
+        if(email.equals(user.getEmail())) {
+            throw new CustomException(ErrorCode.DUPLICATED_EMAIL);
+        }
+        // 5. 이메일 인증여부 검사
+        String redisEmailAuthentication = redisService.getEmailAuthentication(email);
+        if(redisEmailAuthentication == null || !redisEmailAuthentication.equals("Authenticated")) {
+            throw new CustomException(ErrorCode.INVALID_EMAIL_AUTHENTICATION);
+        }
+        // 6. 유저 엔티티에 새로운 이메일 집어넣기
+        user.setEmail(email);
+        // 7. Save User
+        userRepository.save(user);
+        // 8. Redis에서 emailAuthentication prefix 데이터 삭제
+        redisService.removeEmailAuthentication(email);
     }
 
 }
