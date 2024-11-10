@@ -42,6 +42,9 @@ public class HikingService {
     private final UserGroupRepository userGroupRepository;
     private final RedisService redisService;
 
+    private static final int DAY = 7;
+    private static final int DAY_MINUTE = 1440;
+
     @Transactional
     public StartHikingResponseDto startHiking(Long userId, StartHikingRequestDto requestDto) {
         //유저 없으면 에러
@@ -57,11 +60,11 @@ public class HikingService {
             );
             //검증
             //월요일이 1 일요일이 7 -> 일요일이 0, 월이 6으로 변경
-            int day = 7 - startTime.getDayOfWeek().getValue();
+            int day = DAY - startTime.getDayOfWeek().getValue();
             //분 구함
-            int minute = startTime.getHour() * 60 + startTime.getMinute();
+            int minute = (startTime.getHour() * 60) + startTime.getMinute();
             //레디스 저장된 시간으로 구하기
-            int start = minute + (day * 14400);
+            int start = minute + (day * DAY_MINUTE);
             //child계정이 속한 그룹의 타이머에 속하는지 확인
             boolean checkDuplicated = redisService.checkTimerByGroupId(userGroup.getGroup().getGroupId(), start, start + requestDto.getAttentionTime());
             if (checkDuplicated) {
