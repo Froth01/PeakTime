@@ -96,6 +96,11 @@ public class AuthService {
         if(this.checkDuplicateEmail(email)) {
             throw new CustomException(ErrorCode.DUPLICATED_EMAIL);
         }
+        // 4-4. 이메일 인증여부 검사
+        String redisEmailAuthentication = redisService.getEmailAuthentication(email);
+        if(redisEmailAuthentication == null || !redisEmailAuthentication.equals("Authenticated")) {
+            throw new CustomException(ErrorCode.INVALID_EMAIL_AUTHENTICATION);
+        }
         // 5. Create User Entity
         User user = User.createRootUser(
                 userLoginId,
@@ -105,7 +110,9 @@ public class AuthService {
         );
         // 6. Save User
         userRepository.save(user);
-        // 7. Create Block Website Array For Default Preset
+        // 7. Redis에서 emailAuthenticaion prefix 데이터 삭제
+        redisService.removeEmailAuthentication(email);
+        // 8. Create Block Website Array For Default Preset
         List<String> blockWebsiteList;
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("DistractionsWebsites.txt")) {
             if (inputStream == null) {
@@ -117,9 +124,9 @@ public class AuthService {
         } catch (IOException e) {
             throw new CustomException(ErrorCode.FILE_NOT_FOUND);
         }
-        // 8. Create Default Preset
+        // 9. Create Default Preset
         Preset preset = Preset.createDefaultPreset(blockWebsiteList, user);
-        // 9. Save Preset
+        // 10. Save Preset
         presetRepository.save(preset);
     }
 
@@ -257,7 +264,7 @@ public class AuthService {
         }
         // 3. 인증 코드가 일치하면, 우선 Redis에서 필요없는 데이터 삭제하기
         redisService.removeEmailCode(email);
-        // 4. Redis에 Key가 emailAuthentication이라는 prefix와 이메일 주소로 이루어져 있고, Value가 "Authenticated"인 정보를 저장하기 (만료시간 X)
+        // 4. Redis에 Key가 emailAuthentication이라는 prefix와 이메일 주소(소문자)로 이루어져 있고, Value가 "Authenticated"인 정보를 저장하기 (만료시간 X)
         redisService.saveEmailAuthentication(email);
     }
 

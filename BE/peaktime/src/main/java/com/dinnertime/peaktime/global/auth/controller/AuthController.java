@@ -38,6 +38,8 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "400", description = "잘못된 형식의 요청입니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "403", description = "이메일이 인증되지 않았습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "409", description = "이미 존재하는 아이디입니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "500", description = "일시적인 오류로 회원가입을 할 수 없습니다. 잠시 후 다시 이용해 주세요.",

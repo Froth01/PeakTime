@@ -62,8 +62,22 @@ public class RedisService {
     }
 
     public void saveEmailAuthentication(String email) {
-        String key = "emailAuthentication:" + email;
+        // 이메일 주소를 소문자로 변환
+        String lowerEmail = AuthUtil.convertUpperToLower(email);
+        String key = "emailAuthentication:" + lowerEmail;
         redisTemplate.opsForValue().set(key, "Authenticated");
+    }
+
+    public String getEmailAuthentication(String email) {
+        // 이미 이메일이 소문자로 변환되었다고 가정
+        String key = "emailAuthentication:" + email;
+        return (String) redisTemplate.opsForValue().get(key);
+    }
+
+    public void removeEmailAuthentication(String email) {
+        // 이미 이메일이 소문자로 변환되었다고 가정
+        String key = "emailAuthentication:" + email;
+        redisTemplate.delete(key);
     }
 
     public Integer getGPTcount(Long userId) {
