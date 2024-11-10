@@ -99,6 +99,14 @@ function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
       confirmButtonText: "확인",
       confirmButtonColor: "#03C777",
     },
+    // 그룹 타이머 요일 선택 조건 불만족
+    notSelectedRepeatDayError: {
+      title: "요일 선택 오류",
+      text: "요일을 하나 이상 선택해야 합니다.",
+      icon: "warning",
+      confirmButtonText: "확인",
+      confirmButtonColor: "#03C777",
+    },
     // 그룹 타이머 중복 오류
     duplicateGroupTimerError: {
       title: "타이머 중복",
@@ -183,7 +191,7 @@ function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
       }
     });
 
-    return selectedDays.join(", ") + "(반복)";
+    return selectedDays.join(", ");
   };
 
   const handleChangeTitle = (e) => {
@@ -218,15 +226,14 @@ function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
 
   // 그룹 타이머 추가 모달
   const openTimeSetModal = (groupId) => {
+    let root;
     let timerSetting = {};
 
     Swal.fire({
       title: "그룹 타이머 추가",
       html: `<div id="add-group-timer" />`,
       willOpen: () => {
-        const root = ReactDOM.createRoot(
-          document.getElementById("add-group-timer")
-        );
+        root = ReactDOM.createRoot(document.getElementById("add-group-timer"));
 
         const onSave = (saveFunction) => {
           timerSetting = saveFunction();
@@ -235,12 +242,16 @@ function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
         root.render(<AddGroupTimer groupId={groupId} onSave={onSave} />);
       },
       preConfirm: () => {
-        // attentionTime이 30분에서 240분 사이가 아니라면 경고 모달 띄우고 false 반환
         if (
           timerSetting.attentionTime < 30 ||
           timerSetting.attentionTime > 240
         ) {
+          // attentionTime이 30분에서 240분 사이가 아니라면 경고 모달 띄우고 false 반환
           Swal.fire(ALERT_MESSAGE.attentionTimeOutOfRangeError);
+          return false;
+        } else if (timerSetting.repeatDay <= 0) {
+          // 요일을 선택하지 않았다면 경고 모달 띄우고 false 반환
+          Swal.fire(ALERT_MESSAGE.notSelectedRepeatDayError);
           return false;
         }
 
@@ -248,7 +259,6 @@ function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
           .post("", timerSetting)
           .then((result) => {
             Swal.fire(ALERT_MESSAGE.successToCreateGroupTimer);
-            console.log(result);
             setGroupInfo(result.data.data);
             return true;
           })
@@ -265,10 +275,9 @@ function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
           });
       },
       didClose: () => {
-        const root = ReactDOM.createRoot(
-          document.getElementById("add-group-timer")
-        );
-        root.unmount();
+        if (root) {
+          root.unmount();
+        }
       },
       confirmButtonColor: "#03C777",
       confirmButtonText: "저장",
@@ -396,5 +405,6 @@ function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
 UpdateGroup.propTypes = {
   groupId: PropTypes.number.isRequired,
   onChangeContent: PropTypes.func.isRequired,
+  onChangeGroupList: PropTypes.func.isRequired,
 };
 export default UpdateGroup;

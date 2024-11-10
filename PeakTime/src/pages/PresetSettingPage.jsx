@@ -5,9 +5,10 @@ import PresetSetting from "../components/Preset/PresetSetting";
 function PresetSettingPage() {
   // 선택한 프리셋 정보
   const [selected, setSelected] = useState(null);
+  const [updateTrigger, setUpdateTrigger] = useState(false); // setting에서 list로 변경됨을 알려주는 trigger
 
-  const onPresetClick = (presetId) => {
-    setSelected(presetId + 1); // 선택된 presetId를 상태로 설정
+  const onPresetClick = (preset) => {
+    setSelected(preset); // 선택된 presetId를 상태로 설정
   };
 
   // 설정창 돌아가기
@@ -17,8 +18,17 @@ function PresetSettingPage() {
 
   return (
     <>
-      <PresetList onPresetClick={(id) => onPresetClick(id)} />
-      {selected && <PresetSetting presetId={selected} onCancel={onCancel} />}
+      <PresetList
+        onPresetClick={(preset) => onPresetClick(preset)}
+        updateTrigger={updateTrigger}
+      />
+      {selected && (
+        <PresetSetting
+          preset={selected}
+          onCancel={onCancel}
+          setUpdateTrigger={setUpdateTrigger}
+        />
+      )}
     </>
   );
 }
