@@ -155,9 +155,20 @@ public class HikingService {
 
         Long findUserId = Optional.ofNullable(childUserId).orElse(userId);
 
-        User findUser = userRepository.findByUserId(findUserId).orElseThrow(
-                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
-        );
+        User findUser = null;
+
+        //자식계정인 경우 체크
+        if(childUserId!=null) {
+            findUser = userRepository.findUserByRootUserInGroup(userId, childUserId).orElseThrow(
+                    () -> new CustomException(ErrorCode.CHILD_USER_NOT_FOUND)
+            );
+        }
+        //루트 계정인 경우
+        if(findUser==null) {
+            findUser = userRepository.findByUserIdAndIsDeleteFalse(findUserId).orElseThrow(
+                    () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+            );
+        }
 
         HikingStatisticQueryDto hikingStatistic = hikingRepository.getHikingStatistic(findUserId);
 
