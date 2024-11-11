@@ -128,7 +128,7 @@ function AddGroup({ onChangeContent, onChangeGroupList }) {
   };
 
   return (
-    <div className="absolute left-[40vw] w-[60vw] h-[100vh] bg-white">
+    <div className="absolute left-[43vw] w-[54vw] h-[84vh] my-[3vh] bg-[#333333] bg-opacity-70 rounded-lg">
       <h2>새 그룹 생성</h2>
 
       <div>
