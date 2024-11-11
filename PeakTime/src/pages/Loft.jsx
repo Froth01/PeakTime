@@ -94,7 +94,7 @@ const Loft = () => {
     // const hdrPath = path.join(__dirname, "../../public/models/loft/satara_night_no_lamps_2k.hdr")
 
     new RGBELoader().load(
-      "./resources/build/models/loft/satara_night_no_lamps_2k.hdr",
+      "../../resources/build/models/loft/satara_night_no_lamps_2k.hdr",
       // hdrPath,
       (texture) => {
         texture.mapping = THREE.EquirectangularReflectionMapping;
@@ -109,11 +109,11 @@ const Loft = () => {
       opacity: 0.3,
     });
     // FBX 모델 로드
-    // const lobbyloft = path.join(__dirname, "../../public/models/loft/satara_night_no_lamps_2k.hdr")
+    // const lobbyloft = path.join(__dirname, "../../public/models/loft/lobbyloft.fbx")
 
     const loader = new FBXLoader();
     loader.load(
-      "../../resources/build/models/loft/satara_night_no_lamps_2k.hdr", // FBX 파일 경로로 변경
+      "../../resources/build/models/loft/lobbyloft.fbx", // FBX 파일 경로로 변경
       // lobbyloft,
       (object) => {
         // 모델 로드 후 처리
