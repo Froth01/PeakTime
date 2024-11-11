@@ -47,7 +47,8 @@ public enum ErrorCode {
     SAME_EMAIL("기존과 동일한 이메일입니다.", HttpStatus.CONFLICT),
     USER_LOGIN_ID_NOT_FOUND("존재하지 않는 아이디입니다.", HttpStatus.NOT_FOUND),
     NOT_ROOT("서브 계정은 비밀번호 재발급 기능을 이용할 수 없습니다.", HttpStatus.FORBIDDEN),
-    NOT_EQUAL_EMAIL("아이디에 해당하는 이메일 주소가 아닙니다.", HttpStatus.CONFLICT)
+    NOT_EQUAL_EMAIL("아이디에 해당하는 이메일 주소가 아닙니다.", HttpStatus.CONFLICT),
+    SETTINGS_FOR_ROOT("서브 계정은 회원정보 관리 페이지에 접근할 수 없습니다.", HttpStatus.FORBIDDEN)
     ;
 
     private final String message;

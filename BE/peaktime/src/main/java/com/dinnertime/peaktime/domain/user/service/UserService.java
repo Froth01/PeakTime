@@ -4,6 +4,7 @@ import com.dinnertime.peaktime.domain.group.entity.Group;
 import com.dinnertime.peaktime.domain.group.repository.GroupRepository;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
+import com.dinnertime.peaktime.domain.user.service.dto.request.AllowSettingsRequest;
 import com.dinnertime.peaktime.domain.user.service.dto.request.UpdateEmailRequest;
 import com.dinnertime.peaktime.domain.user.service.dto.request.UpdateNicknameRequest;
 import com.dinnertime.peaktime.domain.user.service.dto.request.UpdatePasswordRequest;
@@ -129,6 +130,25 @@ public class UserService {
         userRepository.save(user);
         // 9. Redis에서 emailAuthentication prefix 데이터 삭제
         redisService.removeEmailAuthentication(lowerEmail);
+    }
+
+    // 회원정보 관리 페이지 접근 권한 검사
+    public void allowSettings(AllowSettingsRequest allowSettingsRequest, UserPrincipal userPrincipal) {
+        // 1. 유저 정보 불러오기
+        User user = userRepository.findByUserId(userPrincipal.getUserId())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        // 2. Root 계정인지 Child 계정인지 판별하기
+        if(!user.getIsRoot()) {
+            throw new CustomException(ErrorCode.SETTINGS_FOR_ROOT);
+        }
+        // 3. 클라이언트로부터 받은 비밀번호 형식 검사
+        if(!AuthUtil.checkFormatValidationPassword(allowSettingsRequest.getPassword())) {
+            throw new CustomException(ErrorCode.INVALID_PASSWORD_FORMAT);
+        }
+        // 4. 비밀번호가 일치하는지 확인하기
+        if(!passwordEncoder.matches(allowSettingsRequest.getPassword(), user.getPassword())) {
+            throw new CustomException(ErrorCode.INVALID_ROOT_PASSWORD);
+        }
     }
 
     // 이메일 중복 검사 (이메일 주소로 검사. 이미 존재하면 true 반환)
