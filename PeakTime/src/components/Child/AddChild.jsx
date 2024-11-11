@@ -1,18 +1,24 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
+import authApi from "../../api/authApi";
 import groupsApi from "../../api/groupsApi";
 import childrenApi from "../../api/childrenApi";
-import { Add_Child_ALERT_MESSAGE } from "../../utils/Child/AddChildAlertMessage";
+import {
+  errorToCheckIsIdDuplicated,
+  errorBeforeConfirm,
+  addChildAlertMessage,
+} from "../../utils/Child/AddChildAlertMessage";
 
-function AddChild({ onChangeContent, onChangeGroupList, groupList }) {
+function AddChild({ groupList, onChangeContent, onChangeGroupList }) {
   const [groupId, setGroupId] = useState("");
   const [childLoginId, setChildLoginId] = useState("");
   const [childPassword, setChildPassword] = useState("");
   const [childConfirmPassword, setChildConfirmPassword] = useState("");
   const [childNickname, setChildNickname] = useState("");
 
-  const [passwordcheck, setPasswordCheck] = useState(true);
+  const [passwordCheck, setPasswordCheck] = useState(true);
+  const [isDuplicate, setIsDuplicate] = useState(false); // false, "duplicated", "checked, "needToCheck"
 
   const resetAllInputs = () => {
     setGroupId("");
@@ -20,22 +26,61 @@ function AddChild({ onChangeContent, onChangeGroupList, groupList }) {
     setChildPassword("");
     setChildConfirmPassword("");
     setChildNickname("");
+    setPasswordCheck(true);
+    setIsDuplicate(false);
+  };
+
+  const duplicatedMessage = () => {
+    switch (isDuplicate) {
+      case "duplicated":
+        return (
+          <div style={{ color: "#F40000 " }}>
+            입력한 아이디는 이미 존재합니다.
+          </div>
+        );
+      case "checked":
+        return (
+          <div style={{ color: "#03C777" }}>사용 가능한 아이디입니다.</div>
+        );
+      case "needToCheck":
+        return (
+          <div style={{ color: "#F40000" }}>아이디 중복 확인이 필요합니다.</div>
+        );
+      default:
+        return;
+    }
   };
 
   // 아이디 중복 확인
   const handleCheckId = () => {
-
-  }
+    authApi
+      .get(`/user-login-id`, { params: { userLoginId: childLoginId } })
+      .then((result) => {
+        if (result.data.data.isDuplicated === true) {
+          setIsDuplicate("duplicated");
+        } else {
+          setIsDuplicate("checked");
+        }
+      })
+      .catch(() => Swal.fire(errorToCheckIsIdDuplicated));
+  };
 
   // 생성하기 클릭
   const handleConfirm = () => {
+    if (isDuplicate === false || isDuplicate === "needToCheck") {
+      setIsDuplicate("needToCheck");
+      return false;
+    }
+
     if (
+      isDuplicate !== "checked" ||
       !groupId ||
       !childLoginId ||
       !childPassword ||
       !childConfirmPassword ||
       !childNickname
     ) {
+      Swal.fire(errorBeforeConfirm);
       return false;
     }
 
@@ -49,15 +94,15 @@ function AddChild({ onChangeContent, onChangeGroupList, groupList }) {
       })
       .then(() => {
         resetAllInputs();
-        Swal.fire(Add_Child_ALERT_MESSAGE()).then(() => {
+        Swal.fire(addChildAlertMessage()).then(() => {
           groupsApi
             .get("")
             .then((result) => onChangeGroupList(result.data.data.groupList))
-            .catch((err) => console.log(err));
+            .catch();
         });
       })
       .catch((err) => {
-        Swal.fire(Add_Child_ALERT_MESSAGE(err));
+        Swal.fire(addChildAlertMessage(err));
       });
   };
 
@@ -111,10 +156,15 @@ function AddChild({ onChangeContent, onChangeGroupList, groupList }) {
             name="childLoginId"
             placeholder="로그인 아이디"
             value={childLoginId}
-            onChange={(e) => setChildLoginId(e.target.value)}
+            onChange={(e) => {
+              setChildLoginId(e.target.value);
+              setIsDuplicate("needToCheck");
+            }}
           />
-          {/* 이미 존재하는 아이디입니다 추가 예정 */}
-          <button onClick={handleCheckId}>아이디 중복 확인</button>
+          {duplicatedMessage()}
+          {isDuplicate !== "checked" && (
+            <button onClick={handleCheckId}>아이디 중복 확인</button>
+          )}
         </div>
         <div className="flex flex-col text-left">
           <div className="flex flex-col">
@@ -135,7 +185,11 @@ function AddChild({ onChangeContent, onChangeGroupList, groupList }) {
               value={childConfirmPassword}
               onChange={(e) => setChildConfirmPassword(e.target.value)}
             />
-            {!passwordcheck && <div style={{ color: "#F40000" }}>입력한 비밀번호가 일치하지 않습니다.</div>}
+            {!passwordCheck && (
+              <div style={{ color: "#F40000" }}>
+                입력한 비밀번호가 일치하지 않습니다.
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -148,8 +202,6 @@ function AddChild({ onChangeContent, onChangeGroupList, groupList }) {
 
 // props validation 추가
 AddChild.propTypes = {
-  onChangeContent: PropTypes.func.isRequired,
-  onChangeGroupList: PropTypes.func.isRequired,
   groupList: PropTypes.arrayOf(
     PropTypes.shape({
       groupId: PropTypes.number.isRequired,
@@ -163,6 +215,8 @@ AddChild.propTypes = {
       ).isRequired,
     })
   ).isRequired,
+  onChangeContent: PropTypes.func.isRequired,
+  onChangeGroupList: PropTypes.func.isRequired,
 };
 
 export default AddChild;

@@ -41,13 +41,18 @@ function ChildPage() {
       <ChildList onChangeContent={onChangeContent} groupList={groupList} />
       {showNow === "addChild" && (
         <AddChild
+          groupList={groupList}
           onChangeContent={onChangeContent}
           onChangeGroupList={onChangeGroupList}
-          groupList={groupList}
         />
       )}
       {showNow === "updateChild" && (
-        <UpdateChild childId={updateId} onChangeContent={onChangeContent} />
+        <UpdateChild
+          childId={updateId}
+          groupList={groupList}
+          onChangeContent={onChangeContent}
+          onChangeGroupList={onChangeGroupList}
+        />
       )}
       {showNow === "addGroup" && (
         <AddGroup

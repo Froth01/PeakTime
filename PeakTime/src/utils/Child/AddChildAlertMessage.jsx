@@ -95,7 +95,7 @@ const handle404Message = (message) => {
   }
 };
 
-export const Add_Child_ALERT_MESSAGE = (error = null) => {
+export const addChildAlertMessage = (error = null) => {
   if (!error) {
     return successToCreateUser;
   } else {
@@ -112,4 +112,20 @@ export const Add_Child_ALERT_MESSAGE = (error = null) => {
         return defaultMessage;
     }
   }
+};
+
+export const errorToCheckIsIdDuplicated = {
+  title: "중복 조회 중 오류 발생",
+  text: "아이디 중복 조회 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+  icon: "error",
+  confirmButtonText: "확인",
+  confirmButtonColor: "#03C777",
+};
+
+export const errorBeforeConfirm = {
+  title: "입력 정보 확인",
+  text: "입력하신 정보를 다시 한 번 확인해주세요.",
+  icon: "error",
+  confirmButtonText: "확인",
+  confirmButtonColor: "#03C777",
 };
