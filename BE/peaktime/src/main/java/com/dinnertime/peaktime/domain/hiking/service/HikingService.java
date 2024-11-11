@@ -2,8 +2,6 @@ package com.dinnertime.peaktime.domain.hiking.service;
 
 import com.dinnertime.peaktime.domain.content.entity.Content;
 import com.dinnertime.peaktime.domain.content.repository.ContentRepository;
-import com.dinnertime.peaktime.domain.group.entity.Group;
-import com.dinnertime.peaktime.domain.group.repository.GroupRepository;
 import com.dinnertime.peaktime.domain.hiking.entity.Hiking;
 import com.dinnertime.peaktime.domain.hiking.repository.HikingRepository;
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.UsingInfo;
@@ -26,11 +24,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -41,6 +41,9 @@ public class HikingService {
     private final ContentRepository contentRepository;
     private final UserGroupRepository userGroupRepository;
     private final RedisService redisService;
+
+    private static final int DAY = 7;
+    private static final int DAY_MINUTE = 1440;
 
     @Transactional
     public StartHikingResponseDto startHiking(Long userId, StartHikingRequestDto requestDto) {
@@ -57,11 +60,11 @@ public class HikingService {
             );
             //검증
             //월요일이 1 일요일이 7 -> 일요일이 0, 월이 6으로 변경
-            int day = 7 - startTime.getDayOfWeek().getValue();
+            int day = DAY - startTime.getDayOfWeek().getValue();
             //분 구함
-            int minute = startTime.getHour() * 60 + startTime.getMinute();
+            int minute = (startTime.getHour() * 60) + startTime.getMinute();
             //레디스 저장된 시간으로 구하기
-            int start = minute + (day * 14400);
+            int start = minute + (day * DAY_MINUTE);
             //child계정이 속한 그룹의 타이머에 속하는지 확인
             boolean checkDuplicated = redisService.checkTimerByGroupId(userGroup.getGroup().getGroupId(), start, start + requestDto.getAttentionTime());
             if (checkDuplicated) {
@@ -155,25 +158,38 @@ public class HikingService {
 
         Long findUserId = Optional.ofNullable(childUserId).orElse(userId);
 
-        User findUser = userRepository.findByUserId(findUserId).orElseThrow(
-                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
-        );
+        User findUser = null;
+
+        //자식계정인 경우 체크
+        if(childUserId!=null) {
+            findUser = userRepository.findUserByRootUserInGroup(userId, childUserId).orElseThrow(
+                    () -> new CustomException(ErrorCode.CHILD_USER_NOT_FOUND)
+            );
+        }
+        //루트 계정인 경우
+        if(findUser==null) {
+            findUser = userRepository.findByUserIdAndIsDeleteFalse(findUserId).orElseThrow(
+                    () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+            );
+        }
 
         HikingStatisticQueryDto hikingStatistic = hikingRepository.getHikingStatistic(findUserId);
 
-        if(hikingStatistic==null) return null;
+        if(hikingStatistic==null) return HikingStatisticResponseDto.createNoHiking(findUser.getNickname());
         //전체 차단 접근 횟수
         Long totalBlockedCount = hikingRepository.getTotalBlockedCount(findUserId);
         //사이트 리스트 조회
         List<UsingInfo> siteList = contentRepository.getTopUsingInfoListByUserId("site", findUserId);
         //프로그램 리스트 조회
         List<UsingInfo> programList = contentRepository.getTopUsingInfoListByUserId("program", findUserId);
-        //선호 시간 조회
-        Integer preferTime = hikingRepository.getPreferTimeByUserId(findUserId);
+        //시작 시간 리스트 조회
+        List<LocalDateTime> startDateTimeList = hikingRepository.getStartTimeListByUserId(findUserId);
 
-        log.info(hikingStatistic.toString());
+        List<String> startTimeList = startDateTimeList.stream()
+                .map(localDateTime -> localDateTime.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")))
+                .collect(Collectors.toList());
 
-        return HikingStatisticResponseDto.createHikingStatisticResponseDto(hikingStatistic, totalBlockedCount, findUser.getNickname(), siteList, programList, preferTime);
+        return HikingStatisticResponseDto.createHikingStatisticResponseDto(hikingStatistic, totalBlockedCount, findUser.getNickname(), siteList, programList, startTimeList);
 
     }
 }

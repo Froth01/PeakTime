@@ -14,6 +14,8 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Repository
@@ -123,14 +125,15 @@ public class HikingRepositoryImpl implements HikingRepositoryCustom {
     }
 
     @Override
-    public Integer getPreferTimeByUserId(Long userId) {
-        return queryFactory.select(hiking.startTime.hour())
+    public List<LocalDateTime> getStartTimeListByUserId(Long userId) {
+        return queryFactory.select(hiking.startTime)
                 .from(hiking)
-                .where(hiking.user.userId.eq(userId).and(hiking.realEndTime.isNotNull()))
-                .groupBy(hiking.startTime.hour())
-                .orderBy(hiking.startTime.hour().count().desc())
-                .limit(1)
-                .fetchOne();
+                .where(
+                        hiking.user.userId.eq(userId)
+                                .and(hiking.realEndTime.isNotNull())
+                                .and(hiking.realEndTime.after(hiking.endTime))
+                )
+                .fetch();
     }
 
     @Override

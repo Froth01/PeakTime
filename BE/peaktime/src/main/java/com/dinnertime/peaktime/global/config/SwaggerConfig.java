@@ -33,7 +33,7 @@ public class SwaggerConfig {
 
                 // 서버 URL을 HTTPS로 설정 및 기본 경로 추가
                 .servers(Arrays.asList(
-                        new Server().url("http://k11b309.p.ssafy.io:8080/api/v1"),
+//                        new Server().url("http://k11b309.p.ssafy.io:8080/api/v1"),
                         new Server().url("https://k11b309.p.ssafy.io/api/v1"),
                         new Server().url("http://localhost:8080/api/v1")));
     }

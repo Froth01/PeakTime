@@ -17,8 +17,6 @@ public class TimerRepositoryImpl implements TimerRepositoryCustom {
     public Boolean existsOverlappingTimers (Long groupId, LocalDateTime startTime, int attentionTime, int repeatDay) {
         LocalDateTime requestEndTime = startTime.plusMinutes(attentionTime);
 
-        QTimer timer = QTimer.timer;
-
         int repeatDayNumber = (repeatDay == 0) ? (int) Math.pow(2, 7 - startTime.getDayOfWeek().getValue()) : repeatDay;
 
         String query = "SELECT COUNT(*) FROM timers t " +

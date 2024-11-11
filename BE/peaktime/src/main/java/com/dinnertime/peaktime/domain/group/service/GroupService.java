@@ -152,7 +152,7 @@ public class GroupService {
                 .orElseThrow(() -> new CustomException(ErrorCode.GROUP_NOT_FOUND));
 
         // 그룹에 속해있는 child_user를 검색해서 삭제하기
-        userRepository.updateIsDeleteByGroupId(groupId, true);
+        userRepository.updateIsDeleteByGroupId(groupId);
         
         groupSelected.deleteGroup();
         groupRepository.save(groupSelected);

@@ -6,6 +6,8 @@ import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingDetailQuery
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingStatisticQueryDto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 public interface HikingRepositoryCustom {
@@ -17,7 +19,7 @@ public interface HikingRepositoryCustom {
 
     HikingStatisticQueryDto getHikingStatistic(Long findUserId);
 
-    Integer getPreferTimeByUserId(Long userId);
+    List<LocalDateTime> getStartTimeListByUserId(Long userId);
 
     Long getTotalBlockedCount(Long findUserId);
 }

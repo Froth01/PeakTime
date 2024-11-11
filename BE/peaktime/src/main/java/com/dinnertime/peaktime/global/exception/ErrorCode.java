@@ -48,7 +48,8 @@ public enum ErrorCode {
     USER_LOGIN_ID_NOT_FOUND("존재하지 않는 아이디입니다.", HttpStatus.NOT_FOUND),
     NOT_ROOT("서브 계정은 비밀번호 재발급 기능을 이용할 수 없습니다.", HttpStatus.FORBIDDEN),
     NOT_EQUAL_EMAIL("아이디에 해당하는 이메일 주소가 아닙니다.", HttpStatus.CONFLICT),
-    SETTINGS_FOR_ROOT("서브 계정은 회원정보 관리 페이지에 접근할 수 없습니다.", HttpStatus.FORBIDDEN)
+    SETTINGS_FOR_ROOT("서브 계정은 회원정보 관리 페이지에 접근할 수 없습니다.", HttpStatus.FORBIDDEN),
+    CHILD_USER_NOT_FOUND("자식 유저가 아니거나 찾을 수 없습니다.", HttpStatus.NOT_FOUND)
     ;
 
     private final String message;

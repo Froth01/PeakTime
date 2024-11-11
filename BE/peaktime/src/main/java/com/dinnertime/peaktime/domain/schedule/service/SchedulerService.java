@@ -1,11 +1,13 @@
 package com.dinnertime.peaktime.domain.schedule.service;
 
 import com.dinnertime.peaktime.domain.schedule.entity.Schedule;
+import com.dinnertime.peaktime.domain.schedule.service.dto.RedisSchedule;
 import com.dinnertime.peaktime.global.util.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,10 +21,12 @@ public class SchedulerService {
     private final RedisService redisService;
 
     //매일 0시에 실행
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
     public void addScheduling() {
         //오늘 날짜 기준으로 가져오기
-        List<Schedule> scheduleList = scheduleService.getNowDaySchedule();
+        List<RedisSchedule> scheduleList = scheduleService.getNowDaySchedule();
+
+        log.info(scheduleList.get(0).toString());
 
         //저장
         redisService.addFirstSchedule(scheduleList);
@@ -36,7 +40,7 @@ public class SchedulerService {
         int hour = now.getHour();
         int minute = now.getMinute();
 
-        int start = day * 14400 + hour * 60 + minute;
+        int start = day * 1440 + hour * 60 + minute;
 
         List<String> timerList = redisService.findTimerByStart(start);
 
@@ -44,7 +48,7 @@ public class SchedulerService {
             return;
         }
 
-        log.info(now.toString());
+        log.info("exist timer: "+ now);
 
         timerList.forEach(timer -> {
             String[] split = timer.split("-");
