@@ -9,7 +9,7 @@ function Toolbar() {
   };
 
   return (
-    <div className="bg-gray-200 w-[10vw] h-[100vh] absolute left-0 z-[2] flex flex-col items-center justify-around">
+    <div className="bg-gray-200 w-[8vw] h-[100vh] absolute left-0 z-[2] flex flex-col items-center justify-around">
       <button
         onClick={() => {
           handleMenu("/report");

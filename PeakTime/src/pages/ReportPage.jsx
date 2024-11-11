@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Title from "../components/common/Title";
 import Calendar from "../components/Report/Calendar"; // 캘린더
 import DailyReport from "../components/Report/DailyReport"; // 하루 요약
 
@@ -17,13 +18,14 @@ function ReportPage() {
   };
 
   return (
-    <>
+    <div className="h-[100vh] flex">
+      <Title title={"Calendar"} />
       <Calendar
         selectedDay={selectedDay}
         onDayClick={(day) => onDayClick(day)}
       />
       {selectedDay && <DailyReport day={selectedDay} onCancel={onCancel} />}
-    </>
+    </div>
   );
 }
 

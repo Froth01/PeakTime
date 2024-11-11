@@ -54,23 +54,18 @@ function Calendar({ selectedDay, onDayClick }) {
   }, []);
 
   return (
-    <div
-      className="absolute left-[10vw] w-[30vw] h-[100vh]"
-      style={{ backgroundColor: "#66AADF" }}
-    >
-      <h2 className="text-[50px] text-white">Calender</h2>
-
-      <div>
-        <span className="text-[50px] text-white mr-5">{month}월</span>
-        <span className="text-[25px] text-white">{year}년</span>
+    <div className="absolute left-[12vw] top-[5vh] w-[25vw] h-[90vh] bg-[#333333] bg-opacity-70 p-5 rounded-lg text-white">
+      <div className="text-left mb-[2vh]">
+        <span className="text-5xl text-white mr-2">{month}월</span>
+        <span className="text-2xl text-white">{year}년</span>
       </div>
 
-      <div className="inline-grid grid-cols-5 gap-1 justify-items-center items-center">
+      <div className="inline-grid grid-cols-5 gap-2 justify-items-center items-center">
         {hikingList.map((item, idx) => (
           <button
             key={idx + 1}
             onClick={() => handleDay(item.date)}
-            className={`text-white rounded-lg w-[5vw] h-[5vw] ${
+            className={`text-white rounded-lg w-[4vw] h-[4vw] ${
               item.date === selectedDay ? "border-4 border-white" : ""
             }`}
             style={{
