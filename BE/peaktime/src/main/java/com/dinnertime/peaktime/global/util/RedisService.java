@@ -36,6 +36,7 @@ public class RedisService {
     private static final int TTL = 24; // 하루 단위 gpt
     private static final int DAY = 7;
     private static final int DAY_MINUTE = 1440;
+    private static final int MAX_ATTENTION_TIME = 240;
 
     public void saveRefreshToken(long userId, String refreshToken) {
         String key = "refreshToken:" + userId;
@@ -76,7 +77,7 @@ public class RedisService {
         //key에 해당하는 score(start시간) 중 겹치는 것을 확인
         //최대 4시간 집중할 수 있으므로 시작시간 - 240부터 end시간까지 중 시작시간이 것을 확인
         //
-        Set<String> checkRange = zSet.rangeByScore(key, start-240, end);
+        Set<String> checkRange = zSet.rangeByScore(key, start-MAX_ATTENTION_TIME, end);
 
         // 겹치는지 검사
         //한개라도 겹치면 true
@@ -164,15 +165,11 @@ public class RedisService {
         }
     }
 
-    public void addFirstSchedule(List<Schedule> scheduleList) {
+    public void addFirstSchedule(List<RedisSchedule> scheduleList) {
         String key = "schedule:" + LocalDate.now();
 
-        List<RedisSchedule> redisScheduleList = scheduleList.stream()
-                .map(RedisSchedule::createRedisSchedule)
-                .toList();
-
         ListOperations<String, RedisSchedule> listOps = scheduleRedisTemplate.opsForList();
-        listOps.rightPushAll(key, redisScheduleList);
+        listOps.rightPushAll(key, scheduleList);
 
         // 자정까지 남은 시간으로 만료 설정
         LocalDateTime midnight = LocalDate.now().plusDays(1).atStartOfDay();
