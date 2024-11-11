@@ -18,13 +18,15 @@ function ReportPage() {
   };
 
   return (
-    <div className="h-[100vh] flex">
-      <Title title={"Calendar"} />
-      <Calendar
-        selectedDay={selectedDay}
-        onDayClick={(day) => onDayClick(day)}
-      />
-      {selectedDay && <DailyReport day={selectedDay} onCancel={onCancel} />}
+    <div className="h-[100vh] flex flex-col">
+      <Title title={"월간 하이킹 내역"} />
+      <div className="h-[90vh] top-[10vh]">
+        <Calendar
+          selectedDay={selectedDay}
+          onDayClick={(day) => onDayClick(day)}
+        />
+        {selectedDay && <DailyReport day={selectedDay} onCancel={onCancel} />}
+      </div>
     </div>
   );
 }

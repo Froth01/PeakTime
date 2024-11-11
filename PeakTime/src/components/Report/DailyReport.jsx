@@ -109,51 +109,49 @@ function DailyReport({ day, onCancel }) {
   };
 
   return (
-    <div className="absolute left-[37vw] w-[63vw] h-[100vh]">
-      <div className="bg-[#333333] bg-opacity-70 p-5 mx-[4vw] mt-[5vh] h-[90vh] text-white rounded-lg">
-        <div className="flex justify-around items-center">
-          <h2 className="text-6xl mt-[2vh] mb-[5vh]">Daily Report</h2>
-          {/* YYYY년 MM월 DD일 */}
-          <h3 className="text-left text-3xl">{expression(day, "YMD")}</h3>
-        </div>
-        <div className="flex flex-col justify-around h-[65vh]">
-          {dailyHikingList?.length === 0 ? (
-            // 내역이 없을 경우
-            <div className="text-2xl">선택한 날짜의 사용 기록이 없습니다.</div>
-          ) : (
-            // 내역이 있을 경우
-            dailyHikingList?.map((hiking) => (
-              <div key={hiking.hikingId}>
-                <button
-                  onClick={() => openHikingDetail(hiking.hikingId)}
-                  className="border"
-                >
-                  {/* "실제 시간 / 목표 시간" 표시 */}
-                  <div>
-                    {minutesExpression(
-                      hiking.startTime,
-                      hiking.endTime,
-                      hiking.realEndTime
-                    )}
-                  </div>
-
-                  {/* "시작 시각 ~ 목표 종료 시각" 표시 */}
-                  <div>
-                    {expression(hiking.startTime, "Hm")} ~{" "}
-                    {expression(hiking.endTime, "Hm")}
-                  </div>
-                </button>
-              </div>
-            ))
-          )}
-        </div>
-        <button
-          className="text-lg px-5 py-1 rounded-lg bg-[#66AADF]"
-          onClick={handleCancel}
-        >
-          닫기
-        </button>
+    <div className="relative bg-[#333333] bg-opacity-70 left-[43vw] w-[53vw] h-[84vh] my-[3vh] rounded-lg flex flex-col justify-start items-center text-start p-5">
+      <div className="flex justify-around items-center">
+        <h2 className="text-[40px] font-bold text-white">Daily Report</h2>
+        {/* YYYY년 MM월 DD일 */}
+        <h3 className="text-left text-3xl">{expression(day, "YMD")}</h3>
       </div>
+      <div className="flex flex-col justify-around h-[65vh]">
+        {dailyHikingList?.length === 0 ? (
+          // 내역이 없을 경우
+          <div className="text-2xl">선택한 날짜의 사용 기록이 없습니다.</div>
+        ) : (
+          // 내역이 있을 경우
+          dailyHikingList?.map((hiking) => (
+            <div key={hiking.hikingId}>
+              <button
+                onClick={() => openHikingDetail(hiking.hikingId)}
+                className="border"
+              >
+                {/* "실제 시간 / 목표 시간" 표시 */}
+                <div>
+                  {minutesExpression(
+                    hiking.startTime,
+                    hiking.endTime,
+                    hiking.realEndTime
+                  )}
+                </div>
+
+                {/* "시작 시각 ~ 목표 종료 시각" 표시 */}
+                <div>
+                  {expression(hiking.startTime, "Hm")} ~{" "}
+                  {expression(hiking.endTime, "Hm")}
+                </div>
+              </button>
+            </div>
+          ))
+        )}
+      </div>
+      <button
+        className="text-lg px-5 py-1 rounded-lg bg-[#66AADF]"
+        onClick={handleCancel}
+      >
+        닫기
+      </button>
     </div>
   );
 }
