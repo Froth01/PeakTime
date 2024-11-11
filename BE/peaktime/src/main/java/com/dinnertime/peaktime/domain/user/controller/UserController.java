@@ -1,6 +1,8 @@
 package com.dinnertime.peaktime.domain.user.controller;
 
 import com.dinnertime.peaktime.domain.user.service.UserService;
+import com.dinnertime.peaktime.domain.user.service.dto.request.AllowSettingsRequest;
+import com.dinnertime.peaktime.domain.user.service.dto.request.UpdateEmailRequest;
 import com.dinnertime.peaktime.domain.user.service.dto.request.UpdateNicknameRequest;
 import com.dinnertime.peaktime.domain.user.service.dto.request.UpdatePasswordRequest;
 import com.dinnertime.peaktime.domain.user.service.dto.response.GetProfileResponse;
@@ -122,6 +124,62 @@ public class UserController {
                 .status(HttpStatus.OK)
                 .body(ResultDto.res(HttpStatus.OK.value(),
                         "비밀번호 변경 요청에 성공하였습니다."));
+    }
+
+    // 이메일 변경
+    @Operation(summary = "이메일 변경", description = "이메일 변경하기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "이메일 변경 요청에 성공하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 형식의 요청입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "403", description = "이메일이 인증되지 않았습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않은 유저입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "409", description = "이미 존재하는 이메일입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "500", description = "이메일 변경 요청에 실패하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+    })
+    @CommonSwaggerResponse.CommonResponses
+    @PutMapping("/email")
+    public ResponseEntity<?> updateEmail(@RequestBody @Valid UpdateEmailRequest updateEmailRequest, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        userService.updateEmail(updateEmailRequest, userPrincipal);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResultDto.res(HttpStatus.OK.value(),
+                        "이메일 변경 요청에 성공하였습니다."));
+    }
+
+    // 회원정보 관리 페이지 접근 권한 검사
+    @Operation(summary = "회원정보 관리 페이지 접근 권한 검사", description = "회원정보 관리 페이지 접근 권한 검사하기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "회원정보 관리 페이지 접근 권한 검사 요청에 성공하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 형식의 요청입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "403", description = "서브 계정은 회원정보 관리 페이지에 접근할 수 없습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 유저입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "409", description = "비밀번호가 일치하지 않습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "500", description = "회원정보 관리 페이지 접근 권한 검사 요청에 실패하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+    })
+    @CommonSwaggerResponse.CommonResponses
+    @GetMapping("/settings")
+    public ResponseEntity<?> allowSettings(@RequestBody @Valid AllowSettingsRequest allowSettingsRequest, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        userService.allowSettings(allowSettingsRequest, userPrincipal);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResultDto.res(HttpStatus.OK.value(),
+                        "회원정보 관리 페이지 접근 권한 검사 요청에 성공하였습니다."));
     }
 
 }

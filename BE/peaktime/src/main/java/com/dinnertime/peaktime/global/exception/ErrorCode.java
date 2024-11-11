@@ -40,6 +40,15 @@ public enum ErrorCode {
     INVALID_ROOT_PASSWORD("비밀번호가 일치하지 않습니다.", HttpStatus.CONFLICT),
     DUPLICATED_NICKNAME("현재와 동일한 닉네임입니다.", HttpStatus.CONFLICT),
     DUPLICATED_PASSWORD("현재와 동일한 비밀번호입니다.", HttpStatus.CONFLICT),
+    FAILED_SEND_EMAIL("이메일을 전송하는데 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    EMAIL_CODE_NOT_FOUND("인증시간이 만료되었거나 인증코드를 발급받지 않으셨습니다. 다시 시도해주세요.", HttpStatus.NOT_FOUND),
+    NOT_EQUAL_EMAIL_CODE("인증 코드가 일치하지 않습니다.", HttpStatus.CONFLICT),
+    INVALID_EMAIL_AUTHENTICATION("이메일이 인증되지 않았습니다.", HttpStatus.FORBIDDEN),
+    SAME_EMAIL("기존과 동일한 이메일입니다.", HttpStatus.CONFLICT),
+    USER_LOGIN_ID_NOT_FOUND("존재하지 않는 아이디입니다.", HttpStatus.NOT_FOUND),
+    NOT_ROOT("서브 계정은 비밀번호 재발급 기능을 이용할 수 없습니다.", HttpStatus.FORBIDDEN),
+    NOT_EQUAL_EMAIL("아이디에 해당하는 이메일 주소가 아닙니다.", HttpStatus.CONFLICT),
+    SETTINGS_FOR_ROOT("서브 계정은 회원정보 관리 페이지에 접근할 수 없습니다.", HttpStatus.FORBIDDEN),
     CHILD_USER_NOT_FOUND("자식 유저가 아니거나 찾을 수 없습니다.", HttpStatus.NOT_FOUND)
     ;
 
