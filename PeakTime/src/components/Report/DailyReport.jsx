@@ -109,16 +109,16 @@ function DailyReport({ day, onCancel }) {
   };
 
   return (
-    <div className="relative bg-[#333333] bg-opacity-70 left-[43vw] w-[53vw] h-[84vh] my-[3vh] rounded-lg flex flex-col justify-start items-center text-start p-5">
-      <div className="flex justify-around items-center">
+    <div className="relative bg-[#333333] bg-opacity-70 left-[43vw] w-[54vw] h-[84vh] my-[3vh] rounded-lg flex flex-col justify-start items-center p-5">
+      <div className="flex w-full justify-between items-end">
         <h2 className="text-[40px] font-bold text-white">Daily Report</h2>
         {/* YYYY년 MM월 DD일 */}
-        <h3 className="text-left text-3xl">{expression(day, "YMD")}</h3>
+        <h3 className="text-[30px] font-bold text-white">{expression(day, "YMD")}</h3>
       </div>
       <div className="flex flex-col justify-around h-[65vh]">
         {dailyHikingList?.length === 0 ? (
           // 내역이 없을 경우
-          <div className="text-2xl">선택한 날짜의 사용 기록이 없습니다.</div>
+          <div className="text-[30px] text-white font-bold">선택한 날짜의 사용 기록이 없습니다.</div>
         ) : (
           // 내역이 있을 경우
           dailyHikingList?.map((hiking) => (
@@ -147,7 +147,7 @@ function DailyReport({ day, onCancel }) {
         )}
       </div>
       <button
-        className="text-lg px-5 py-1 rounded-lg bg-[#66AADF]"
+        className="text-[20px] text-white font-bold px-5 py-1 rounded-lg bg-[#66AADF]"
         onClick={handleCancel}
       >
         닫기
