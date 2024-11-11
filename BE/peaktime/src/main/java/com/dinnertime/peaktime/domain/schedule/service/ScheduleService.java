@@ -101,10 +101,10 @@ public class ScheduleService {
         );
 
         Preset preset = group.getPreset();
+        SendTimerResponseDto responseDto = SendTimerResponseDto.createSendTimerResponseDto(attentionTime, preset);
 
         sseEmitterList.forEach(
                 (key, emitter) -> CompletableFuture.runAsync(() -> {
-                    SendTimerResponseDto responseDto = SendTimerResponseDto.createSendTimerResponseDto(attentionTime, preset);
                     emitterRepository.saveEventCache(key, responseDto);
                     sendToClient(emitter, key, responseDto);
                 })
