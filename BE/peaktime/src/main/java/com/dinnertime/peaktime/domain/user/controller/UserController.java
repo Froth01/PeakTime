@@ -173,7 +173,7 @@ public class UserController {
                     content = @Content(schema = @Schema(implementation = ResultDto.class)))
     })
     @CommonSwaggerResponse.CommonResponses
-    @GetMapping("/settings")
+    @PostMapping("/settings")
     public ResponseEntity<?> allowSettings(@RequestBody @Valid AllowSettingsRequest allowSettingsRequest, @AuthenticationPrincipal UserPrincipal userPrincipal) {
         userService.allowSettings(allowSettingsRequest, userPrincipal);
         return ResponseEntity
