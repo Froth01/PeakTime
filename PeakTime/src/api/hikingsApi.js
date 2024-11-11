@@ -6,7 +6,7 @@ const getUserState = useUserStore.getState;
 
 // axios 객체 만들기
 const hikingsApi = axios.create({
-  baseURL: `${import.meta.env.VITE_BACK_URL}/api/v1/hikings`,
+  baseURL: "",
 });
 
 // ipcRenderer로 값을 받아오기
