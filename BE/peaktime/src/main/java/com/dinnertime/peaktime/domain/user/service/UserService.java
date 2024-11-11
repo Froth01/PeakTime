@@ -133,6 +133,7 @@ public class UserService {
     }
 
     // 회원정보 관리 페이지 접근 권한 검사
+    @Transactional(readOnly = true)
     public void allowSettings(AllowSettingsRequest allowSettingsRequest, UserPrincipal userPrincipal) {
         // 1. 유저 정보 불러오기
         User user = userRepository.findByUserId(userPrincipal.getUserId())
