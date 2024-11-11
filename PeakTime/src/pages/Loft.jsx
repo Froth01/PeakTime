@@ -4,6 +4,14 @@ import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
 import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
 import gsap from "gsap";
+// import path from 'path';
+// import { fileURLToPath } from 'url';
+
+
+// // 현재 파일의 디렉토리 경로 가져오기
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
+
 const Loft = () => {
   const mountRef = useRef(null);
   const mixerRef = useRef(null);
@@ -82,8 +90,12 @@ const Loft = () => {
     // mainlight.add(light, "intensity", 0, 50, 1).name("Intensity");
 
     // 배경 설정
+
+    // const hdrPath = path.join(__dirname, "../../public/models/loft/satara_night_no_lamps_2k.hdr")
+
     new RGBELoader().load(
-      "/models/loft/satara_night_no_lamps_2k.hdr",
+      "./resources/build/models/loft/satara_night_no_lamps_2k.hdr",
+      // hdrPath,
       (texture) => {
         texture.mapping = THREE.EquirectangularReflectionMapping;
         scene.background = texture;
@@ -97,9 +109,12 @@ const Loft = () => {
       opacity: 0.3,
     });
     // FBX 모델 로드
+    // const lobbyloft = path.join(__dirname, "../../public/models/loft/satara_night_no_lamps_2k.hdr")
+
     const loader = new FBXLoader();
     loader.load(
-      "/models/loft/lobbyloft.fbx", // FBX 파일 경로로 변경
+      "../../resources/build/models/loft/satara_night_no_lamps_2k.hdr", // FBX 파일 경로로 변경
+      // lobbyloft,
       (object) => {
         // 모델 로드 후 처리
         model = object; // 모델 저장
