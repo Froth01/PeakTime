@@ -31,14 +31,13 @@ function ChildList({ onChangeContent, groupList }) {
             </button>
             {group.childList.map((child, childIndex) => (
               <div key={childIndex} className="flex items-center ml-4">
-                <span className="mr-1">└</span>
                 <button
                   onClick={() =>
                     handleChangeContent("updateChild", child.userId)
                   }
                   className="text-left"
                 >
-                  {child.nickname}
+                  └ {child.nickname}
                 </button>
               </div>
             ))}
@@ -79,4 +78,5 @@ ChildList.propTypes = {
     })
   ).isRequired,
 };
+
 export default ChildList;

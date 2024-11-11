@@ -39,9 +39,20 @@ function ChildPage() {
   return (
     <>
       <ChildList onChangeContent={onChangeContent} groupList={groupList} />
-      {showNow === "addChild" && <AddChild onChangeContent={onChangeContent} />}
+      {showNow === "addChild" && (
+        <AddChild
+          groupList={groupList}
+          onChangeContent={onChangeContent}
+          onChangeGroupList={onChangeGroupList}
+        />
+      )}
       {showNow === "updateChild" && (
-        <UpdateChild childId={updateId} onChangeContent={onChangeContent} />
+        <UpdateChild
+          childId={updateId}
+          groupList={groupList}
+          onChangeContent={onChangeContent}
+          onChangeGroupList={onChangeGroupList}
+        />
       )}
       {showNow === "addGroup" && (
         <AddGroup
