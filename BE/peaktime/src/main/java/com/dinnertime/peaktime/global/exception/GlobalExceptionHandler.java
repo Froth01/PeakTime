@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
                 "등록되지 않은 아이디이거나 아이디 또는 비밀번호를 잘못 입력했습니다."
         );
 
-        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
     // 회원탈퇴한 유저로 로그인 시도시
@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
                 "등록되지 않은 아이디이거나 아이디 또는 비밀번호를 잘못 입력했습니다."
         );
 
-        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
