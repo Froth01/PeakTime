@@ -5,10 +5,6 @@ const authApi = axios.create({
   baseURL: `${import.meta.env.VITE_BACK_URL}/api/v1/auth`,
 });
 
-export function sendUrl() {
-  console.log("authAPI URL :", `${import.meta.env.VITE_BACK_URL}`);
-  window.electronAPI.sendBackUrl(`${import.meta.env.VITE_BACK_URL}`);
-}
 // 응답 인터셉터 추가하기 (로그인 화면으로 리다이렉트)
 authApi.interceptors.response.use(
   (response) => response,

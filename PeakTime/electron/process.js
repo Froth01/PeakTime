@@ -1,14 +1,12 @@
-import path from "path";
-import { fileURLToPath, pathToFileURL } from "url";
+import path from 'path';
+import { fileURLToPath, pathToFileURL } from 'url';
 
 // 현재 파일의 디렉토리 경로 가져오기
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // 모듈 경로를 file:// URL로 변환
-const modulePath = pathToFileURL(
-  path.resolve(__dirname, "./endHiking.js")
-).href;
+const modulePath = pathToFileURL(path.resolve(__dirname, './endHiking.js')).href;
 
 // 하이킹 중 데이터 변수
 let siteData = [];
@@ -41,7 +39,7 @@ export async function checkDone(event, hikingId, accessToken) {
   try {
     if (isSiteDone && isProgramDone) {
       const sumData = [...siteData, ...programData];
-
+      
       // 동적으로 endHikingProcess 함수 가져오기
       const endHikingProcess = await getEndHikingProcess();
       await endHikingProcess(sumData, hikingId, accessToken); // API 요청
