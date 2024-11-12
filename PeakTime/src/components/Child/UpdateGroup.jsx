@@ -6,11 +6,16 @@ import AddGroupTimer from "./AddGroupTimer";
 import PropTypes from "prop-types";
 import Swal from "sweetalert2";
 import ReactDOM from "react-dom/client";
+import { IoIosArrowDown } from "react-icons/io";
 
 function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
   const [groupTitle, setGroupTitle] = useState(null);
   const [presetList, setPresetList] = useState(null);
   const [groupInfo, setGroupInfo] = useState(null);
+
+  // 드롭다운 관련
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(null);
 
   const ALERT_MESSAGE = {
     // 그룹 정보 업데이트 경고
@@ -201,10 +206,10 @@ function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
     }));
   };
 
-  const handleChangePresetId = (e) => {
+  const handleChangePresetId = (presetId) => {
     setGroupInfo((prevGroupInfo) => ({
       ...prevGroupInfo,
-      presetId: e.target.value,
+      presetId: presetId,
     }));
   };
 
@@ -340,63 +345,116 @@ function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
   };
 
   return (
-    <div className="absolute left-[40vw] w-[60vw] h-[100vh] bg-white border border-black">
+    <div className="absolute left-[43vw] w-[54vw] h-[84vh] my-[3vh] bg-[#333333] bg-opacity-70 rounded-lg p-5 flex flex-col items-center justify-between">
       {/* title */}
-      <h2>{groupTitle}</h2>
+      <h2 className="text-white text-[30px] font-bold">{groupTitle}</h2>
 
       {/* title, presets */}
-      <div className="flex justify-center">
+      <div className="flex justify-between w-[70%]">
         {/* title */}
-        <div>
-          <label>그룹명</label>
+        <div className="flex flex-col gap-3 text-start w-[40%]">
+          <label className="text-white font-bold">그룹명</label>
           <input
             id="title"
             name="title"
             value={groupInfo?.title || ""}
             onChange={handleChangeTitle}
+            className="h-[60%] rounded-lg focus:ring-4 focus:ring-[#66aadf] focus:outline-none ps-3"
           />
         </div>
 
         {/* presets */}
-        <div>
-          <label>프리셋</label>
-          <select
-            id="presetId"
-            name="presetId"
-            onChange={handleChangePresetId}
-            value={groupInfo?.presetId || ""}
+        <div className="flex flex-col gap-3 text-start w-[40%]">
+          <label className="text-white font-bold">프리셋</label>
+          <div
+            tabIndex={0}
+            className={`relative h-[60%] rounded-lg bg-white border border-gray-300 px-3 py-2 cursor-pointer ${
+              isOpen ? "focus:ring-4 focus:ring-[#66aadf]" : ""
+            }`}
           >
-            {presetList?.map((preset) => (
-              <option key={preset.presetId} value={preset.presetId}>
-                {preset.title}
-              </option>
-            ))}
-          </select>
+            <div
+              onClick={() => setIsOpen(!isOpen)}
+              className="flex justify-between items-center"
+            >
+              <p>
+                {selectedOption ? selectedOption.title : "프리셋을 선택하세요."}
+              </p>
+              <IoIosArrowDown />
+            </div>
+            {isOpen && (
+              <ul
+                className="absolute left-0 right-0 mt-3 bg-white border
+                  border-gray-300 rounded-lg shadow-lg"
+              >
+                {presetList.map((preset, index) => (
+                  <div key={preset.presetId}>
+                    <li
+                      onClick={() => {
+                        handleChangePresetId(preset.presetId);
+                        setSelectedOption(preset);
+                        setIsOpen(false);
+                      }}
+                      className="px-3 py-2 hover:bg-[#66aadf] cursor-pointer rounded-lg hover:font-bold"
+                    >
+                      {preset.title}
+                    </li>
+                    {index < presetList.length - 1 && (
+                      <hr className="border-gray-200" />
+                    )}
+                  </div>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       </div>
 
       {/* timers */}
-      <div className="p-3 border">
-        {groupInfo?.timerList.map((timer) => (
-          <div
-            key={timer.timerId}
-            value={timer.timerId}
-            className="flex justify-between"
+      <div className="w-[85%] h-[50%] text-start">
+        <div className="w-full h-[90%] rounded-xl border-4 border-[#66aadf] p-5">
+          {groupInfo?.timerList.map((timer) => (
+            <div
+              key={timer.timerId}
+              value={timer.timerId}
+              className="flex justify-between p-2 mb-3 text-[18px] text-white bg-[#1d1d1d] rounded-xl"
+            >
+              <span>
+                {timeOnly(timer.startTime)} ~{" "}
+                {timeOnly(timer.startTime, timer.attentionTime)}
+              </span>
+              <span>{convertBitmaskToDays(timer.repeatDay)}</span>
+              <button
+                onClick={() => deleteTimer(timer.timerId)}
+                className="font-bold text-[#f40000] pe-2"
+              >
+                X
+              </button>
+            </div>
+          )) || ""}
+        </div>
+        <div className="self-start mt-3">
+          <button
+            onClick={() => openTimeSetModal(groupId)}
+            className="text-white font-bold text-[20px] ps-3"
           >
-            <span>
-              {timeOnly(timer.startTime)} ~{" "}
-              {timeOnly(timer.startTime, timer.attentionTime)}
-            </span>
-            <span>{convertBitmaskToDays(timer.repeatDay)}</span>
-            <button onClick={() => deleteTimer(timer.timerId)}>X</button>
-          </div>
-        )) || ""}
+            +시간 추가
+          </button>
+        </div>
       </div>
 
-      <div className="flex justify-around">
-        <button onClick={() => openTimeSetModal(groupId)}>+시간 추가</button>
-        <button onClick={() => openDeleteModal(groupId)}>그룹삭제</button>
-        <button onClick={() => openUpdateModal(groupId)}>적용하기</button>
+      <div className="w-full flex justify-end gap-5">
+        <button
+          onClick={() => openDeleteModal(groupId)}
+          className="bg-[#f40000] rounded-xl px-5 py-2 hover:bg-[#d60000] focus:ring-4 focus:ring-[#f40000] text-white font-bold"
+        >
+          그룹삭제
+        </button>
+        <button
+          onClick={() => openUpdateModal(groupId)}
+          className="bg-[#03c777] rounded-xl px-5 py-2 hover:bg-[#02a566] focus:ring-4 focus:ring-[#03c777] text-white font-bold"
+        >
+          적용하기
+        </button>
       </div>
     </div>
   );
