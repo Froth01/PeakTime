@@ -4,6 +4,12 @@ import PropTypes from "prop-types";
 import Swal from "sweetalert2";
 import ReactDOM from "react-dom/client";
 import DailyReportDetail from "./DailyReportDetail";
+import {
+  diffInMinutes,
+  successToHiking,
+} from "../../utils/SuccessFunctionUtils";
+import "../../styles/custom-scrollbar.css";
+import "../../styles/daily-report-custom-swal.css";
 
 function DailyReport({ day, onCancel }) {
   const ALERT_MESSAGE = {
@@ -24,14 +30,75 @@ function DailyReport({ day, onCancel }) {
   };
 
   // 하이킹 목록
-  const [dailyHikingList, setDailyHikingList] = useState([]);
+  const [dailyHikingList, setDailyHikingList] = useState([
+    {
+      hikingId: 1,
+      startTime: "2024-10-08 10:00:00",
+      endTime: "2024-10-08 11:30:00",
+      realEndTime: "2024-10-08 11:30:00",
+    },
+    {
+      hikingId: 2,
+      startTime: "2024-10-08 14:00:00",
+      endTime: "2024-10-08 17:30:00",
+      realEndTime: "2024-10-08 17:00:00",
+    },
+    {
+      hikingId: 1,
+      startTime: "2024-10-08 10:00:00",
+      endTime: "2024-10-08 11:30:00",
+      realEndTime: "2024-10-08 11:30:00",
+    },
+    {
+      hikingId: 2,
+      startTime: "2024-10-08 14:00:00",
+      endTime: "2024-10-08 17:30:00",
+      realEndTime: "2024-10-08 17:00:00",
+    },
+    {
+      hikingId: 1,
+      startTime: "2024-10-08 10:00:00",
+      endTime: "2024-10-08 11:30:00",
+      realEndTime: "2024-10-08 11:30:00",
+    },
+    {
+      hikingId: 2,
+      startTime: "2024-10-08 14:00:00",
+      endTime: "2024-10-08 17:30:00",
+      realEndTime: "2024-10-08 17:00:00",
+    },
+    {
+      hikingId: 1,
+      startTime: "2024-10-08 10:00:00",
+      endTime: "2024-10-08 11:30:00",
+      realEndTime: "2024-10-08 11:30:00",
+    },
+    {
+      hikingId: 2,
+      startTime: "2024-10-08 14:00:00",
+      endTime: "2024-10-08 17:30:00",
+      realEndTime: "2024-10-08 17:00:00",
+    },
+    {
+      hikingId: 1,
+      startTime: "2024-10-08 10:00:00",
+      endTime: "2024-10-08 11:30:00",
+      realEndTime: "2024-10-08 11:30:00",
+    },
+    {
+      hikingId: 2,
+      startTime: "2024-10-08 14:00:00",
+      endTime: "2024-10-08 17:30:00",
+      realEndTime: "2024-10-08 17:00:00",
+    },
+  ]);
 
   // 하이킹 디테일 모달
   const openHikingDetail = (hikingId) => {
     let root;
 
     Swal.fire({
-      title: "하이킹 상세",
+      title: "<span class='swal-title'> 하이킹 상세</span>",
       html: `<div id="daily-report-detail" style="width: 100%; height: 100%; padding: 16px; overflow: auto;" />`,
       willOpen: () => {
         hikingsApi
@@ -52,8 +119,9 @@ function DailyReport({ day, onCancel }) {
       showConfirmButton: false,
       showCloseButton: true,
       customClass: {
-        title: "leading-tight m-0",
-        popup: "w-[50vw] max-w-[1000px] h-[60vh] min-h-[500px]",
+        title: "swal-title",
+        popup:
+          "w-[60vw] min-w-[1000px] h-[55vh] min-h-[700px] custom-swal-popup",
       },
     });
   };
@@ -81,11 +149,6 @@ function DailyReport({ day, onCancel }) {
     }
   };
 
-  // endtime - starttime 분 단위 계산
-  const diffInMinutes = (startTime, endTime) => {
-    return Math.round((new Date(endTime) - new Date(startTime)) / (1000 * 60));
-  };
-
   const minutesExpression = (startTime, endTime, realEndTime) => {
     return `${diffInMinutes(startTime, realEndTime)} / ${diffInMinutes(
       startTime,
@@ -109,45 +172,77 @@ function DailyReport({ day, onCancel }) {
   };
 
   return (
-    <div className="relative bg-[#333333] bg-opacity-70 left-[43vw] w-[54vw] h-[84vh] my-[3vh] rounded-lg flex flex-col justify-start items-center p-5">
-      <div className="flex w-full justify-between items-end">
-        <h2 className="text-[40px] font-bold text-white">Daily Report</h2>
+    <div className="relative bg-[#333333] bg-opacity-70 left-[43vw] w-[54vw] h-[84vh] my-[3vh] flex flex-col justify-start items-center p-5">
+      <div className="flex w-full justify-between items-end mb-5">
+        <h2 className="text-[40px] font-bold text-white">일간 리포트</h2>
         {/* YYYY년 MM월 DD일 */}
-        <h3 className="text-[30px] font-bold text-white">{expression(day, "YMD")}</h3>
+        <h3 className="text-[30px] font-bold text-white">
+          {expression(day, "YMD")}
+        </h3>
       </div>
-      <div className="flex flex-col justify-around h-[65vh]">
+      <div
+        className={`flex flex-col h-[65vh] w-full mb-5 p-10 overflow-y-scroll custom-scrollbar ${
+          dailyHikingList?.length === 0
+            ? "justify-center items-center"
+            : "justify-around grid grid-cols-2 gap-[30px] "
+        }`}
+      >
         {dailyHikingList?.length === 0 ? (
           // 내역이 없을 경우
-          <div className="text-[30px] text-white font-bold">선택한 날짜의 사용 기록이 없습니다.</div>
+          <div className="text-[30px] text-white font-bold w-full h-full flex items-center justify-center">
+            선택한 날짜의 사용 기록이 없습니다.
+          </div>
         ) : (
           // 내역이 있을 경우
           dailyHikingList?.map((hiking) => (
-            <div key={hiking.hikingId}>
-              <button
-                onClick={() => openHikingDetail(hiking.hikingId)}
-                className="border"
+            <div
+              key={hiking.hikingId}
+              className="border rounded-xl text-white flex justify-around items-center h-[150px]"
+              onMouseEnter={(e) => {
+                e.currentTarget.style.animation = "subtlePing 0.25s forwards";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.animation =
+                  "subtlePingReverse 0.25s forwards";
+              }}
+              onClick={() => openHikingDetail(hiking.hikingId)}
+            >
+              <div
+                className={`flex justify-center items-center text-[30px] font-bold w-[80px] h-[80px] rounded-full ${
+                  successToHiking(hiking.endTime, hiking.realEndTime)
+                    ? "bg-[#03C777]"
+                    : "bg-[#F40000]"
+                }`}
               >
+                {`${
+                  successToHiking(hiking.endTime, hiking.realEndTime)
+                    ? "성공"
+                    : "실패"
+                }`}
+              </div>
+              <div>
+                {/* "시작 시각 ~ 목표 종료 시각" 표시 */}
+                <div className="text-[20px]">
+                  {expression(hiking.startTime, "Hm")} ~{" "}
+                  {expression(hiking.endTime, "Hm")}
+                </div>
+
                 {/* "실제 시간 / 목표 시간" 표시 */}
-                <div>
+                <div className="text-[30px] font-bold">
                   {minutesExpression(
                     hiking.startTime,
                     hiking.endTime,
                     hiking.realEndTime
-                  )}
+                  )}{" "}
+                  분
                 </div>
-
-                {/* "시작 시각 ~ 목표 종료 시각" 표시 */}
-                <div>
-                  {expression(hiking.startTime, "Hm")} ~{" "}
-                  {expression(hiking.endTime, "Hm")}
-                </div>
-              </button>
+              </div>
             </div>
           ))
         )}
       </div>
       <button
-        className="text-[20px] text-white font-bold px-5 py-1 rounded-lg bg-[#66AADF]"
+        className="text-[20px] text-white font-bold px-5 py-1 rounded-lg bg-[#7C7C7C] hover:bg-[#5C5C5C]"
         onClick={handleCancel}
       >
         닫기
