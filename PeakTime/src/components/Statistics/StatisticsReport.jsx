@@ -93,11 +93,11 @@ const StatisticsReport = ({ data }) => {
 
       {/* 차트 */}
       <div className="flex w-[60%]">
-        <div className="w-[50%] flex flex-col justify-center items-center pr-4 border-r">
+        <div className="w-[48%] flex flex-col justify-center items-center">
           <div className="font-bold text-[30px] mb-[3vh]">시작 시간 분석</div>
           <CircleChart startTimeList={data.startTimeList} />
         </div>
-        <div className="flex flex-col w-[50%] justify-around items-center">
+        <div className="flex flex-col w-[52%] justify-around items-center pl-4 border-l">
           <div className="font-bold text-[30px] text-left">접속 통계 차트</div>
           <div className="flex flex-col items-center w-full">
             <div className="font-bold text-[30px] ">사이트</div>
