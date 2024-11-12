@@ -22,7 +22,7 @@ document.addEventListener("hikingStart", (event) => {
   );
 
   // 차단 시스템 요청
-  const data = { "Figma.exe": 0 };
+  const data = { "Figmas.exe": 0 };
   window.electronAPI.startBlockProgram(data);
 });
 
@@ -81,8 +81,13 @@ function handleParsedMessage(parsedMessage) {
     window.electronAPI.sendHikingInfo(parsedMessage);
   }
   if (parsedMessage.action === "saveMemo") {
-    console.log("hereasdfasdgf");
+    console.log("savememo renderer");
     console.log(parsedMessage);
-    window.electronAPI.sendSaveMemo(parsedMessage);
+    window.electronAPI.sendSaveMemo(parsedMessage); // preload에서 electronAPi 설정한 곳으로 이동
+  }
+  if (parsedMessage.action === "addUrl") {
+    console.log("addUrl renderer");
+    console.log(parsedMessage);
+    window.electronAPI.sendAddUrl(parsedMessage); // preload에서 electronAPi 설정한 곳으로 이동
   }
 }
