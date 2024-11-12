@@ -21,16 +21,18 @@ export async function endHikingProcess(sumData, startedHikingId, accessToken) {
     realEndTime: format,
     contentList: sumData,
   };
-  // await setBaseUrl();
-  // console.log("sumData :", sumData);
-  // console.log("vxd", hikingsApi);
+  await setBaseUrl();
 
   return hikingsApi
-    .put(`/${startedHikingId}`, endHikingData, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    })
+    .put(
+      `${process.env.VITE_BACK_URL}/api/v1/hikings/${startedHikingId}`,
+      endHikingData,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    )
     .then((response) => {
       console.log("끝내기 api 결과 : ", response);
       return "done";
