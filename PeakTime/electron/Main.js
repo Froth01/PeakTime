@@ -51,6 +51,7 @@ function createWindow() {
    * */
   win.loadURL(startUrl);
 }
+
 let wss;
 
 // 웹소켓 메세지 주고받기
@@ -111,10 +112,11 @@ ipcMain.on("hikingInfo", async (event, data) => {
     console.log("hikingInfo Main on");
     const accessToken = await store.get("accessToken");
     console.log("store accessToken : ", accessToken);
+
     const response = data.urlList;
     await siteProcess(response); // 비동기 처리 완료 기다리
     console.log("siteProcess :", response);
-    checkDone(event, data.hikingId, accessToken, url);
+    checkDone(event, data.hikingId, accessToken);
   } catch (error) {
     console.error("hikingInfo error :", error);
   }
@@ -127,22 +129,14 @@ ipcMain.on("start-block-program", (event, data) => {
 });
 
 // .env에서 로드된 환경 변수 반환
-ipcMain.handle("getBackUrl", async (event) => {
-  const url = await store.get("url");
-  console.log("main.js url :", url);
-  return url;
+ipcMain.handle("getBackUrl", (event) => {
+  return process.env.BACK_URL; // .env에서 로드한 BACK_URL 반환
 });
 
 //토큰 받기
 ipcMain.on("sendAccessToken", (event, token) => {
   console.log("Received access token:", token);
   store.set("accessToken", token);
-});
-
-//url 받기
-ipcMain.on("sendBackUrl", (event, url) => {
-  console.log("Received back url:", url);
-  store.set("url", url);
 });
 
 // 차단 프로그램 종료
