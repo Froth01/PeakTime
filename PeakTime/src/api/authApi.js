@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useUserStore } from "../stores/UserStore";
 
 // axios 객체 만들기
 const authApi = axios.create({
@@ -13,7 +14,9 @@ authApi.interceptors.response.use(
     if (error.response) {
       const status = error.response.status;
       if (status === 401) {
-        window.location.href = "/";
+        useUserStore.getState().userActions.setUser(null);
+        localStorage.removeItem("user");
+        window.location.href = "/login";
       }
     } else if (error.request) {
       console.error("No response received from the server:", error.request);

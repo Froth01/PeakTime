@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
+import { MdAccessTimeFilled } from "react-icons/md";
 
 function AddGroupTimer({ groupId, onSave }) {
   const [startTime, setStartTime] = useState("00:00");
@@ -79,41 +80,42 @@ function AddGroupTimer({ groupId, onSave }) {
   };
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col justify-evenly items-center text-start mt-5">
       <div className="flex space-x-4">
         {/* 시작 시각 */}
-        <div className="flex flex-col">
-          <label htmlFor="start-time" className="mb-1 text-left">
+        <div className="relative flex flex-col gap-3">
+          <label htmlFor="start-time" className="font-bold">
             시작 시각
           </label>
-          <div className="flex items-center">
-            <input
-              type="time"
-              id="start-time"
-              name="start-time"
-              value={startTime || ""}
-              onChange={handleChange}
-              className="border border-gray-300 rounded px-2 py-1"
-            />
+          <input
+            type="time"
+            id="start-time"
+            name="start-time"
+            value={startTime || ""}
+            onChange={handleChange}
+            className="appearance-auto webkit-appearance-auto rounded-lg focus:ring-4 focus:ring-[#66aadf] focus:outline-none ps-3"
+          />
+          <div className="absolute right-3 bottom-8 pointer-events-none">
+            <MdAccessTimeFilled />
           </div>
         </div>
 
         {/* 시간 */}
-        <div className="flex flex-col">
-          <label htmlFor="attention-time" className="mb-1 text-left">
-            시간
+        <div className="flex flex-col gap-3 w-full mb-5">
+          <label htmlFor="attention-time" className="font-bold">
+            하이킹 시간
           </label>
-          <div className="flex items-center">
+          <div className="flex items-center w-[50%]">
             <input
               type="text"
               id="attention-time"
               name="attention-time"
               value={attentionTime || ""}
               onChange={handleChange}
-              className="border border-gray-300 rounded px-2 py-1"
+              className="rounded-lg focus:ring-4 focus:ring-[#66aadf] focus:outline-none ps-3"
               placeholder="시간 입력"
             />
-            <span className="text-gray-500 pointer-events-none">분</span>
+            <span className="pointer-events-none ms-2 font-bold">분</span>
           </div>
         </div>
       </div>
