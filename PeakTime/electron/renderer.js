@@ -14,7 +14,7 @@ document.addEventListener("hikingStart", (event) => {
   window.electronAPI.sendWebSocketMessage(
     JSON.stringify({
       action: "start",
-      websiteList: event.detail.selectedPreset.blockWebsiteList,
+      websiteList: event.detail.selectedPreset.blockWebsiteArray,
       role: "root",
       presetId: event.detail.selectedPreset.presetId,
       hikingId: event.detail.startedHikingId,
@@ -23,7 +23,7 @@ document.addEventListener("hikingStart", (event) => {
 
   // 차단 시스템 요청
   const data = {};
-  const blockProgramList = event.detail.selectedPreset.blockProgramList;
+  const blockProgramList = event.detail.selectedPreset.blockProgramArray;
   console.log("start info: ", event.detail);
   for (let program of blockProgramList) {
     console.log("data insert program : ", program);
