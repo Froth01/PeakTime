@@ -30,68 +30,7 @@ function DailyReport({ day, onCancel }) {
   };
 
   // 하이킹 목록
-  const [dailyHikingList, setDailyHikingList] = useState([
-    {
-      hikingId: 1,
-      startTime: "2024-10-08 10:00:00",
-      endTime: "2024-10-08 11:30:00",
-      realEndTime: "2024-10-08 11:30:00",
-    },
-    {
-      hikingId: 2,
-      startTime: "2024-10-08 14:00:00",
-      endTime: "2024-10-08 17:30:00",
-      realEndTime: "2024-10-08 17:00:00",
-    },
-    {
-      hikingId: 1,
-      startTime: "2024-10-08 10:00:00",
-      endTime: "2024-10-08 11:30:00",
-      realEndTime: "2024-10-08 11:30:00",
-    },
-    {
-      hikingId: 2,
-      startTime: "2024-10-08 14:00:00",
-      endTime: "2024-10-08 17:30:00",
-      realEndTime: "2024-10-08 17:00:00",
-    },
-    {
-      hikingId: 1,
-      startTime: "2024-10-08 10:00:00",
-      endTime: "2024-10-08 11:30:00",
-      realEndTime: "2024-10-08 11:30:00",
-    },
-    {
-      hikingId: 2,
-      startTime: "2024-10-08 14:00:00",
-      endTime: "2024-10-08 17:30:00",
-      realEndTime: "2024-10-08 17:00:00",
-    },
-    {
-      hikingId: 1,
-      startTime: "2024-10-08 10:00:00",
-      endTime: "2024-10-08 11:30:00",
-      realEndTime: "2024-10-08 11:30:00",
-    },
-    {
-      hikingId: 2,
-      startTime: "2024-10-08 14:00:00",
-      endTime: "2024-10-08 17:30:00",
-      realEndTime: "2024-10-08 17:00:00",
-    },
-    {
-      hikingId: 1,
-      startTime: "2024-10-08 10:00:00",
-      endTime: "2024-10-08 11:30:00",
-      realEndTime: "2024-10-08 11:30:00",
-    },
-    {
-      hikingId: 2,
-      startTime: "2024-10-08 14:00:00",
-      endTime: "2024-10-08 17:30:00",
-      realEndTime: "2024-10-08 17:00:00",
-    },
-  ]);
+  const [dailyHikingList, setDailyHikingList] = useState([]);
 
   // 하이킹 디테일 모달
   const openHikingDetail = (hikingId) => {
