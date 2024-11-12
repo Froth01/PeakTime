@@ -64,12 +64,22 @@
       "electron/**/*",
       "public/**/*"
     ],
-    "directories": {
-      "buildResources": "public"
-    },
+    "asar": true,
     "win": {
       "icon": "public/Logo/Logo.ico",
-      "target": "nsis"
+      "target": [
+        "zip",
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "directories": {
+      "buildResources": "./resources/installer/",
+      "output": "./dist/",
+      "app": "."
     }
   }
 }

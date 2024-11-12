@@ -27,13 +27,14 @@ function LoginPage() {
         userActions.setUser(loginResponse.data.data);
         localStorage.setItem("user", JSON.stringify(loginResponse.data.data));
         navigate("/");
-      } catch (error) { // 에러 코드가 발생하면 여기로 진입
+      } catch (error) {
+        // 에러 코드가 발생하면 여기로 진입
         Swal.fire({
           title: "다시 시도해주세요.",
           text: `${error.response.data.message}`,
           icon: "error",
           confirmButtonColor: "green",
-          confirmButtonText: "확인"
+          confirmButtonText: "확인",
         });
       }
     } else {
@@ -42,10 +43,10 @@ function LoginPage() {
         text: "아이디와 비밀번호를 입력해 주세요.",
         icon: "error",
         confirmButtonColor: "green",
-        confirmButtonText: "확인"
+        confirmButtonText: "확인",
       });
     }
-  }
+  };
 
   // 회원 가입 버튼 클릭
   const handleSignup = () => {
@@ -60,7 +61,7 @@ function LoginPage() {
   return (
     <div className="h-[100vh] flex justify-center items-center">
       <div className="w-[30vw] h-[60vh] flex flex-col justify-around items-center bg-[#333333] bg-opacity-90 p-5 rounded-lg text-white">
-        <h1>로그인</h1>
+        <h1 className="text-[30px] font-bold">로그인</h1>
         <div className="relative z-0 w-full mb-5 group text-start ms-[30%]">
           <input
             type="text"
@@ -122,6 +123,5 @@ function LoginPage() {
     </div>
   );
 }
-
 
 export default LoginPage;
