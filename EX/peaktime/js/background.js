@@ -38,7 +38,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         const presetId = presetData.presetId || null;
 
         // 일렉트론으로 URL과 presetId를 전송
-        await sendSocketMessage({ action: "addUrl", url: msg.url, presetId });
+        const response = await sendSocketMessage({ action: "addUrl", url: msg.url, presetId });
+
+        console.log("response",response)
 
         // 비동기 작업이 완료되었음을 응답으로 알림
         sendResponse({ success: true });
