@@ -1,7 +1,6 @@
 package com.dinnertime.peaktime.domain.schedule.service.dto.response;
 
 import com.dinnertime.peaktime.domain.preset.entity.Preset;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,25 +16,25 @@ public class SendTimerResponseDto {
 
     private Long presetId;
 
-    private List<String> blockWebsiteList;
+    private List<String> blockWebsiteArray;
 
-    private List<String> blockProgramList;
+    private List<String> blockProgramArray;
 
 
     @Builder
-    private SendTimerResponseDto(Integer attentionTime, Long presetId, List<String> blockWebsiteList, List<String> blockProgramList) {
+    private SendTimerResponseDto(Integer attentionTime, Long presetId, List<String> blockWebsiteArray, List<String> blockProgramArray) {
         this.attentionTime = attentionTime;
         this.presetId = presetId;
-        this.blockWebsiteList = blockWebsiteList;
-        this.blockProgramList = blockProgramList;
+        this.blockWebsiteArray = blockWebsiteArray;
+        this.blockProgramArray = blockProgramArray;
     }
 
     public static SendTimerResponseDto createSendTimerResponseDto(Integer attentionTime, Preset preset) {
         return SendTimerResponseDto.builder()
                 .attentionTime(attentionTime)
                 .presetId(preset.getPresetId())
-                .blockWebsiteList(preset.getBlockWebsiteArray())
-                .blockProgramList(preset.getBlockProgramArray())
+                .blockWebsiteArray(preset.getBlockWebsiteArray())
+                .blockProgramArray(preset.getBlockProgramArray())
                 .build();
     }
 }
