@@ -16,6 +16,7 @@ export function setBaseUrl() {
       // 렌더러 프로세스에서 Electron API 사용
       window.electronAPI.getBackUrl().then((url) => {
         hikingsApi.defaults.baseURL = `${url}/api/v1/hikings`; // API URL 설정
+        console.log("hikingApi url :", url);
       });
     } else {
       // Node.js 환경에서 실행
