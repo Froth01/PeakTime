@@ -237,6 +237,8 @@ function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
     Swal.fire({
       title: "그룹 타이머 추가",
       html: `<div id="add-group-timer" />`,
+      width: "40%",
+      heightAuto: false,
       willOpen: () => {
         root = ReactDOM.createRoot(document.getElementById("add-group-timer"));
 
