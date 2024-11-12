@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import hikingsApi, { setBaseUrl } from "../../api/hikingsApi.js";
-
+import memosApi from "../../api/memosApi.js";
+import presetsApi from "../../api/presetsApi.js";
 function Timer() {
   const [inputTime, setInputTime] = useState(""); // 사용자 입력 시간 (분 단위)
   const [totalTime, setTotalTime] = useState(0); // 타이머 시간 (분 단위)
@@ -154,26 +155,26 @@ function Timer() {
   //   setElectronData(data);
   // };
 
-  const handleElectronMessage = async (data) => {
-    // 익스텍션에서 추가로 받은 리스트 저장
-    console.log(data);
-    setElectronData(data);
-  };
+  useEffect(() => {
+    const handleExtensionMemoMessage = async (data) => {
+      // 익스텍션에서 받은 메모 저장
+      console.log("handleExtensionMemoMessage: ", data);
+      // setExtensionMemoData(data);
+      createPostMemo(data);
+    };
 
-  const handleExtensionMemoMessage = async (data) => {
-    // 익스텍션에서 받은 메모 저장
-    console.log("handleExtensionMemoMessage: ", data);
-    setExtensionMemoData(data);
-    createPostMemo(data);
-  };
+    console.log("extension memo 값 변경 감지 중");
+    // 이벤트 리스너 등록
+    window.electronAPI.onSaveMemo(handleExtensionMemoMessage);
+  }, []);
 
   const createPostMemo = async (data) => {
     try {
       // 프리셋 생성 Post 요청을 보내기
       // Request Body 데이터 가공
       console.log("받고싶은 데이터 data", data);
-      console.log("받고싶은 데이터 data.title", data.title);
-      console.log("받고싶은 데이터 ", data.content);
+      console.log("받고싶은 데이터 data의 타이틀", data.title);
+      console.log("받고싶은 데이터 data컨텐츠", data.content);
       const requestData = {
         title: data.title,
         content: data.content,
@@ -182,6 +183,37 @@ function Timer() {
       console.log("CreateMemoPostApi: ", response.data);
     } catch (error) {
       console.error("Error create Memo:", error);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    const handleExtensionUrlMessage = async (data) => {
+      // 익스텍션에서 받은 url 저장
+      console.log("handleExtensionurlMessage: ", data);
+      // setExtensionMemoData(data);
+      addUrlPost(data);
+    };
+
+    console.log("extension url 추가 감지 중");
+    // 이벤트 리스너 등록
+    window.electronAPI.onAddUrl(handleExtensionUrlMessage);
+  }, []);
+
+  const addUrlPost = async (data) => {
+    try {
+      // 프리셋 단일 추가 Post 요청을 보내기
+      // Request Body 데이터 가공
+      console.log("받고싶은 데이터 data", data);
+      console.log("데이터 data 프리셋 아이디", data.presetId);
+      console.log("받고싶은 데이터 data url", data.url);
+      const requestData = {
+        url: data.url,
+      };
+      const response = await presetsApi.post(`${data.presetId}`, requestData);
+      console.log("addUrlPostApi: ", response.data);
+    } catch (error) {
+      console.error("Error addurl:", error);
       throw error;
     }
   };
@@ -199,8 +231,6 @@ function Timer() {
 
     setBaseUrl();
     startNow();
-    console.log("extension memo 값 변경 감지 중");
-    window.electronAPI.onSaveMemo(handleExtensionMemoMessage);
   }, []);
 
   // useEffect(() => {
