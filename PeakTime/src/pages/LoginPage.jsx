@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserStore } from "../stores/UserStore";
-import authApi from "../api/authApi";
+import authApi, { sendUrl } from "../api/authApi";
 
 function LoginPage() {
   // 스토어 불러오기
@@ -22,6 +22,7 @@ function LoginPage() {
       };
       const loginResponse = await authApi.post("/login", loginData); // 비동기 처리를 시뮬레이션
       userActions.setuser(loginResponse.data.data);
+      await sendUrl();
       localStorage.setItem("user", JSON.stringify(loginResponse.data.data));
       console.log(localStorage.getItem("user"));
       if (loginResponse.data.data.accessToken) {
