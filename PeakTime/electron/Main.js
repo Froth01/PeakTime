@@ -67,6 +67,14 @@ ipcMain.on("websocket-message", (event, action) => {
   }
 });
 
+let lastWebSocketMessage = null; // 마지막 메시지 저장
+
+// 렌더러 프로세스에서 메시지를 설정하는 이벤트 리스너
+ipcMain.on("set-start-hiking", (event, message) => {
+  lastWebSocketMessage = message;
+});
+
+
 app.whenReady().then(() => {
   createWindow();
   console.log(__dirname);
@@ -81,6 +89,11 @@ app.whenReady().then(() => {
   wss.on("connection", (ws) => {
     console.log("New client connected");
 
+  // 새 클라이언트에게 저장된 메시지 전송
+  if (lastWebSocketMessage) {
+    ws.send(lastWebSocketMessage);
+    // console.log("Sent saved message to new client:", lastWebSocketMessage);
+  }
     // 클라이언트로부터 메시지 수신
     ws.on("message", (message) => {
       console.log(`Received from client: ${message}`);
