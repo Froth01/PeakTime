@@ -10,9 +10,6 @@ function Timer() {
 
   const [startedHikingId, setStartedHikingId] = useState(null); // 시작한 hikingId 정보
 
-  const [extenstionData, setExtenstionData] = useState(null); // extension hiking 데이터
-  const [electronData, setElectronData] = useState(null); // electron hiking 데이터
-
   //현재 시간
   let [now, setNow] = useState(new Date());
   let nowInterval = null;
@@ -55,10 +52,11 @@ function Timer() {
     // 시간 정수화
     const time = parseInt(inputTime, 10);
     // 입력 시간 유효성 검사
-    if (isNaN(time) || time <= 0) {
+    if (isNaN(time) || time <= 29) {
       Swal.fire({
         title: "올바른 시간을 입력하세요.",
         icon: "error",
+        text: "30분 ~ 240분 사이의 시간을 입력해주세요!",
         confirmButtonColor: "green",
         confirmButtonText: "확인",
       });
@@ -140,74 +138,12 @@ function Timer() {
     }
   }, [startedHikingId]);
 
-  // ipc 처리
-  // const handleExtensionMessage = async (data) => {
-  //   console.log(data.urlList);
-  //   setExtenstionData(data.urlList); // 받은 데이터를 상태로 저장
-  // };
-
-  // const handleElectronMessage = async (data) => {
-  //   // 익스텍션에서 추가로 받은 리스트 저장
-  //   console.log(data);
-  //   setElectronData(data);
-  // };
-
-  // onWebSocketMessage 이벤트 리스너 등록
   useEffect(() => {
-    // console.log("onHikingInfo 리스너 등록 중...");
-    // window.electronAPI.onHikingInfo(handleExtensionMessage);
-
-    // console.log("onBlockHistory 리스너 등록 중");
-    // window.electronAPI.onBlockHistory(handleElectronMessage);
-
-    console.log("onBlockHistory 리스너 등록 중");
     window.electronAPI.onAllDone(allDone);
 
     setBaseUrl();
     startNow();
   }, []);
-
-  // useEffect(() => {
-  //   const updateHikingData = async () => {
-  //     if (extenstionData == null || electronData == null) {
-  //       return;
-  //     }
-
-  //     console.log("extenstionData", extenstionData);
-  //     console.log("electronData:", electronData);
-
-  //     // 현재 시간 포맷 생성
-  //     const now = new Date();
-  //     const year = now.getFullYear();
-  //     const month = now.getMonth() + 1;
-  //     const day = now.getDate();
-  //     const hour = now.getHours();
-  //     const minute = now.getMinutes();
-  //     const second = now.getSeconds();
-
-  //     const format = `${year}-${("00" + month.toString()).slice(-2)}-${(
-  //       "00" + day.toString()
-  //     ).slice(-2)} ${("00" + hour.toString()).slice(-2)}:${(
-  //       "00" + minute.toString()
-  //     ).slice(-2)}:${("00" + second.toString()).slice(-2)}`;
-
-  //     const endHikingData = {
-  //       realEndTime: format,
-  //       contentList: [...electronData, ...extenstionData],
-  //     };
-
-  //     console.log(endHikingData);
-  //     const response = await hikingsApi.put(
-  //       `${startedHikingId}`,
-  //       endHikingData
-  //     );
-  //     console.log("response:", response.data);
-  //     setElectronData(null);
-  //     setExtenstionData(null);
-  //   };
-
-  //   updateHikingData();
-  // }, [extenstionData, electronData]);
 
   // 포기 버튼 누르기
   const handleGiveup = () => {
