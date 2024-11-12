@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 function MemoList({ onMemoClick, updateCountGPT }) {
   // 메모 리스트
   const [memoList, setMemoList] = useState([]);
-  const [countGPT, setCountGPT] = useState(null);
+  const [countGPT, setCountGPT] = useState(0);
   const [showDeleteButton, setShowDeleteButton] = useState(false);
 
   // 휴지통 버튼을 눌렀을 때 `X` 버튼을 표시하도록 설정
@@ -34,6 +34,9 @@ function MemoList({ onMemoClick, updateCountGPT }) {
       throw error;
     }
   };
+  useEffect(() => {
+    updateCountGPT(countGPT);
+  }, [countGPT]);
 
   const deleteMemo = async (memoId) => {
     try {

@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import summariesApi from "../../api/summariesApi";
 
 function MemoSummary({ data }) {
-  const { summaryId, content, updateAt } = data;
+  const { summaryId, content, updatedAt } = data;
 
   // 생성날짜 바로 보이게 처리
   const formatDate = (date) => {
@@ -46,12 +46,14 @@ function MemoSummary({ data }) {
         <div>
           <h2>요약 ID: {summaryId}</h2>
           <p>{content}</p>
-          <p>업데이트 날짜: {formatDate(updateAt)}</p>
+          <p>업데이트 날짜: {formatDate(updatedAt)}</p>
+          <button onClick={() => openDeleteWarn(summaryId)}>
+            요약 삭제하기
+          </button>
         </div>
       ) : (
         <p>요약한 정보가 없습니다.</p>
       )}
-      <button onClick={() => openDeleteWarn(summaryId)}>요약 삭제하기</button>
     </div>
   );
 }
@@ -60,7 +62,7 @@ MemoSummary.propTypes = {
   data: PropTypes.shape({
     summaryId: PropTypes.number,
     content: PropTypes.string,
-    updateAt: PropTypes.string,
+    updatedAt: PropTypes.string,
   }),
 };
 

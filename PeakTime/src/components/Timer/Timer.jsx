@@ -165,18 +165,12 @@ function Timer() {
   //   setElectronData(data);
   // };
 
-  useEffect(() => {
-    const handleExtensionMemoMessage = async (data) => {
-      // 익스텍션에서 받은 메모 저장
-      console.log("handleExtensionMemoMessage: ", data);
-      // setExtensionMemoData(data);
-      createPostMemo(data);
-    };
-
-    console.log("extension memo 값 변경 감지 중");
-    // 이벤트 리스너 등록
-    window.electronAPI.onSaveMemo(handleExtensionMemoMessage);
-  }, []);
+  const handleExtensionMemoMessage = async (data) => {
+    // 익스텍션에서 받은 메모 저장
+    console.log("handleExtensionMemoMessage: ", data);
+    // setExtensionMemoData(data);
+    createPostMemo(data);
+  };
 
   const createPostMemo = async (data) => {
     try {
@@ -197,18 +191,12 @@ function Timer() {
     }
   };
 
-  useEffect(() => {
-    const handleExtensionUrlMessage = async (data) => {
-      // 익스텍션에서 받은 url 저장
-      console.log("handleExtensionurlMessage: ", data);
-      // setExtensionMemoData(data);
-      addUrlPost(data);
-    };
-
-    console.log("extension url 추가 감지 중");
-    // 이벤트 리스너 등록
-    window.electronAPI.onAddUrl(handleExtensionUrlMessage);
-  }, []);
+  const handleExtensionUrlMessage = async (data) => {
+    // 익스텍션에서 받은 url 저장
+    console.log("handleExtensionurlMessage: ", data);
+    // setExtensionMemoData(data);
+    addUrlPost(data);
+  };
 
   const addUrlPost = async (data) => {
     try {
@@ -231,6 +219,11 @@ function Timer() {
   // onWebSocketMessage 이벤트 리스너 등록
   useEffect(() => {
     window.electronAPI.onAllDone(allDone);
+
+    // 이벤트 리스너 등록
+    window.electronAPI.onSaveMemo(handleExtensionMemoMessage);
+
+    window.electronAPI.onAddUrl(handleExtensionUrlMessage);
 
     presetsApi
       .get("")
