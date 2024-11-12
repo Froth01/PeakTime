@@ -53,8 +53,8 @@ public class HikingService {
         );
         LocalDateTime startTime = requestDto.getStartTime();
         
-        //자식계정인 경우
-        if(!user.getIsRoot()) {
+        //자식계정이고 스스로 했을 경우
+        if(!user.getIsRoot() && requestDto.getIsSelf()) {
             UserGroup userGroup = userGroupRepository.findByUser_UserId(userId).orElseThrow(
                     () -> new CustomException(ErrorCode.GROUP_NOT_FOUND)
             );
