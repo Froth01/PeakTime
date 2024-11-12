@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "main": "public/Main.js",
+  "main": "./electron/Main.js",
   "homepage": "./",
   "scripts": {
     "dev": "vite",
@@ -12,12 +12,15 @@
     "preview": "vite preview",
     "vite-start": "set BROWSER=none && npm run dev",
     "electron-start": "set ELECTRON_START_URL=http://localhost:5173 && electron .",
-    "electron-pack": "npm run build && electron-builder build -c.extraMetadata.main=build/Main.js"
+    "electron-pack": "npm run build && electron-builder build -c.extraMetadata.main=build/Main.js",
+    "copy-public": "cp -r public dist/public",
+    "build:electron": "npm run build && npm run copy-public && electron-builder"
   },
   "dependencies": {
     "active-win": "^9.0.0",
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.7",
+    "bcrypt": "^5.1.1",
     "chart.js": "^4.4.6",
     "chartjs-plugin-datalabels": "^2.2.0",
     "d3": "^7.9.0",
@@ -25,6 +28,7 @@
     "electron-store": "^10.0.0",
     "flowbite-react": "^0.10.2",
     "gsap": "^3.12.5",
+    "node-gyp": "^10.2.0",
     "postcss": "^8.4.47",
     "react": "^18.3.1",
     "react-chartjs-2": "^5.2.0",
@@ -51,5 +55,21 @@
     "postcss-loader": "^8.1.1",
     "tailwindcss": "^3.4.14",
     "vite": "^5.4.10"
+  },
+  "build": {
+    "appId": "com.dinnertime.peaktime",
+    "productName": "PeakTime",
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "public/**/*"
+    ],
+    "directories": {
+      "buildResources": "public"
+    },
+    "win": {
+      "icon": "public/Logo/Logo.ico",
+      "target": "nsis"
+    }
   }
 }
