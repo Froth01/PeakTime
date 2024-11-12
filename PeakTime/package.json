@@ -61,18 +61,6 @@
       "electron/**/*",
       "public/**/*"
     ],
-    "extraResources": [
-      {
-        "from": "electron",
-        "to": "electron",
-        "filter": ["**/*"]
-      },
-      {
-        "from": "dist/build",
-        "to": "build",
-        "filter": ["**/*"]
-      }
-    ],
     "directories": {
       "buildResources": "public"
     },
