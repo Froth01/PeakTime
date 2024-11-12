@@ -2,44 +2,64 @@
 import "./webSocket.js";
 import "./saveText.js";
 import "./tracking.js";
-import { receivedSocketMessage, getConnectStatus, sendSocketMessage } from "./webSocket.js";
+import {
+  receivedSocketMessage,
+  getConnectStatus,
+  sendSocketMessage,
+} from "./webSocket.js";
 
 // 설치할때 실행
 chrome.runtime.onInstalled.addListener(() => {
-  console.log('extension installed');
+  console.log("extension installed");
 });
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  if(msg.action==="quit") {
-    receivedSocketMessage({action:"end"})
+  if (msg.action === "quit") {
+    receivedSocketMessage({ action: "end" });
   }
-  if(msg.action==="checkSocketStatus") {
+  if (msg.action === "checkSocketStatus") {
     const status = getConnectStatus();
-    console.log(status)
+    console.log(status);
     sendResponse({ connected: status });
   }
-  if(msg.action==="addUrl") {
-    //크롬 저장소에 현재 url저장하기
-    chrome.storage.local.get({ websiteList: [] }, function (data) {
-      const websiteList = data.websiteList; // 기존 리스트 가져오기
-      websiteList.push(msg.url); // 새로운 URL 추가
-      // 업데이트된 리스트를 다시 저장
-      chrome.storage.local.set({ websiteList: websiteList }, function () {
-      });
-    });
+  if (msg.action === "addUrl") {
+    (async () => {
+      try {
+        // 현재 URL을 크롬 저장소에 저장
+        const data = await chrome.storage.local.get({ websiteList: [] });
+        const websiteList = data.websiteList;
+        websiteList.push(msg.url);
 
-    // 비동기적으로 presetId 값을 가져온 후에 sendSocketMessage 호출
-    chrome.storage.local.get("presetId", function (data) {
-      const presetId = data.presetId; // 가져온 presetId 값
+        await chrome.storage.local.set({ websiteList });
+        console.log("Website list updated:", websiteList);
 
-      // 일렉트론으로 현재 url 보내기
-      sendSocketMessage({ action: "addUrl", url: msg.url, presetId: presetId});
-    });
+        // presetId 값을 비동기적으로 가져오기
+        const presetData = await chrome.storage.local.get("presetId");
+        const presetId = presetData.presetId || null;
 
+        // 일렉트론으로 URL과 presetId를 전송
+        await sendSocketMessage({ action: "addUrl", url: msg.url, presetId });
+
+        // 비동기 작업이 완료되었음을 응답으로 알림
+        sendResponse({ success: true });
+
+        // 모든 작업이 끝난 후 페이지 새로 고침
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          chrome.tabs.reload(tabs[0].id);
+        });
+      } catch (error) {
+        console.error("Error handling addUrl action:", error);
+        sendResponse({ success: false, error });
+      }
+    })();
+
+    return true; // 비동기 응답을 위해 true 반환
   }
-
-  if(msg.action==="saveMemo") {
-    sendSocketMessage({ action: "saveMemo", title: msg.title, content: msg.content })
+  if (msg.action === "saveMemo") {
+    sendSocketMessage({
+      action: "saveMemo",
+      title: msg.title,
+      content: msg.content,
+    });
   }
-
-})
+});
