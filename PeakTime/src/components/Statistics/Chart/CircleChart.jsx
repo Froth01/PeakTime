@@ -10,9 +10,9 @@ const CircleChart = ({ startTimeList }) => {
   const val = 5; // 기준 값
 
   useEffect(() => {
-    const width = 300;
-    const height = 350; // 범례 공간 포함한 높이 설정
-    const radius = 100;
+    const width = 400;
+    const height = 450; // 범례 공간 포함한 높이 설정
+    const radius = 150;
     const totalMinutes = 12 * 60;
 
     // 각 시간대의 사용 횟수를 카운트
@@ -38,12 +38,13 @@ const CircleChart = ({ startTimeList }) => {
       .select("body")
       .append("div")
       .style("position", "absolute")
-      .style("background", "#fff")
-      .style("border", "1px solid #ccc")
+      .style("background", "#000000")
+      .style("color", "#FFFFFF")
       .style("padding", "5px")
       .style("border-radius", "5px")
       .style("pointer-events", "none")
-      .style("visibility", "hidden");
+      .style("visibility", "hidden")
+      .style("font-size", "20px");
 
     // 항상 5개의 grid가 나타나도록 설정
     const numGrids = 5;
@@ -54,15 +55,15 @@ const CircleChart = ({ startTimeList }) => {
         .attr("r", gridRadius)
         .attr("fill", "none")
         .attr("stroke", "#e0e0e0")
-        .attr("stroke-dasharray", "2,2");
+        .attr("stroke-dasharray", "1,5");
     }
 
     // 눈금
     const angleStep = (2 * Math.PI) / 12;
     for (let i = 0; i < 12; i++) {
       const angle = i * angleStep - Math.PI / 2;
-      const x = Math.cos(angle) * (radius + 20);
-      const y = Math.sin(angle) * (radius + 20);
+      const x = Math.cos(angle) * (radius + 25);
+      const y = Math.sin(angle) * (radius + 25);
 
       svg
         .append("text")
@@ -70,7 +71,8 @@ const CircleChart = ({ startTimeList }) => {
         .attr("y", y)
         .attr("text-anchor", "middle")
         .attr("alignment-baseline", "middle")
-        .attr("fill", "#333")
+        .attr("fill", "#FFFFFF")
+        .style("font-size", "30px")
         .text(i === 0 ? 12 : i); // 12시 방향 표시
     }
 
@@ -86,9 +88,9 @@ const CircleChart = ({ startTimeList }) => {
         .attr("y1", 0)
         .attr("x2", x)
         .attr("y2", y)
-        .attr("stroke", "#e0e0e0")
+        .attr("stroke", "#FFFFFF")
         .attr("stroke-width", 1)
-        .attr("stroke-dasharray", "2,2");
+        .attr("stroke-dasharray", "1,5");
     }
 
     // AM/PM 시간대 각도 계산 함수
@@ -124,7 +126,7 @@ const CircleChart = ({ startTimeList }) => {
           .attr("y2", y1) // 초기 y2 위치는 바깥쪽
           .attr("stroke", timeMinutes < totalMinutes ? "#FF4500" : "#3476D0") // AM과 PM 색상 구분
           .attr("stroke-width", 2)
-          .attr("opacity", 0.5)
+          .attr("opacity", 0.8)
           .on("mouseover", function (event) {
             tooltip
               .style("visibility", "visible")
@@ -161,32 +163,34 @@ const CircleChart = ({ startTimeList }) => {
     legend
       .append("rect")
       .attr("x", 0)
-      .attr("y", 0)
-      .attr("width", 12)
+      .attr("y", -2)
+      .attr("width", 20)
       .attr("height", 12)
       .attr("fill", "#FF4500");
 
     legend
       .append("text")
-      .attr("x", 18)
+      .attr("x", 30)
       .attr("y", 10)
       .text("오전")
-      .attr("fill", "#333");
+      .style("font-size", "20px")
+      .attr("fill", "#FFFFFF");
 
     legend
       .append("rect")
-      .attr("x", 60)
-      .attr("y", 0)
-      .attr("width", 12)
+      .attr("x", 80)
+      .attr("y", -2)
+      .attr("width", 20)
       .attr("height", 12)
       .attr("fill", "#3476D0");
 
     legend
       .append("text")
-      .attr("x", 78)
+      .attr("x", 110)
       .attr("y", 10)
       .text("오후")
-      .attr("fill", "#333");
+      .style("font-size", "20px")
+      .attr("fill", "#FFFFFF");
 
     return () => {
       d3.select(svgRef.current).selectAll("*").remove();

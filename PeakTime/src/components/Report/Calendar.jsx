@@ -1,7 +1,9 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
+import { FaRegCalendarAlt } from "react-icons/fa";
 import hikingsApi from "../../api/hikingsApi";
 import Swal from "sweetalert2";
+import "../../styles/animation.css";
 
 function Calendar({ selectedDay, onDayClick }) {
   const ALERT_MESSAGE = {
@@ -54,30 +56,46 @@ function Calendar({ selectedDay, onDayClick }) {
   }, []);
 
   return (
-    <div
-      className="absolute left-[10vw] w-[30vw] h-[100vh]"
-      style={{ backgroundColor: "#66AADF" }}
-    >
-      <h2 className="text-[50px] text-white">Calender</h2>
-
-      <div>
-        <span className="text-[50px] text-white mr-5">{month}월</span>
-        <span className="text-[25px] text-white">{year}년</span>
+    <div className="absolute bg-[#333333] bg-opacity-70 left-[11vw] w-[29vw] h-[84vh] my-[3vh] rounded-lg flex flex-col p-5">
+      <div className="flex items-start mb-5">
+        <div className="text-[40px] font-bold text-white">캘린더</div>
       </div>
 
-      <div className="inline-grid grid-cols-5 gap-1 justify-items-center items-center">
-        {hikingList.map((item, idx) => (
-          <button
-            key={idx + 1}
-            onClick={() => handleDay(item.date)}
-            className={`text-white rounded-lg w-[5vw] h-[5vw] ${
-              item.date === selectedDay ? "border-4 border-white" : ""
-            }`}
-            style={{
-              backgroundColor: colorPalette(item.totalMinute),
-            }}
-          />
-        ))}
+      <div className="flex flex-col">
+        <div className="flex justify-center items-center mb-5">
+          <div className="text-[50px] font-bold text-white mr-3">
+            <FaRegCalendarAlt />
+          </div>
+          <div className="flex items-end">
+            <div className="text-[40px] font-bold text-white mr-2">
+              {month}월
+            </div>
+            <div className="text-[30px] font-bold text-white">{year}년</div>
+          </div>
+        </div>
+
+        <div className="flex justify-center">
+          <div className="inline-grid grid-cols-5 gap-2 justify-center items-center">
+            {hikingList.map((item, idx) => (
+              <button
+                key={idx + 1}
+                onClick={() => handleDay(item.date)}
+                className={`text-white rounded-lg w-[4vw] h-[4vw] ${
+                  item.date === selectedDay ? "border-4 border-white" : ""
+                }`}
+                style={{
+                  backgroundColor: colorPalette(item.totalMinute),
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.animation = "subtlePing 0.25s forwards";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.animation = "subtlePingReverse 0.25s forwards";
+                }}
+              />
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

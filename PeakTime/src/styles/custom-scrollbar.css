@@ -1,0 +1,18 @@
+/* 스크롤바 스타일 */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px; /* 스크롤바 너비 */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1; /* 스크롤바 트랙 배경 */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #66aadf; /* 스크롤바 색상 */
+  border-radius: 10px; /* 둥글게 만들기 */
+  border: 2px solid transparent; /* 스크롤바와 트랙 사이 여백 */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #4d90d8; /* 호버 시 색상 */
+}

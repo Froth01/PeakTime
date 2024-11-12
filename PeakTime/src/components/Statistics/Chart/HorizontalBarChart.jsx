@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import {
-  Chart,
+  Chart as ChartJS,
   BarController,
   CategoryScale,
   LinearScale,
@@ -11,7 +11,7 @@ import {
 } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels"; // 플러그인 임포트
 
-Chart.register(
+ChartJS.register(
   BarController,
   CategoryScale,
   LinearScale,
@@ -21,7 +21,9 @@ Chart.register(
   ChartDataLabels // 플러그인 등록
 );
 
-const HorizontalBarChart = ({ listArray }) => {
+ChartJS.unregister(ChartDataLabels);
+
+const HorizontalBarChart = ({ listArray, ylabel }) => {
   const chartRef = useRef(null);
   const colors = ["#FF6384", "#FFCE56", "#03C777", "#36A2EB", "#9966FF"];
 
@@ -29,7 +31,7 @@ const HorizontalBarChart = ({ listArray }) => {
 
   useEffect(() => {
     if (chartRef.current) {
-      const chartInstance = new Chart(chartRef.current, {
+      const chartInstance = new ChartJS(chartRef.current, {
         type: "bar",
         data: {
           labels: dataArray.map((item) => item?.name || ""),
@@ -45,8 +47,8 @@ const HorizontalBarChart = ({ listArray }) => {
         },
         options: {
           indexAxis: "y",
-          responsive: false,
-          maintainAspectRatio: false,
+          responsive: true,
+          maintainAspectRatio: true,
           scales: {
             x: {
               beginAtZero: true,
@@ -54,11 +56,39 @@ const HorizontalBarChart = ({ listArray }) => {
               title: {
                 display: true,
                 text: "시간 (분)", // x축 라벨
+                color: "#FFFFFF",
+                font: {
+                  size: 15,
+                },
+              },
+              grid: {
+                color: "#666666",
+              },
+              border: {
+                color: "#FFFFFF",
+              },
+              ticks: {
+                color: "#FFFFFF",
+                font: {
+                  size: 15,
+                },
               },
             },
             y: {
+              title: {
+                display: true,
+                text: ylabel,
+                color: "#FFFFFF",
+                font: { size: 15 },
+              },
               ticks: {
                 display: false,
+              },
+              grid: {
+                color: "#666666",
+              },
+              border: {
+                color: "#FFFFFF",
               },
             },
           },
@@ -83,7 +113,7 @@ const HorizontalBarChart = ({ listArray }) => {
     }
   }, [listArray]);
 
-  return <canvas ref={chartRef} className="" />;
+  return <canvas ref={chartRef} />;
 };
 
 HorizontalBarChart.propTypes = {
@@ -93,6 +123,7 @@ HorizontalBarChart.propTypes = {
       name: PropTypes.string.isRequired,
     })
   ).isRequired,
+  ylabel: PropTypes.string.isRequired,
 };
 
 export default HorizontalBarChart;

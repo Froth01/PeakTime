@@ -14,15 +14,22 @@ document.addEventListener("hikingStart", (event) => {
   window.electronAPI.sendWebSocketMessage(
     JSON.stringify({
       action: "start",
-      websiteList: ["www.naver.com"],
+      websiteList: event.detail.selectedPreset.blockWebsiteArray,
       role: "root",
-      presetId: 1,
+      presetId: event.detail.selectedPreset.presetId,
       hikingId: event.detail.startedHikingId,
     })
   );
 
   // 차단 시스템 요청
-  const data = { "Figma.exe": 0 };
+  const data = {};
+  const blockProgramList = event.detail.selectedPreset.blockProgramArray;
+  console.log("start info: ", event.detail);
+  for (let program of blockProgramList) {
+    console.log("data insert program : ", program);
+    data[program] = 0;
+  }
+  console.log("start program data : ", data);
   window.electronAPI.startBlockProgram(data);
 });
 
