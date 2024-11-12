@@ -457,6 +457,12 @@ function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
         >
           적용하기
         </button>
+        <button
+          onClick={() => onChangeContent(null)}
+          className="bg-[#7c7c7c] rounded-xl px-5 py-2 hover:bg-[#5c5c5c] focus:ring-4 focus:ring-[#c5c5c5] text-white font-bold"
+        >
+          닫기
+        </button>
       </div>
     </div>
   );
