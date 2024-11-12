@@ -1,8 +1,10 @@
 // import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import Title from "../components/common/Title";
 import hikingsApi from "../api/hikingsApi";
 import groupsApi from "../api/groupsApi";
 import StatisticsReport from "../components/Statistics/StatisticsReport";
+import { HiOutlinePresentationChartLine } from "react-icons/hi2";
 
 function StatisticPage() {
   // root인지 sub인지 파악
@@ -191,7 +193,9 @@ function StatisticPage() {
     if (user.isRoot) {
       groupsApi
         .get("")
-        .then((result) => setGroupList(result.data.data.groupList))
+        .then((result) => {
+          setGroupList(result.data.data.groupList);
+        })
         .catch();
     }
 
@@ -200,66 +204,86 @@ function StatisticPage() {
   }, []);
 
   return (
-    <div className="absolute left-[10vw] flex flex-col items-center w-full h-full">
-      <div className="text-xl">StatisticPage</div>
-      {/* <button onClick={goBack}>돌아가기</button> */}
+    <div className="h-[100vh] flex flex-col">
+      <div className="left-[11vw] flex flex-col w-full h-full">
+        <Title title={"통계"} />
+        {/* <button onClick={goBack}>돌아가기</button> */}
 
-      <div className="flex justify-between px-5">
-        {/* title */}
-        <div className="text-xl">통계: {getNickname(selectedUserId)}</div>
+        <div className="absolute bg-[#333333] bg-opacity-70 left-[11vw] top-[10vh] w-[86vw] h-[84vh] my-[3vh] rounded-lg flex flex-col p-5 text-white">
+          {/* header 부분 */}
+          <div className="grid grid-cols-3 items-center pb-3 mb-3 border-b">
+            {/* 왼쪽 아이콘 */}
+            <div className="text-[60px] font-bold flex justify-start">
+              <HiOutlinePresentationChartLine />
+            </div>
 
-        {/* group, subuser 선택 부분, root user만 사용 가능 */}
-        {user.isRoot && (
-          <div>
-            <select
-              id="groupId"
-              name="groupId"
-              value={selectedGroupId ?? ""}
-              onChange={handleChangeGroupId}
-            >
-              <option value="">{user.nickname}</option>
-              <option disabled>==== 그룹 ====</option>
-              {groupList?.map((group) => (
-                <option key={group.groupId} value={group.groupId}>
-                  {group.groupTitle}
-                </option>
-              ))}
-            </select>
+            {/* 가운데 제목 */}
+            <div className="text-center text-[40px] font-bold">
+              {getNickname(selectedUserId)} 의 통계
+            </div>
 
-            <select
-              id="subUserId"
-              name="subUserId"
-              value={selectedUserId ?? ""}
-              onChange={handleChangeSubUserId}
-              disabled={!selectedGroupId}
-            >
-              {selectedGroupId ? (
-                groupList.find((group) => group.groupId === selectedGroupId)
-                  ?.childList?.length > 0 ? (
-                  groupList
-                    .find((group) => group.groupId === selectedGroupId)
-                    ?.childList.map((user) => (
-                      <option key={user.userId} value={user.userId}>
-                        {user.nickname}
+            {/* 오른쪽 드롭다운 (root 사용자일 때만 표시) */}
+            {user.isRoot && (
+              <div className="flex justify-end space-x-3">
+                <select
+                  id="groupId"
+                  name="groupId"
+                  value={selectedGroupId ?? ""}
+                  onChange={handleChangeGroupId}
+                  className="w-[250px] p-2 bg-gray-800 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-[#03C777]"
+                >
+                  <option value="">{user?.nickname}</option>
+                  <option disabled>==== 그룹 ====</option>
+                  {groupList?.map((group) => (
+                    <option key={group.groupId} value={group.groupId}>
+                      {group.groupTitle}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  id="subUserId"
+                  name="subUserId"
+                  value={selectedUserId ?? ""}
+                  onChange={handleChangeSubUserId}
+                  className="w-[250px] p-2 bg-gray-800 text-white rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-[#03C777]"
+                  disabled={!selectedGroupId}
+                >
+                  {selectedGroupId ? (
+                    groupList.find((group) => group.groupId === selectedGroupId)
+                      ?.childList?.length > 0 ? (
+                      <>
+                        <option value="" disabled>
+                          유저를 선택해주세요.
+                        </option>
+
+                        {groupList
+                          .find((group) => group.groupId === selectedGroupId)
+                          ?.childList.map((user) => (
+                            <option key={user.userId} value={user.userId}>
+                              {user.nickname}
+                            </option>
+                          ))}
+                      </>
+                    ) : (
+                      <option disabled value="">
+                        등록된 유저가 없습니다.
                       </option>
-                    ))
-                ) : (
-                  <option disabled value="">
-                    등록된 유저가 없습니다.
-                  </option>
-                )
-              ) : (
-                <option disabled value="">
-                  그룹을 선택하세요
-                </option>
-              )}
-            </select>
+                    )
+                  ) : (
+                    <option disabled value="">
+                      그룹을 선택해주세요.
+                    </option>
+                  )}
+                </select>
+              </div>
+            )}
           </div>
-        )}
-      </div>
 
-      {/* 통계 */}
-      {statisticsData && <StatisticsReport data={statisticsData} />}
+          {/* 통계 */}
+          {statisticsData && <StatisticsReport data={statisticsData} />}
+        </div>
+      </div>
     </div>
   );
 }
