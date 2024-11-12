@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import hikingsApi, { setBaseUrl } from "../../api/hikingsApi.js";
+import { IoIosArrowDown } from "react-icons/io";
+import presetsApi from "../../api/presetsApi.js";
 
 function Timer() {
   const [inputTime, setInputTime] = useState(""); // 사용자 입력 시간 (분 단위)
@@ -9,6 +11,11 @@ function Timer() {
   const [isRunning, setIsRunning] = useState(false); // 타이머 시작 상태
 
   const [startedHikingId, setStartedHikingId] = useState(null); // 시작한 hikingId 정보
+  const [presetList, setPresetList] = useState(null); // 프리셋 리스트
+
+  // 드롭다운 관련
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(null);
 
   //현재 시간
   let [now, setNow] = useState(new Date());
@@ -110,7 +117,10 @@ function Timer() {
           // 커스텀 이벤트
           const hikingStart = new CustomEvent("hikingStart", {
             bubbles: true,
-            detail: { startedHikingId: responseStartHiking.data.data.hikingId },
+            detail: {
+              startedHikingId: responseStartHiking.data.data.hikingId,
+              selectedPreset: selectedOption,
+            },
           });
           const startBtn = document.getElementById("start");
           startBtn.dispatchEvent(hikingStart);
@@ -140,6 +150,13 @@ function Timer() {
 
   useEffect(() => {
     window.electronAPI.onAllDone(allDone);
+
+    presetsApi
+      .get("")
+      .then((result) => {
+        setPresetList(result.data.data.presetList);
+      })
+      .catch();
 
     setBaseUrl();
     startNow();
@@ -310,12 +327,56 @@ function Timer() {
                 type="number"
                 value={inputTime}
                 onChange={(e) => setInputTime(e.target.value)}
-                className="hover:border-[#66AADF] rounded-xl"
+                className="w-[60%] hover:border-[#66AADF] rounded-xl"
                 placeholder="하이킹 시간을 입력해주세요"
               />
               <label htmlFor="hikingStart" className="text-sm text-white">
                 *분 단위로 입력해주세요.<br></br>최소 30분부터 240분까지
                 가능합니다.
+              </label>
+              <div
+                tabIndex={0}
+                className={`mt-5 relative w-[60%] h-[60%] rounded-lg bg-white border border-gray-300 px-3 py-2 cursor-pointer ${
+                  isOpen ? "focus:ring-4 focus:ring-[#66aadf]" : ""
+                }`}
+              >
+                <div
+                  onClick={() => setIsOpen(!isOpen)}
+                  className="flex justify-between items-center"
+                >
+                  <p>
+                    {selectedOption
+                      ? selectedOption.title
+                      : "프리셋을 선택하세요."}
+                  </p>
+                  <IoIosArrowDown />
+                </div>
+                {isOpen && (
+                  <ul
+                    className="absolute left-0 right-0 mt-3 bg-white border
+                  border-gray-300 rounded-lg shadow-lg"
+                  >
+                    {presetList.map((preset, index) => (
+                      <div key={preset.presetId}>
+                        <li
+                          onClick={() => {
+                            setSelectedOption(preset);
+                            setIsOpen(false);
+                          }}
+                          className="px-3 py-2 hover:bg-[#66aadf] cursor-pointer rounded-lg hover:font-bold"
+                        >
+                          {preset.title}
+                        </li>
+                        {index < presetList.length - 1 && (
+                          <hr className="border-gray-200" />
+                        )}
+                      </div>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <label htmlFor="" className="text-sm text-white">
+                *적용할 프리셋을 선택해주세요.
               </label>
               <button
                 className="w-[10vw] h-[6vh] mt-[10%] rounded-xl text-white bg-[#03c777]"
