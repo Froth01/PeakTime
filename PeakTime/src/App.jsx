@@ -44,7 +44,7 @@ function App() {
   useEffect(() => {
     if (!user) {
       if (localUser) {
-        userActions.setuser(localUser);
+        userActions.setUser(localUser);
       }
     }
   }, [user, localUser]);

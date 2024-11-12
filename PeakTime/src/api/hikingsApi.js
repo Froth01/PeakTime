@@ -56,7 +56,9 @@ hikingsApi.interceptors.response.use(
     if (status === 401) {
       console.log("사용자 인증이 실패했어요");
       // store.dispatch(setAccessToken(""));
-      window.location.href = "/";
+      useUserStore.getState().userActions.setUser(null);
+      localStorage.removeItem("user");
+      window.location.href = "/login";
     }
     // 요청이 만들어졌지만 서버로부터 응답이 없을 때, error.request에 요청 정보가 들어간다.
     else if (error.request) {

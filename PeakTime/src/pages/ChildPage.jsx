@@ -4,6 +4,7 @@ import AddChild from "../components/Child/AddChild";
 import UpdateChild from "../components/Child/UpdateChild";
 import AddGroup from "../components/Child/AddGroup";
 import UpdateGroup from "../components/Child/UpdateGroup";
+import Title from "../components/common/Title";
 import { useState, useEffect } from "react";
 import groupsApi from "../api/groupsApi";
 
@@ -37,26 +38,40 @@ function ChildPage() {
   }, []);
 
   return (
-    <>
-      <ChildList onChangeContent={onChangeContent} groupList={groupList} />
-      {showNow === "addChild" && <AddChild onChangeContent={onChangeContent} />}
-      {showNow === "updateChild" && (
-        <UpdateChild childId={updateId} onChangeContent={onChangeContent} />
-      )}
-      {showNow === "addGroup" && (
-        <AddGroup
-          onChangeContent={onChangeContent}
-          onChangeGroupList={onChangeGroupList}
-        />
-      )}
-      {showNow === "updateGroup" && (
-        <UpdateGroup
-          groupId={updateId}
-          onChangeContent={onChangeContent}
-          onChangeGroupList={onChangeGroupList}
-        />
-      )}
-    </>
+    <div className="h-[100vh] flex flex-col">
+      <Title title={"서브계정 설정"} />
+      <div className="h-[90vh] top-[10vh]">
+        <ChildList onChangeContent={onChangeContent} groupList={groupList} />
+        {showNow === "addChild" && (
+          <AddChild
+            groupList={groupList}
+            onChangeContent={onChangeContent}
+            onChangeGroupList={onChangeGroupList}
+          />
+        )}
+        {showNow === "updateChild" && (
+          <UpdateChild
+            childId={updateId}
+            groupList={groupList}
+            onChangeContent={onChangeContent}
+            onChangeGroupList={onChangeGroupList}
+          />
+        )}
+        {showNow === "addGroup" && (
+          <AddGroup
+            onChangeContent={onChangeContent}
+            onChangeGroupList={onChangeGroupList}
+          />
+        )}
+        {showNow === "updateGroup" && (
+          <UpdateGroup
+            groupId={updateId}
+            onChangeContent={onChangeContent}
+            onChangeGroupList={onChangeGroupList}
+          />
+        )}
+      </div>
+    </div>
   );
 }
 

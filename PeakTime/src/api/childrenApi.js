@@ -5,12 +5,12 @@ import { useUserStore } from "../stores/UserStore";
 const getUserState = useUserStore.getState;
 
 // axios 객체 만들기
-const groupsApi = axios.create({
-  baseURL: `${import.meta.env.VITE_BACK_URL}/api/v1/groups`,
+const childrenApi = axios.create({
+  baseURL: `${import.meta.env.VITE_BACK_URL}/api/v1/children`,
 }); // BASE_URL/api/vi/directories?category={category}
 
 // axios 객체에 요청 인터셉터 추가하기 (헤더에 JWT Token 삽입하기)
-groupsApi.interceptors.request.use(
+childrenApi.interceptors.request.use(
   (config) => {
     const { user } = getUserState();
     const accessToken = user.accessToken;
@@ -27,7 +27,7 @@ groupsApi.interceptors.request.use(
 );
 
 // axios 객체에 응답 인터셉터 추가하기 (로그인 화면으로 보내기)
-groupsApi.interceptors.response.use(
+childrenApi.interceptors.response.use(
   (response) => response,
   (error) => {
     //권한 오류 발생 시
@@ -54,4 +54,4 @@ groupsApi.interceptors.response.use(
   }
 );
 
-export default groupsApi;
+export default childrenApi;

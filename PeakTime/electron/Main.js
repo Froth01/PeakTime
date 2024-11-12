@@ -24,7 +24,7 @@ function createWindow() {
     width: 1366,
     height: 768,
     webPreferences: {
-      preload: path.join(__dirname, "public", "preload.js"),
+      preload: path.join(__dirname, "electron", "preload.js"),
       contextIsolation: true,
       nodeIntegration: false, // 보안 상 비활성화
       sandbox: true,
