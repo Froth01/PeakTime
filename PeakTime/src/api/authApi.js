@@ -39,6 +39,7 @@ authApi.interceptors.response.use(
             localStorage.removeItem("user");
             // 로그인 페이지로 강제 라우팅
             window.location.href = "/login";
+            return;
           });
       } else { // 여기는 에러 코드가 401이 아닌 모든 에러 코드 처리
         console.log(status);

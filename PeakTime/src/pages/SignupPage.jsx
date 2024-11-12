@@ -22,11 +22,25 @@ function SignupPage() {
   };
 
   return (
-    <>
-      <div>SignupPage</div>
-      <button onClick={openResultModal}>가입 완료</button>
-      <button onClick={goBack}>돌아가기</button>
-    </>
+    <div className="h-[100vh] flex justify-center items-center">
+      <div className="w-[60vw] h-[60vh] flex flex-col justify-around items-center bg-[#333333] bg-opacity-90 p-5 rounded-lg text-white">
+        <h1>회원가입</h1>
+        <div className="main-content">
+          <div className="group">
+            <input
+              type="text"
+            />
+            <label>
+              아이디
+            </label>
+          </div>
+        </div>
+        <div className="footer-content">
+          <button onClick={openResultModal}>가입 완료</button>
+          <button onClick={goBack}>돌아가기</button>
+        </div>
+      </div>
+    </div>
   );
 }
 
