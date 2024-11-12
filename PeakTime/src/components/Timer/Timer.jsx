@@ -10,7 +10,7 @@ function Timer() {
 
   const [startedHikingId, setStartedHikingId] = useState(null); // 시작한 hikingId 정보
 
-  const [extenstionData, setExtenstionData] = useState(null); // extension hiking 데이터
+  const [extensionData, setExtensionData] = useState(null); // extension hiking 데이터
   const [electronData, setElectronData] = useState(null); // electron hiking 데이터
 
   //현재 시간
@@ -25,6 +25,8 @@ function Timer() {
   const stopNow = () => {
     clearInterval(nowInterval);
   };
+
+  const [extensionMemoData, setExtensionMemoData] = useState(null); // extension memo 저장 데이터
 
   // 시작 상태, 남은 시간 변경시마다 적용
   useEffect(() => {
@@ -152,6 +154,38 @@ function Timer() {
   //   setElectronData(data);
   // };
 
+  const handleElectronMessage = async (data) => {
+    // 익스텍션에서 추가로 받은 리스트 저장
+    console.log(data);
+    setElectronData(data);
+  };
+
+  const handleExtensionMemoMessage = async (data) => {
+    // 익스텍션에서 받은 메모 저장
+    console.log("handleExtensionMemoMessage: ", data);
+    setExtensionMemoData(data);
+    createPostMemo(data);
+  };
+
+  const createPostMemo = async (data) => {
+    try {
+      // 프리셋 생성 Post 요청을 보내기
+      // Request Body 데이터 가공
+      console.log("받고싶은 데이터 data", data);
+      console.log("받고싶은 데이터 data.title", data.title);
+      console.log("받고싶은 데이터 ", data.content);
+      const requestData = {
+        title: data.title,
+        content: data.content,
+      };
+      const response = await memosApi.post(``, requestData);
+      console.log("CreateMemoPostApi: ", response.data);
+    } catch (error) {
+      console.error("Error create Memo:", error);
+      throw error;
+    }
+  };
+
   // onWebSocketMessage 이벤트 리스너 등록
   useEffect(() => {
     // console.log("onHikingInfo 리스너 등록 중...");
@@ -165,6 +199,8 @@ function Timer() {
 
     setBaseUrl();
     startNow();
+    console.log("extension memo 값 변경 감지 중");
+    window.electronAPI.onSaveMemo(handleExtensionMemoMessage);
   }, []);
 
   // useEffect(() => {
@@ -229,6 +265,12 @@ function Timer() {
           });
           const endBtn = document.getElementById("giveup");
           endBtn.dispatchEvent(hikingEnd);
+
+          // API 요청 보내기
+          setTimeout(() => {
+            setExtensionData([]);
+            setElectronData([]);
+          }, 2000);
 
           // 상태 업데이트
           setTotalTime(0);

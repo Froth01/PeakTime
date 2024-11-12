@@ -1,9 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
+import memosApi from "../../api/memosApi";
 import PropTypes from "prop-types";
 
 function MemoList({ onMemoClick }) {
   // 메모 리스트
-  const [memoList, setMemoList] = useState(["메모1", "메모2", "메모3"]);
+  const [memoList, setMemoList] = useState([]);
+  const [countGPT, setCountGPT] = useState(null);
+
+  useEffect(() => {
+    fetchGetMemoList();
+  }, []);
+
+  const fetchGetMemoList = async () => {
+    try {
+      // 메모 전체 조회 GET 요청을 보내기
+      const response = await memosApi.get(``);
+      console.log("memoListGetApi: ", response.data);
+      const memoList = response.data.data.memoList;
+      const countGPT = response.data.data.summaryCount;
+      setMemoList([...memoList]); // 상태를 업데이트하여 UI에 반영
+      setCountGPT(countGPT);
+      return response;
+    } catch (error) {
+      console.error("Error fetching memoList:", error);
+      throw error;
+    }
+  };
 
   // 메모 클릭
   const handleClickSetting = (index) => {
@@ -20,8 +43,10 @@ function MemoList({ onMemoClick }) {
       <div className="flex flex-col gap-5">
         {memoList.map((memo, index) => (
           <div className="gap-5" key={index}>
-            <button onClick={() => handleClickSetting(index)}>{memo}</button>|
-            <button onClick={() => handleDelete(index)}>X</button>
+            <button onClick={() => handleClickSetting(index)}>
+              {memo.title}
+            </button>
+            |<button onClick={() => handleDelete(index)}>X</button>
           </div>
         ))}
       </div>

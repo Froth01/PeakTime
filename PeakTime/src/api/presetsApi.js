@@ -37,6 +37,7 @@ presetsApi.interceptors.response.use(
 
     // 사용자 인증이 실패한 경우, 로그인 페이지로 리다이렉트
     if (status === 401) {
+      console.log("사용자 인증이 실패했어요");
       // store.dispatch(setAccessToken(""));
       window.location.href = "/";
     }

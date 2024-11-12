@@ -17,6 +17,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
   startBlockProgram: (data) => {
     ipcRenderer.send("start-block-program", data);
   },
+<<<<<<< Updated upstream
   // 프로그램 차단 종료
   endBlockProgram: (data) => {
     ipcRenderer.send("end-block-program", data);
@@ -25,4 +26,28 @@ contextBridge.exposeInMainWorld("electronAPI", {
   onAllDone: (callback) => {
     ipcRenderer.on("all-done", (event, data) => callback(data));
   },
+=======
+
+  endBlockProgram: () => {
+    ipcRenderer.send("end-block-program");
+  },
+
+  onBlockHistory: (callback) => {
+    ipcRenderer.on("blockHistoryResponse", (event, data) => {
+      console.log("차단 히스토리 조회");
+      callback(data);
+    });
+  },
+  sendSaveMemo: (data) => {
+    console.log("sendSaveMemo", data);
+    ipcRenderer.send("save-memo", data);
+  },
+  onSaveMemo: (callback) => {
+    ipcRenderer.on("save-memo-response", (data) => {
+      console.log("onsavememo 콜백 전");
+      console.log(data);
+      callback(data);
+    });
+  },
+>>>>>>> Stashed changes
 });

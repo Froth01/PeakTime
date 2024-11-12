@@ -80,4 +80,9 @@ function handleParsedMessage(parsedMessage) {
     // sendHikingInfo 호출을 분리한 처리로 이동
     window.electronAPI.sendHikingInfo(parsedMessage);
   }
+  if (parsedMessage.action === "saveMemo") {
+    console.log("hereasdfasdgf");
+    console.log(parsedMessage);
+    window.electronAPI.sendSaveMemo(parsedMessage);
+  }
 }
