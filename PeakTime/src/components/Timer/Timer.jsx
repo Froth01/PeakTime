@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import hikingsApi, { setBaseUrl } from "../../api/hikingsApi.js";
-import { IoIosArrowDown } from "react-icons/io";
+import memosApi from "../../api/memosApi.js";
 import presetsApi from "../../api/presetsApi.js";
+import { IoIosArrowDown } from "react-icons/io";
 import { useUserStore } from "../../stores/UserStore.js";
-import { EventSourcePolyfill } from 'event-source-polyfill';
+import { EventSourcePolyfill } from "event-source-polyfill";
 
 function Timer() {
   const [inputTime, setInputTime] = useState(""); // 사용자 입력 시간 (분 단위)
@@ -15,6 +16,8 @@ function Timer() {
   const [startedHikingId, setStartedHikingId] = useState(null); // 시작한 hikingId 정보
   const [presetList, setPresetList] = useState(null); // 프리셋 리스트
 
+  const [extensionData, setExtensionData] = useState(null); // extension hiking 데이터
+  const [electronData, setElectronData] = useState(null); // electron hiking 데이터
   // 드롭다운 관련
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -35,6 +38,8 @@ function Timer() {
   const stopNow = () => {
     clearInterval(nowInterval);
   };
+
+  const [extensionMemoData, setExtensionMemoData] = useState(null); // extension memo 저장 데이터
 
   // 시작 상태, 남은 시간 변경시마다 적용
   useEffect(() => {
@@ -151,28 +156,27 @@ function Timer() {
     // user 객체가 존재하고, root 사용자가 아닐 경우에만 실행
     if (user && !user.isRoot) {
       const accessToken = user.accessToken;
-  
+
       // EventSourcePolyfill 인스턴스 생성 함수
       const createEventSource = () => {
-        console.log("연결 시작")
+        console.log("연결 시작");
         const eventSource = new EventSourcePolyfill(
           `${import.meta.env.VITE_BACK_URL}/api/v1/schedules`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
-              Accept : "text/event-stream"
+              Accept: "text/event-stream",
             },
-            heartbeatTimeout: 3600000
+            heartbeatTimeout: 3600000,
           }
         );
-  
+
         // 서버에서 메시지를 받을 때마다 실행
         eventSource.addEventListener("message", (event) => {
-          
           // 수신된 메시지 데이터 파싱
           const data = event.data;
           console.log("Received event:", data);
-          
+
           // 데이터가 JSON 형식일 경우 파싱
           let parsedData;
           try {
@@ -180,14 +184,13 @@ function Timer() {
           } catch (e) {
             parsedData = data; // JSON이 아닐 경우 그대로 사용
           }
-        
+
           // 메시지를 상태에 추가
-          if(parsedData != 'start'){
+          if (parsedData != "start") {
             setMessages(parsedData);
           }
         });
-        
-  
+
         // 에러 발생 시 연결 종료 후 3초 후 재연결
         eventSource.onerror = () => {
           console.log("EventSource error, attempting to reconnect...");
@@ -196,20 +199,19 @@ function Timer() {
             createEventSource();
           }, 3000);
         };
-  
+
         return eventSource;
       };
-  
+
       // EventSource 생성 및 관리
       const eventSourceInstance = createEventSource();
-  
-      
+
       return () => {
         console.log("Closing EventSource connection...");
         eventSourceInstance.close();
       };
     }
-  }, []);  
+  }, []);
 
   // 메인 사용자가 설정한 시간에 서브 계정의 차단 프로세스, sse 메세지가 올 때 시작
   useEffect(() => {
@@ -225,43 +227,46 @@ function Timer() {
             const hour = now.getHours();
             const minute = now.getMinutes();
             const second = now.getSeconds();
-      
+
             const format = `${year}-${("00" + month.toString()).slice(-2)}-${(
               "00" + day.toString()
             ).slice(-2)} ${("00" + hour.toString()).slice(-2)}:${(
               "00" + minute.toString()
             ).slice(-2)}:${("00" + second.toString()).slice(-2)}`;
-      
+
             const startHikingData = {
               startTime: format,
               attentionTime: messages.attentionTime,
               isSelf: false,
             };
             console.log("보낼 바디 :", startHikingData);
-      
+
             // API 요청
-            const responseStartHiking = await hikingsApi.post("", startHikingData);
-      
+            const responseStartHiking = await hikingsApi.post(
+              "",
+              startHikingData
+            );
+
             // 상태 업데이트
             setStartedHikingId(responseStartHiking.data.data.hikingId);
             setTotalTime(messages.attentionTime);
             setRemainTime(messages.attentionTime * 60 - 1); // 분 단위로 받은 시간을 초로 변환
             setIsRunning(true);
             stopNow();
-      
+
             // 커스텀 이벤트 발생
             const hikingStart = new CustomEvent("hikingStart", {
               bubbles: true,
               detail: {
                 startedHikingId: responseStartHiking.data.data.hikingId,
-                selectedPreset: messages
+                selectedPreset: messages,
               },
             });
             const startBtn = document.getElementById("start");
             startBtn?.dispatchEvent(hikingStart);
           } catch (err) {
             console.error("API 요청 중 오류 발생:", err);
-      
+
             // SweetAlert를 사용하여 오류 메시지 표시
             Swal.fire({
               title: "하이킹을 시작하는 데 실패했습니다.",
@@ -272,7 +277,7 @@ function Timer() {
             });
           }
         };
-      
+
         // 함수 호출
         startHiking();
       }
@@ -280,7 +285,6 @@ function Timer() {
       setMessages(null);
     }
   }, [messages]);
-
 
   // 요청해서 아이디 받으면
   useEffect(() => {
@@ -290,8 +294,77 @@ function Timer() {
     }
   }, [startedHikingId]);
 
+  // ipc 처리
+  // const handleExtensionMessage = async (data) => {
+  //   console.log(data.urlList);
+  //   setExtenstionData(data.urlList); // 받은 데이터를 상태로 저장
+  // };
+
+  // const handleElectronMessage = async (data) => {
+  //   // 익스텍션에서 추가로 받은 리스트 저장
+  //   console.log(data);
+  //   setElectronData(data);
+  // };
+
+  const handleExtensionMemoMessage = async (data) => {
+    // 익스텍션에서 받은 메모 저장
+    console.log("handleExtensionMemoMessage: ", data);
+    // setExtensionMemoData(data);
+    createPostMemo(data);
+  };
+
+  const createPostMemo = async (data) => {
+    try {
+      // 프리셋 생성 Post 요청을 보내기
+      // Request Body 데이터 가공
+      console.log("받고싶은 데이터 data", data);
+      console.log("받고싶은 데이터 data의 타이틀", data.title);
+      console.log("받고싶은 데이터 data컨텐츠", data.content);
+      const requestData = {
+        title: data.title,
+        content: data.content,
+      };
+      const response = await memosApi.post(``, requestData);
+      console.log("CreateMemoPostApi: ", response.data);
+    } catch (error) {
+      console.error("Error create Memo:", error);
+      throw error;
+    }
+  };
+
+  const handleExtensionUrlMessage = async (data) => {
+    // 익스텍션에서 받은 url 저장
+    console.log("handleExtensionurlMessage: ", data);
+    // setExtensionMemoData(data);
+    addUrlPost(data);
+  };
+
+  const addUrlPost = async (data) => {
+    try {
+      // 프리셋 단일 추가 Post 요청을 보내기
+      // Request Body 데이터 가공
+      console.log("받고싶은 데이터 data", data);
+      console.log("데이터 data 프리셋 아이디", data.presetId);
+      console.log("받고싶은 데이터 data url", data.url);
+      const requestData = {
+        url: data.url,
+      };
+      const response = await presetsApi.post(`${data.presetId}`, requestData);
+      console.log("addUrlPostApi: ", response.data);
+    } catch (error) {
+      console.error("Error addurl:", error);
+      throw error;
+    }
+  };
+
+  // onWebSocketMessage 이벤트 리스너 등록
   useEffect(() => {
     window.electronAPI.onAllDone(allDone);
+
+    // 이벤트 리스너 등록
+    window.electronAPI.onSaveMemo(handleExtensionMemoMessage);
+
+    window.electronAPI.onAddUrl(handleExtensionUrlMessage);
 
     presetsApi
       .get("")
@@ -324,6 +397,12 @@ function Timer() {
           });
           const endBtn = document.getElementById("giveup");
           endBtn.dispatchEvent(hikingEnd);
+
+          // API 요청 보내기
+          setTimeout(() => {
+            setExtensionData([]);
+            setElectronData([]);
+          }, 2000);
 
           // 상태 업데이트
           setTotalTime(0);
