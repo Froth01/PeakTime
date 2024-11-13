@@ -122,15 +122,29 @@ function Timer() {
           setIsRunning(true);
           stopNow();
 
+          let hikingStart;
           // 커스텀 이벤트
-          const hikingStart = new CustomEvent("hikingStart", {
-            bubbles: true,
-            detail: {
-              startedHikingId: responseStartHiking.data.data.hikingId,
-              selectedPreset: selectedOption,
-              backUrl: hikingsApi.defaults.baseURL,
-            },
-          });
+          if(user.isRoot){
+              hikingStart = new CustomEvent("hikingStart", {
+              bubbles: true,
+              detail: {
+                startedHikingId: responseStartHiking.data.data.hikingId,
+                selectedPreset: selectedOption,
+                backUrl: hikingsApi.defaults.baseURL,
+              },
+            });
+          }
+          else{
+            hikingStart = new CustomEvent("hikingStart", {
+              bubbles: true,
+              detail: {
+                startedHikingId: responseStartHiking.data.data.hikingId,
+                selectedPreset: presetList[0],
+                backUrl: hikingsApi.defaults.baseURL,
+              },
+            });
+          }
+         
           const startBtn = document.getElementById("start");
           startBtn.dispatchEvent(hikingStart);
         } catch (err) {
