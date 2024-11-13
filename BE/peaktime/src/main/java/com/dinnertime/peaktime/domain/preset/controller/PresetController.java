@@ -3,6 +3,7 @@ package com.dinnertime.peaktime.domain.preset.controller;
 import com.dinnertime.peaktime.domain.preset.service.PresetService;
 import com.dinnertime.peaktime.domain.preset.service.dto.request.AddUrlPresetRequestDto;
 import com.dinnertime.peaktime.domain.preset.service.dto.request.SavePresetRequestDto;
+import com.dinnertime.peaktime.domain.preset.service.dto.response.PresetResponseDto;
 import com.dinnertime.peaktime.domain.preset.service.dto.response.PresetWrapperResponseDto;
 import com.dinnertime.peaktime.global.auth.service.dto.security.UserPrincipal;
 import com.dinnertime.peaktime.global.util.CommonSwaggerResponse;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Path;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -74,6 +76,28 @@ public class PresetController {
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(),"프리셋 전체 조회에 성공했습니다.", responseDto));
     }
 
+    // 특정 프리셋 조회
+    // 프리셋 조회
+    @Operation(summary = "특정 프리셋 조회", description = "프리셋 상세 조회하기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "특정 프리셋 조회에 성공했습니다.",
+                    content = @Content(schema= @Schema(implementation = PresetWrapperResponseDto.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "특정 프리셋 조회에 실패했습니다.",
+                    content= @Content(schema= @Schema(implementation = ResultDto.class))
+            )
+    })
+    @CommonSwaggerResponse.CommonResponses
+    @GetMapping("/{presetId}")
+    public ResponseEntity<?> getEachPreset(@AuthenticationPrincipal UserPrincipal userPrincipal,
+    @PathVariable Long presetId) {
+        log.info("getEachPreset 메서드가 호출되었습니다.");
+
+        PresetResponseDto responseDto = presetService.getUniquePreset(userPrincipal.getUserId(), presetId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(),"특정 프리셋 조회에 성공했습니다.", responseDto));
+    }
+
     // 프리셋 수정
     @Operation(summary = "특정 프리셋 수정하기", description = "프리셋 수정하기")
     @ApiResponses(value = {
@@ -96,6 +120,8 @@ public class PresetController {
 
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(),"프리셋 수정에 성공했습니다."));
     }
+
+
 
     // 프리셋 삭제
     @Operation(summary = "특정 프리셋 삭제하기", description = "프리셋 삭제하기")
