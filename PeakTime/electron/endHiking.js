@@ -1,6 +1,9 @@
 import hikingsApi, { setBaseUrl } from "../src/api/hikingsApi.js";
 
 export async function endHikingProcess(sumData, startedHikingId, accessToken) {
+
+  // window.electronAPI.sendStartMessage(null);
+
   //현재 시간 포맷 생성
   const now = new Date();
   const year = now.getFullYear();

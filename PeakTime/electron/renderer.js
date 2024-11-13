@@ -1,4 +1,5 @@
 //하이킹 시작
+
 document.addEventListener("hikingStart", (event) => {
   console.log("스타트 커스텀 이벤트 발생, event정보 :", event.detail);
   if (typeof window !== "undefined" && window.electronAPI) {
@@ -11,15 +12,18 @@ document.addEventListener("hikingStart", (event) => {
       console.log("send accessToken info", accessToken);
     }
   }
-  window.electronAPI.sendWebSocketMessage(
-    JSON.stringify({
-      action: "start",
-      websiteList: event.detail.selectedPreset.blockWebsiteArray,
-      role: "root",
-      presetId: event.detail.selectedPreset.presetId,
-      hikingId: event.detail.startedHikingId,
-    })
-  );
+  // WebSocket 전송 데이터 생성 및 저장
+  const message = JSON.stringify({
+    action: "start",
+    websiteList: event.detail.selectedPreset.blockWebsiteArray,
+    role: "root",
+    presetId: event.detail.selectedPreset.presetId,
+    hikingId: event.detail.startedHikingId,
+  });
+
+  window.electronAPI.sendWebSocketMessage(message);
+  // 메인 프로세스에 메시지 저장 요청
+  window.electronAPI.sendStartMessage(message); 
 
   // 차단 시스템 요청
   const data = {};
@@ -35,6 +39,9 @@ document.addEventListener("hikingStart", (event) => {
 
 //하이킹 종료
 document.addEventListener("hikingEnd", (event) => {
+
+  window.electronAPI.sendStartMessage(null);
+  
   console.log("하이킹 끝");
   window.electronAPI.sendWebSocketMessage(
     JSON.stringify({
@@ -86,5 +93,15 @@ function handleParsedMessage(parsedMessage) {
   if (parsedMessage.action === "end") {
     // sendHikingInfo 호출을 분리한 처리로 이동
     window.electronAPI.sendHikingInfo(parsedMessage);
+  }
+  if (parsedMessage.action === "saveMemo") {
+    console.log("savememo renderer");
+    console.log(parsedMessage);
+    window.electronAPI.sendSaveMemo(parsedMessage); // preload에서 electronAPi 설정한 곳으로 이동
+  }
+  if (parsedMessage.action === "addUrl") {
+    console.log("addUrl renderer");
+    console.log(parsedMessage);
+    window.electronAPI.sendAddUrl(parsedMessage); // preload에서 electronAPi 설정한 곳으로 이동
   }
 }
