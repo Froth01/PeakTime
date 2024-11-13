@@ -1,5 +1,6 @@
 import { spawn } from "child_process";
 import { activeWindow } from "active-win";
+import { dialog } from "electron";
 
 // 차단할 프로세스 목록과 주기
 const interval = 2000;
@@ -45,13 +46,25 @@ function terminateProcess(processName) {
   });
 
   processKiller.on("close", (code) => {
+    
     if (code === 0) {
       console.log(`Successfully terminated process: ${processName}`);
+      showAlert(`프로그램 차단 : "${processName}"가 종료되었습니다.`);
     } else {
       console.log(
         `Failed to terminate process: ${processName} with exit code ${code}`
       );
     }
+  });
+}
+
+// 경고창을 띄우는 함수
+function showAlert(message) {
+  dialog.showMessageBox({
+    type: "warning",
+    title: "Blocked Program Alert",
+    message: message,
+    buttons: ["OK"]
   });
 }
 
