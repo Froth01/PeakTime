@@ -22,8 +22,12 @@ function LoginPage() {
         password: password,
       };
       try {
-        const loginResponse = await authApi.post("/login", loginData);
+        const loginResponse = await authApi.post("/login", loginData, {
+        withCredentials: true
+        });
         // 성공하면 이어서 진행
+        console.log(loginResponse.headers); // 전체 헤더 확인
+        console.log(loginResponse.headers['set-cookie']); // 쿠키 헤더만 확인
         userActions.setUser(loginResponse.data.data);
         localStorage.setItem("user", JSON.stringify(loginResponse.data.data));
         navigate("/");
