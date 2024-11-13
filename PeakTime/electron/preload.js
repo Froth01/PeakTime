@@ -8,6 +8,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.on("websocket-message", (event, message) => callback(message)),
   //토큰 전달
   sendAccessToken: (token) => ipcRenderer.send("sendAccessToken", token),
+  //url 전달
+  sendBackUrl: (url) => ipcRenderer.send("sendBackUrl", url),
   // 하이킹 종료시 정보 주고받기
   sendHikingInfo: (data) => {
     console.log("sendHikingInfo :", data);

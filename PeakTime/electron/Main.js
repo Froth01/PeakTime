@@ -141,14 +141,21 @@ ipcMain.on("start-block-program", (event, data) => {
 });
 
 // .env에서 로드된 환경 변수 반환
-ipcMain.handle("getBackUrl", (event) => {
-  return process.env.BACK_URL; // .env에서 로드한 BACK_URL 반환
+ipcMain.handle("getBackUrl", async (event) => {
+  const url = await store.get("url");
+  return url;
 });
 
 //토큰 받기
 ipcMain.on("sendAccessToken", (event, token) => {
   console.log("Received access token:", token);
   store.set("accessToken", token);
+});
+
+//url 받기
+ipcMain.on("sendBackUrl", (event, url) => {
+  console.log("Received back url:", url);
+  store.set("url", url);
 });
 
 // 메모저장 신호받기

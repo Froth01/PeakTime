@@ -11,6 +11,7 @@ document.addEventListener("hikingStart", (event) => {
       window.electronAPI.sendAccessToken(accessToken); // IPC 채널로 토큰 전달
       console.log("send accessToken info", accessToken);
     }
+    window.electronAPI.sendBackUrl(event.detail.backUrl);
   }
   // WebSocket 전송 데이터 생성 및 저장
   const message = JSON.stringify({

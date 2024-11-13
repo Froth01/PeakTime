@@ -1,4 +1,4 @@
-import hikingsApi, { setBaseUrl } from "../src/api/hikingsApi.js";
+import electronApi, { setBaseUrl } from "./electronApi.js";
 
 export async function endHikingProcess(sumData, startedHikingId, accessToken) {
 
@@ -26,16 +26,12 @@ export async function endHikingProcess(sumData, startedHikingId, accessToken) {
   };
   await setBaseUrl();
 
-  return hikingsApi
-    .put(
-      `${process.env.VITE_BACK_URL}/api/v1/hikings/${startedHikingId}`,
-      endHikingData,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    )
+  return electronApi
+    .put(`/${startedHikingId}`, endHikingData, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
     .then((response) => {
       console.log("끝내기 api 결과 : ", response);
       return "done";

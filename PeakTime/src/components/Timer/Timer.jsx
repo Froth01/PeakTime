@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import hikingsApi, { setBaseUrl } from "../../api/hikingsApi.js";
+import hikingsApi from "../../api/hikingsApi.js";
 import memosApi from "../../api/memosApi.js";
 import presetsApi from "../../api/presetsApi.js";
 import { IoIosArrowDown } from "react-icons/io";
@@ -16,8 +16,6 @@ function Timer() {
   const [startedHikingId, setStartedHikingId] = useState(null); // 시작한 hikingId 정보
   const [presetList, setPresetList] = useState(null); // 프리셋 리스트
 
-  const [extensionData, setExtensionData] = useState(null); // extension hiking 데이터
-  const [electronData, setElectronData] = useState(null); // electron hiking 데이터
   // 드롭다운 관련
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -110,7 +108,6 @@ function Timer() {
             attentionTime: inputTime,
             isSelf: true,
           };
-          console.log("보낼 바디 :", startHikingData);
 
           // API 요청
           const responseStartHiking = await hikingsApi.post(
@@ -131,6 +128,7 @@ function Timer() {
             detail: {
               startedHikingId: responseStartHiking.data.data.hikingId,
               selectedPreset: selectedOption,
+              backUrl: hikingsApi.defaults.baseURL,
             },
           });
           const startBtn = document.getElementById("start");
@@ -260,6 +258,7 @@ function Timer() {
               detail: {
                 startedHikingId: responseStartHiking.data.data.hikingId,
                 selectedPreset: messages,
+                backUrl: hikingsApi.defaults.baseURL,
               },
             });
             const startBtn = document.getElementById("start");
@@ -293,18 +292,6 @@ function Timer() {
       // 차단 프로세스 시작
     }
   }, [startedHikingId]);
-
-  // ipc 처리
-  // const handleExtensionMessage = async (data) => {
-  //   console.log(data.urlList);
-  //   setExtenstionData(data.urlList); // 받은 데이터를 상태로 저장
-  // };
-
-  // const handleElectronMessage = async (data) => {
-  //   // 익스텍션에서 추가로 받은 리스트 저장
-  //   console.log(data);
-  //   setElectronData(data);
-  // };
 
   const handleExtensionMemoMessage = async (data) => {
     // 익스텍션에서 받은 메모 저장
@@ -373,7 +360,6 @@ function Timer() {
       })
       .catch();
 
-    setBaseUrl();
     startNow();
   }, []);
 
@@ -398,12 +384,6 @@ function Timer() {
           const endBtn = document.getElementById("giveup");
           endBtn.dispatchEvent(hikingEnd);
 
-          // API 요청 보내기
-          setTimeout(() => {
-            setExtensionData([]);
-            setElectronData([]);
-          }, 2000);
-
           // 상태 업데이트
           setTotalTime(0);
           setRemainTime(null); // 분 단위로 받은 시간을 초로 변환
@@ -425,7 +405,7 @@ function Timer() {
   };
   // 다 됐을떄
   const allDone = (data) => {
-    console.log("야진짜 다됐다", data);
+    console.log("allDone", data);
   };
   return (
     <>
@@ -555,47 +535,49 @@ function Timer() {
                 *분 단위로 입력해주세요.<br></br>최소 30분부터 240분까지
                 가능합니다.
               </label>
-              <div
-                tabIndex={0}
-                className={`mt-5 relative w-[60%] h-[60%] rounded-lg bg-white border border-gray-300 px-3 py-2 cursor-pointer ${
-                  isOpen ? "focus:ring-4 focus:ring-[#66aadf]" : ""
-                }`}
-              >
+              {user.isRoot && (
                 <div
-                  onClick={() => setIsOpen(!isOpen)}
-                  className="flex justify-between items-center"
+                  tabIndex={0}
+                  className={`mt-5 relative w-[60%] h-[60%] rounded-lg bg-white border border-gray-300 px-3 py-2 cursor-pointer ${
+                    isOpen ? "focus:ring-4 focus:ring-[#66aadf]" : ""
+                  }`}
                 >
-                  <p>
-                    {selectedOption
-                      ? selectedOption.title
-                      : "프리셋을 선택하세요."}
-                  </p>
-                  <IoIosArrowDown />
-                </div>
-                {isOpen && (
-                  <ul
-                    className="absolute left-0 right-0 mt-3 bg-white border
-                  border-gray-300 rounded-lg shadow-lg"
+                  <div
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="flex justify-between items-center"
                   >
-                    {presetList.map((preset, index) => (
-                      <div key={preset.presetId}>
-                        <li
-                          onClick={() => {
-                            setSelectedOption(preset);
-                            setIsOpen(false);
-                          }}
-                          className="px-3 py-2 hover:bg-[#66aadf] cursor-pointer rounded-lg hover:font-bold"
-                        >
-                          {preset.title}
-                        </li>
-                        {index < presetList.length - 1 && (
-                          <hr className="border-gray-200" />
-                        )}
-                      </div>
-                    ))}
-                  </ul>
-                )}
-              </div>
+                    <p>
+                      {selectedOption
+                        ? selectedOption.title
+                        : "프리셋을 선택하세요."}
+                    </p>
+                    <IoIosArrowDown />
+                  </div>
+                  {isOpen && (
+                    <ul
+                      className="absolute left-0 right-0 mt-3 bg-white border
+                  border-gray-300 rounded-lg shadow-lg"
+                    >
+                      {presetList.map((preset, index) => (
+                        <div key={preset.presetId}>
+                          <li
+                            onClick={() => {
+                              setSelectedOption(preset);
+                              setIsOpen(false);
+                            }}
+                            className="px-3 py-2 hover:bg-[#66aadf] cursor-pointer rounded-lg hover:font-bold"
+                          >
+                            {preset.title}
+                          </li>
+                          {index < presetList.length - 1 && (
+                            <hr className="border-gray-200" />
+                          )}
+                        </div>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
               <label htmlFor="" className="text-sm text-white">
                 *적용할 프리셋을 선택해주세요.
               </label>
