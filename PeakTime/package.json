@@ -63,15 +63,26 @@
     "productName": "PeakTime",
     "files": [
       "dist/**/*",
-      "electron/**/*",
-      "public/**/*"
+      "electron/**/*"
     ],
-    "directories": {
-      "buildResources": "public"
-    },
+    "asar": true,
     "win": {
       "icon": "public/Logo/Logo.ico",
+      "target": [
+        "zip",
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "directories": {
+      "buildResources": "./resources/installer/",
+      "output": "./dist/",
+      "app": ".",
       "target": "nsis"
     }
+    
   }
 }
