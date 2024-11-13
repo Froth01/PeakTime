@@ -81,7 +81,7 @@ public class PresetController {
     @Operation(summary = "특정 프리셋 조회", description = "프리셋 상세 조회하기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "특정 프리셋 조회에 성공했습니다.",
-                    content = @Content(schema= @Schema(implementation = PresetWrapperResponseDto.class))
+                    content = @Content(schema= @Schema(implementation = PresetResponseDto.class))
             ),
             @ApiResponse(responseCode = "500", description = "특정 프리셋 조회에 실패했습니다.",
                     content= @Content(schema= @Schema(implementation = ResultDto.class))
