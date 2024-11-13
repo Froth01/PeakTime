@@ -3,6 +3,7 @@ import Swal from "sweetalert2";
 import PropTypes from "prop-types";
 import presetsApi from "../../api/presetsApi";
 import PresetSetting from "./PresetSetting";
+import { FaTrashAlt } from "react-icons/fa";
 
 function PresetList({ onPresetClick, updateTrigger }) {
   // 프리셋 리스트 api 요청 필요
@@ -104,23 +105,39 @@ function PresetList({ onPresetClick, updateTrigger }) {
   // };
 
   return (
-    <div className="absolute left-[10vw] w-[15vw] h-[100vh] flex flex-col justify-between bg-gray-400">
-      <div className="flex flex-col gap-5">
+    <div className="absolute bg-[#333333] bg-opacity-70 left-[11vw] w-[29vw] h-[84vh] my-[3vh] rounded-lg flex flex-col justify-start items-center text-start p-5">
+      <div className="w-full mb-3 flex justify-between items-start">
+        <h2 className="self-start text-white font-bold text-[30px]">
+          차단 프리셋 목록
+        </h2>
+      </div>
+
+      <div className="flex flex-col gap-5 bg-white text-[20px] w-[25vw] h-[70vh] overflow-y-auto rounded-lg p-5 font-bold">
         {presetList.map((preset, index) => (
-          <div className="gap-5" key={index}>
+          <div className="gap-5 flex justify-between" key={index}>
             <button onClick={() => handleClickSetting(preset)}>
               {preset.title}
             </button>
-            |
             <button
+              className="text-[23px]"
               onClick={() => openDeleteWarn(preset.title, preset.presetId)}
             >
-              X
+              <FaTrashAlt />
             </button>
           </div>
         ))}
       </div>
-      <button onClick={handleAddBtn}>프리셋 추가</button>
+
+      <div className="self-start mt-3">
+        {presetList.length < 5 ? (
+          <button
+            className="text-white font-bold text-[20px]"
+            onClick={handleAddBtn}
+          >
+            +차단 프리셋 추가
+          </button>
+        ) : null}
+      </div>
     </div>
   );
 }

@@ -100,14 +100,14 @@ const StatisticsReport = ({ data }) => {
         <div className="flex flex-col w-[52%] justify-around items-center pl-4 border-l">
           <div className="font-bold text-[30px] text-left">접속 통계 차트</div>
           <div className="flex flex-col items-center w-full">
-            <div className="font-bold text-[30px] ">사이트</div>
+            <div className="font-bold text-[30px]">사이트</div>
             <HorizontalBarChart
               listArray={data.mostSiteList}
               ylabel={"사이트"}
             />
           </div>
           <div className="flex flex-col items-center w-full">
-            <div className="font-bold text-[30px] ">프로그램</div>
+            <div className="font-bold text-[30px]">프로그램</div>
 
             <HorizontalBarChart
               listArray={data.mostProgramList}

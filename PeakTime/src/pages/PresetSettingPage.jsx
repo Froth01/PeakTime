@@ -1,6 +1,7 @@
 import { useState } from "react";
 import PresetList from "../components/Preset/PresetList"; // 프리셋 리스트
 import PresetSetting from "../components/Preset/PresetSetting";
+import Title from "../components/common/Title";
 
 function PresetSettingPage() {
   // 선택한 프리셋 정보
@@ -17,19 +18,22 @@ function PresetSettingPage() {
   };
 
   return (
-    <>
-      <PresetList
-        onPresetClick={(preset) => onPresetClick(preset)}
-        updateTrigger={updateTrigger}
-      />
-      {selected && (
-        <PresetSetting
-          preset={selected}
-          onCancel={onCancel}
-          setUpdateTrigger={setUpdateTrigger}
+    <div className="h-[100vh] flex flex-col">
+      <Title title={"차단 관리"} />
+      <div className="h-[90vh] top-[10vh]">
+        <PresetList
+          onPresetClick={(preset) => onPresetClick(preset)}
+          updateTrigger={updateTrigger}
         />
-      )}
-    </>
+        {selected && (
+          <PresetSetting
+            preset={selected}
+            onCancel={onCancel}
+            setUpdateTrigger={setUpdateTrigger}
+          />
+        )}
+      </div>
+    </div>
   );
 }
 

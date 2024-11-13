@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 import { useState } from "react";
 import presetsApi from "../../api/presetsApi";
 import Swal from "sweetalert2";
+import "../../styles/custom-scrollbar.css";
 
 function PresetSetting({ preset, onCancel, setUpdateTrigger }) {
   const [title, setTitle] = useState(preset.title);
@@ -115,17 +116,18 @@ function PresetSetting({ preset, onCancel, setUpdateTrigger }) {
   };
 
   return (
-    <div className="absolute right-0 w-[75vw] h-[100vh] flex flex-col bg-white">
-      <h2>{title} 설정</h2>
+    <div className="absolute left-[43vw] w-[54vw] h-[84vh] my-[3vh] bg-[#333333] bg-opacity-70 rounded-lg p-5 flex flex-col items-center justify-between text-white">
+      <h2 className="text-[30px] font-bold">{title} 설정</h2>
       <input
         type="text"
         value={title}
+        className="rounded-lg text-black focus:ring-4 focus:ring-[#66aadf] focus:outline-none ps-3"
         onChange={(event) => setTitle(event.target.value)}
-      ></input>
-      <div className="grid gap-2 grid-cols-2">
+      />
+      <div className="grid gap-5 grid-cols-2 w-full">
         <div>
-          <h3>사이트 차단 목록</h3>
-          <div className="h-96 overflow-y-scroll border border-gray-300 p-2">
+          <h3 className="text-[30px] font-bold mb-5">사이트 차단 목록</h3>
+          <div className="h-[40vh] overflow-y-scroll border border-white p-3 custom-scrollbar">
             {blockWebsiteArray.map((site, idx) => (
               <li key={idx} className="flex items-center gap-2">
                 <span>{site}</span>
@@ -136,8 +138,8 @@ function PresetSetting({ preset, onCancel, setUpdateTrigger }) {
           <button onClick={openAddSiteModal}>+ 사이트 추가</button>
         </div>
         <div>
-          <h3>프로그램 프리셋 내역 들어갈 부분</h3>
-          <div className="h-96 overflow-y-scroll border border-gray-300 p-2">
+          <h3 className="text-[30px] font-bold mb-5">프로그램 차단 목록</h3>
+          <div className="h-[40vh] overflow-y-scroll border border-white p-3 custom-scrollbar">
             {blockProgramArray.map((program, idx) => (
               <li key={idx} className="flex items-center gap-2">
                 <span>{program}</span>
@@ -162,5 +164,6 @@ PresetSetting.propTypes = {
     blockProgramArray: PropTypes.arrayOf(PropTypes.string),
   }).isRequired,
   onCancel: PropTypes.func.isRequired,
+  setUpdateTrigger: PropTypes.func.isRequired,
 };
 export default PresetSetting;
