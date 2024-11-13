@@ -9,8 +9,9 @@ async function recordTime(url) {
   if (!isTracking || !url) return;
 
   try {
-    // const urlObject = new URL(url);
-    const domainName = url.hostname; // 도메인만 추출
+    const urlObject = new URL(url);
+    const domainName = urlObject.hostname; // 도메인만 추출
+    const fullUrl = urlObject.href; // 전체 URL 문자열
 
     const endTime = Date.now();
     const timeSpent = endTime - startTime;
@@ -22,8 +23,9 @@ async function recordTime(url) {
     const { websiteList = [] } = await chrome.storage.local.get("websiteList");
     console.log("websiteList", websiteList);
     const shouldBlock = websiteList.some((urlPattern) =>
-      domainName.startsWith(urlPattern)
+      fullUrl.includes(urlPattern)
     );
+    
     const isBlock = shouldBlock;
 
     const newUrlData = {
@@ -99,20 +101,6 @@ function removeListeners() {
   console.log("이벤트 리스너가 제거되었습니다.");
 }
 
-// 추적 시작 (특정 이벤트 발생 시)
-// function startTracking() {
-//   if (isTracking) return;
-
-//   currentUrl = null;
-//   startTime = Date.now();
-//   isTracking = true;
-//   console.log(`Tracking started`);
-
-//   // 이벤트 리스너 추가
-//   chrome.tabs.onUpdated.addListener(handleTabUpdate);
-//   chrome.tabs.onActivated.addListener(handleTabActivation);
-// }
-
 let currentTabId = "";
 function startTracking() {
   if (isTracking) return;
@@ -128,7 +116,7 @@ function startTracking() {
       handleUrlChange(tabs[0].url);
 
       // currentTabId가 설정된 후에 새로 고침 실행
-      chrome.tabs.reload(currentTabId);
+      // chrome.tabs.reload(currentTabId);
     }
   });
 
@@ -158,7 +146,7 @@ function handleUrlChange(newUrl) {
   chrome.storage.local.get({ websiteList: [] }, function (data) {
     const websiteList = data.websiteList || [];
     const shouldBlock = websiteList.some((urlPattern) =>
-      fullUrl.startsWith(urlPattern)
+      fullUrl.includes(urlPattern)
     );
     // console.log("Should block:", shouldBlock);
 

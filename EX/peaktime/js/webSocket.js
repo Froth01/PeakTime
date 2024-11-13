@@ -2,7 +2,6 @@ import { startTracking, stopAndClearTracking } from "./tracking.js";
 
 let socket;
 const WEBSOCKET_URL = "ws://localhost:12345";
-// const RECONNECT_INTERVAL_MINUTES = 1;
 let reconnectAttempts = 0;
 let socketConnected = false;
 
@@ -13,7 +12,6 @@ function connectWebSocket() {
   socket.onopen = () => {
     console.log("WebSocket connected");
     reconnectAttempts = 0;
-    console.log(reconnectAttempts);
   };
 
   // WebSocket 메시지 수신 이벤트
@@ -68,10 +66,35 @@ function receivedSocketMessage(data) {
 }
 
 //소켓으로 json 보내기
+// function sendSocketMessage(data) {
+//   console.log(data);
+//   socket.send(JSON.stringify(data));
+// }
 function sendSocketMessage(data) {
-  console.log(data);
-  socket.send(JSON.stringify(data));
+  return new Promise((resolve, reject) => {
+    // JSON 형태로 데이터 전송
+    console.log("Sending data:", data);
+    socket.send(JSON.stringify(data));
+
+    // 응답을 받을 이벤트 리스너 추가
+    const handleMessage = (event) => {
+      try {
+        const response = JSON.parse(event.data);
+        console.log("Received response:", response);
+
+        // 응답을 받았으므로 Promise를 resolve하고 리스너를 제거합니다.
+        resolve(response);
+        socket.removeEventListener("message", handleMessage);
+      } catch (error) {
+        reject(error);
+      }
+    };
+
+    // WebSocket 응답 대기
+    socket.addEventListener("message", handleMessage);
+  });
 }
+
 
 // 초기 WebSocket 연결 설정
 connectWebSocket();
