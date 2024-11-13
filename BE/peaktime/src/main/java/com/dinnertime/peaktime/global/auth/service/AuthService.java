@@ -4,6 +4,8 @@ import com.dinnertime.peaktime.domain.group.entity.Group;
 import com.dinnertime.peaktime.domain.group.repository.GroupRepository;
 import com.dinnertime.peaktime.domain.preset.entity.Preset;
 import com.dinnertime.peaktime.domain.preset.repository.PresetRepository;
+import com.dinnertime.peaktime.domain.statistic.entity.Statistic;
+import com.dinnertime.peaktime.domain.statistic.repository.StatisticRepository;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
 import com.dinnertime.peaktime.global.auth.service.dto.request.*;
@@ -59,6 +61,7 @@ public class AuthService {
     private final PresetRepository presetRepository;
     private final GroupRepository groupRepository;
     private final UserGroupRepository userGroupRepository;
+    private final StatisticRepository statisticRepository;
 
     // 회원가입
     @Transactional
@@ -109,6 +112,9 @@ public class AuthService {
         );
         // 6. Save User
         userRepository.save(user);
+        //6-1. Save statistic
+        Statistic statistic = Statistic.createFirstStatistic(user);
+        statisticRepository.save(statistic);
         // 7. Redis에서 emailAuthenticaion prefix 데이터 삭제
         redisService.removeEmailAuthentication(lowerEmail);
         // 8. Create Block Website Array For Default Preset
