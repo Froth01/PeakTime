@@ -65,6 +65,15 @@
       "dist/**/*",
       "electron/**/*"
     ],
+    "extraResources": [
+      {
+        "from": "dist/build/",
+        "to": "build/",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
     "directories": {
       "buildResources": "public"
     },
@@ -73,6 +82,7 @@
       "target": "nsis"
     },
     "nsis": {
+      "oneClick": false,
       "allowToChangeInstallationDirectory": true
     }
   }

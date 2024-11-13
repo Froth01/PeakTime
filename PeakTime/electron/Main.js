@@ -24,7 +24,13 @@ function createWindow() {
     width: 1366,
     height: 768,
     webPreferences: {
-      preload: path.join(__dirname, "electron", "preload.js"),
+      preload: path.join(
+        __dirname,
+        "resources",
+        "build",
+        "electron",
+        "preload.js"
+      ),
       contextIsolation: true,
       nodeIntegration: false, // 보안 상 비활성화
       sandbox: true,
@@ -40,7 +46,7 @@ function createWindow() {
   const startUrl =
     process.env.ELECTRON_START_URL ||
     url.format({
-      pathname: path.join(__dirname, "/../build/index.html"),
+      pathname: path.join(__dirname, "resources", "build", "index.html"),
       protocol: "file:",
       slashes: true,
     });
@@ -74,7 +80,6 @@ ipcMain.on("set-start-hiking", (event, message) => {
   lastWebSocketMessage = message;
 });
 
-
 app.whenReady().then(() => {
   createWindow();
   console.log(__dirname);
@@ -89,11 +94,11 @@ app.whenReady().then(() => {
   wss.on("connection", (ws) => {
     console.log("New client connected");
 
-  // 새 클라이언트에게 저장된 메시지 전송
-  if (lastWebSocketMessage) {
-    ws.send(lastWebSocketMessage);
-    // console.log("Sent saved message to new client:", lastWebSocketMessage);
-  }
+    // 새 클라이언트에게 저장된 메시지 전송
+    if (lastWebSocketMessage) {
+      ws.send(lastWebSocketMessage);
+      // console.log("Sent saved message to new client:", lastWebSocketMessage);
+    }
     // 클라이언트로부터 메시지 수신
     ws.on("message", (message) => {
       console.log(`Received from client: ${message}`);
