@@ -1,7 +1,7 @@
 package com.dinnertime.peaktime.domain.hiking.service.dto.response;
 
-import com.dinnertime.peaktime.domain.hiking.service.dto.query.UsingInfo;
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingDetailQueryDto;
+import com.dinnertime.peaktime.domain.statistic.entity.StatisticContent;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -27,12 +27,12 @@ public class HikingDetailResponseDto {
 
     private int blockedProgramCount;
 
-    private List<UsingInfo> visitedSiteList;
+    private List<StatisticContent> visitedSiteList;
 
-    private List<UsingInfo> visitedProgramList;
+    private List<StatisticContent> visitedProgramList;
 
     @Builder
-    private HikingDetailResponseDto(LocalDateTime startTime, LocalDateTime endTime, LocalDateTime realEndTime, int blockedSiteCount, int blockedProgramCount, List<UsingInfo> visitedSiteList, List<UsingInfo> visitedProgramList) {
+    private HikingDetailResponseDto(LocalDateTime startTime, LocalDateTime endTime, LocalDateTime realEndTime, int blockedSiteCount, int blockedProgramCount, List<StatisticContent> visitedSiteList, List<StatisticContent> visitedProgramList) {
         this.startTime = startTime;
         this.endTime = endTime;
         this.realEndTime = realEndTime;

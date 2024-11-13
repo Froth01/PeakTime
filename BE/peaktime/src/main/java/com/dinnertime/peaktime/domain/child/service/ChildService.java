@@ -5,6 +5,8 @@ import com.dinnertime.peaktime.domain.child.service.dto.request.CreateChildReque
 import com.dinnertime.peaktime.domain.child.service.dto.request.UpdateChildRequestDto;
 import com.dinnertime.peaktime.domain.group.entity.Group;
 import com.dinnertime.peaktime.domain.group.repository.GroupRepository;
+import com.dinnertime.peaktime.domain.statistic.entity.Statistic;
+import com.dinnertime.peaktime.domain.statistic.repository.StatisticRepository;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
 import com.dinnertime.peaktime.domain.user.service.UserService;
@@ -29,6 +31,7 @@ public class ChildService {
     private final UserRepository userRepository;
     private final UserGroupRepository userGroupRepository;
     private final GroupRepository groupRepository;
+    private final StatisticRepository statisticRepository;
 
     @Transactional
     public void createChild(CreateChildRequestDto requestDto){
@@ -76,6 +79,10 @@ public class ChildService {
         // 9. 유저 테이블 저장
         User user = User.createChildUser(requestDto.getChildLoginId(), encodedPassword, requestDto.getChildNickname());
         userRepository.save(user);
+
+        //9-1. 통계 테이블 저장
+        Statistic statistic = Statistic.createFirstStatistic(user);
+        statisticRepository.save(statistic);
 
         // 10. 유저 그룹 테이블 저장
         UserGroup userGroup = UserGroup.createUserGroup(user, group);

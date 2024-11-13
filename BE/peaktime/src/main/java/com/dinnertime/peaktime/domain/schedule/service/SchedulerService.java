@@ -1,5 +1,6 @@
 package com.dinnertime.peaktime.domain.schedule.service;
 
+import com.dinnertime.peaktime.domain.hiking.repository.HikingRepository;
 import com.dinnertime.peaktime.domain.schedule.entity.Schedule;
 import com.dinnertime.peaktime.domain.schedule.service.dto.RedisSchedule;
 import com.dinnertime.peaktime.global.util.RedisService;
@@ -19,6 +20,7 @@ public class SchedulerService {
 
     private final ScheduleService scheduleService;
     private final RedisService redisService;
+    private final HikingRepository hikingRepository;
 
     //매일 0시에 실행
     @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
