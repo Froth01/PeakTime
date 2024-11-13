@@ -23,6 +23,7 @@ function Timer() {
   // sse messages
   const [messages, setMessages] = useState(null);
   const { user } = useUserStore();
+  const localUser = JSON.parse(localStorage.getItem("user")) || null;
 
   //현재 시간
   let [now, setNow] = useState(new Date());
@@ -535,52 +536,54 @@ function Timer() {
                 *분 단위로 입력해주세요.<br></br>최소 30분부터 240분까지
                 가능합니다.
               </label>
-              {user.isRoot && (
-                <div
-                  tabIndex={0}
-                  className={`mt-5 relative w-[60%] h-[60%] rounded-lg bg-white border border-gray-300 px-3 py-2 cursor-pointer ${
-                    isOpen ? "focus:ring-4 focus:ring-[#66aadf]" : ""
-                  }`}
-                >
+              {localUser.isRoot && (
+                <>
                   <div
-                    onClick={() => setIsOpen(!isOpen)}
-                    className="flex justify-between items-center"
+                    tabIndex={0}
+                    className={`mt-5 relative w-[60%] h-[60%] rounded-lg bg-white border border-gray-300 px-3 py-2 cursor-pointer ${
+                      isOpen ? "focus:ring-4 focus:ring-[#66aadf]" : ""
+                    }`}
                   >
-                    <p>
-                      {selectedOption
-                        ? selectedOption.title
-                        : "프리셋을 선택하세요."}
-                    </p>
-                    <IoIosArrowDown />
-                  </div>
-                  {isOpen && (
-                    <ul
-                      className="absolute left-0 right-0 mt-3 bg-white border
-                  border-gray-300 rounded-lg shadow-lg"
+                    <div
+                      onClick={() => setIsOpen(!isOpen)}
+                      className="flex justify-between items-center"
                     >
-                      {presetList.map((preset, index) => (
-                        <div key={preset.presetId}>
-                          <li
-                            onClick={() => {
-                              setSelectedOption(preset);
-                              setIsOpen(false);
-                            }}
-                            className="px-3 py-2 hover:bg-[#66aadf] cursor-pointer rounded-lg hover:font-bold"
-                          >
-                            {preset.title}
-                          </li>
-                          {index < presetList.length - 1 && (
-                            <hr className="border-gray-200" />
-                          )}
-                        </div>
-                      ))}
-                    </ul>
-                  )}
-                </div>
+                      <p>
+                        {selectedOption
+                          ? selectedOption.title
+                          : "프리셋을 선택하세요."}
+                      </p>
+                      <IoIosArrowDown />
+                    </div>
+                    {isOpen && (
+                      <ul
+                        className="absolute left-0 right-0 mt-3 bg-white border
+                  border-gray-300 rounded-lg shadow-lg"
+                      >
+                        {presetList.map((preset, index) => (
+                          <div key={preset.presetId}>
+                            <li
+                              onClick={() => {
+                                setSelectedOption(preset);
+                                setIsOpen(false);
+                              }}
+                              className="px-3 py-2 hover:bg-[#66aadf] cursor-pointer rounded-lg hover:font-bold"
+                            >
+                              {preset.title}
+                            </li>
+                            {index < presetList.length - 1 && (
+                              <hr className="border-gray-200" />
+                            )}
+                          </div>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                  <label htmlFor="" className="text-sm text-white">
+                    *적용할 프리셋을 선택해주세요.
+                  </label>
+                </>
               )}
-              <label htmlFor="" className="text-sm text-white">
-                *적용할 프리셋을 선택해주세요.
-              </label>
               <button
                 className="w-[10vw] h-[6vh] mt-[10%] rounded-xl text-white bg-[#03c777]"
                 onClick={handleStart}
