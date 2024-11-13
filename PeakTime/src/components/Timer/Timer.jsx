@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import hikingsApi, { setBaseUrl } from "../../api/hikingsApi.js";
-import { IoIosArrowDown } from "react-icons/io";
+import hikingsApi from "../../api/hikingsApi.js";
+import memosApi from "../../api/memosApi.js";
 import presetsApi from "../../api/presetsApi.js";
+import { IoIosArrowDown } from "react-icons/io";
+import { useUserStore } from "../../stores/UserStore.js";
+import { EventSourcePolyfill } from "event-source-polyfill";
 
 function Timer() {
   const [inputTime, setInputTime] = useState(""); // 사용자 입력 시간 (분 단위)
@@ -17,6 +20,10 @@ function Timer() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
 
+  // sse messages
+  const [messages, setMessages] = useState(null);
+  const { user } = useUserStore();
+
   //현재 시간
   let [now, setNow] = useState(new Date());
   let nowInterval = null;
@@ -29,6 +36,8 @@ function Timer() {
   const stopNow = () => {
     clearInterval(nowInterval);
   };
+
+  const [extensionMemoData, setExtensionMemoData] = useState(null); // extension memo 저장 데이터
 
   // 시작 상태, 남은 시간 변경시마다 적용
   useEffect(() => {
@@ -99,7 +108,6 @@ function Timer() {
             attentionTime: inputTime,
             isSelf: true,
           };
-          console.log("보낼 바디 :", startHikingData);
 
           // API 요청
           const responseStartHiking = await hikingsApi.post(
@@ -120,6 +128,7 @@ function Timer() {
             detail: {
               startedHikingId: responseStartHiking.data.data.hikingId,
               selectedPreset: selectedOption,
+              backUrl: hikingsApi.defaults.baseURL,
             },
           });
           const startBtn = document.getElementById("start");
@@ -140,6 +149,142 @@ function Timer() {
     });
   };
 
+  // sse 등록
+  useEffect(() => {
+    // user 객체가 존재하고, root 사용자가 아닐 경우에만 실행
+    if (user && !user.isRoot) {
+      const accessToken = user.accessToken;
+
+      // EventSourcePolyfill 인스턴스 생성 함수
+      const createEventSource = () => {
+        console.log("연결 시작");
+        const eventSource = new EventSourcePolyfill(
+          `${import.meta.env.VITE_BACK_URL}/api/v1/schedules`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              Accept: "text/event-stream",
+            },
+            heartbeatTimeout: 3600000,
+          }
+        );
+
+        // 서버에서 메시지를 받을 때마다 실행
+        eventSource.addEventListener("message", (event) => {
+          // 수신된 메시지 데이터 파싱
+          const data = event.data;
+          console.log("Received event:", data);
+
+          // 데이터가 JSON 형식일 경우 파싱
+          let parsedData;
+          try {
+            parsedData = JSON.parse(data);
+          } catch (e) {
+            parsedData = data; // JSON이 아닐 경우 그대로 사용
+          }
+
+          // 메시지를 상태에 추가
+          if (parsedData != "start") {
+            setMessages(parsedData);
+          }
+        });
+
+        // 에러 발생 시 연결 종료 후 3초 후 재연결
+        eventSource.onerror = () => {
+          console.log("EventSource error, attempting to reconnect...");
+          eventSource.close();
+          setTimeout(() => {
+            createEventSource();
+          }, 3000);
+        };
+
+        return eventSource;
+      };
+
+      // EventSource 생성 및 관리
+      const eventSourceInstance = createEventSource();
+
+      return () => {
+        console.log("Closing EventSource connection...");
+        eventSourceInstance.close();
+      };
+    }
+  }, []);
+
+  // 메인 사용자가 설정한 시간에 서브 계정의 차단 프로세스, sse 메세지가 올 때 시작
+  useEffect(() => {
+    if (user && messages) {
+      if (!user.isRoot) {
+        const startHiking = async () => {
+          try {
+            // 시작 시간 포맷 생성
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const day = now.getDate();
+            const hour = now.getHours();
+            const minute = now.getMinutes();
+            const second = now.getSeconds();
+
+            const format = `${year}-${("00" + month.toString()).slice(-2)}-${(
+              "00" + day.toString()
+            ).slice(-2)} ${("00" + hour.toString()).slice(-2)}:${(
+              "00" + minute.toString()
+            ).slice(-2)}:${("00" + second.toString()).slice(-2)}`;
+
+            const startHikingData = {
+              startTime: format,
+              attentionTime: messages.attentionTime,
+              isSelf: false,
+            };
+            console.log("보낼 바디 :", startHikingData);
+
+            // API 요청
+            const responseStartHiking = await hikingsApi.post(
+              "",
+              startHikingData
+            );
+
+            // 상태 업데이트
+            setStartedHikingId(responseStartHiking.data.data.hikingId);
+            setTotalTime(messages.attentionTime);
+            setRemainTime(messages.attentionTime * 60 - 1); // 분 단위로 받은 시간을 초로 변환
+            setIsRunning(true);
+            stopNow();
+
+            // 커스텀 이벤트 발생
+            const hikingStart = new CustomEvent("hikingStart", {
+              bubbles: true,
+              detail: {
+                startedHikingId: responseStartHiking.data.data.hikingId,
+                selectedPreset: messages,
+                backUrl: hikingsApi.defaults.baseURL,
+              },
+            });
+            const startBtn = document.getElementById("start");
+            startBtn?.dispatchEvent(hikingStart);
+          } catch (err) {
+            console.error("API 요청 중 오류 발생:", err);
+
+            // SweetAlert를 사용하여 오류 메시지 표시
+            Swal.fire({
+              title: "하이킹을 시작하는 데 실패했습니다.",
+              text: `오류 내용: ${err.response?.data?.message || err.message}`,
+              icon: "error",
+              confirmButtonColor: "green",
+              confirmButtonText: "확인",
+            });
+          }
+        };
+
+        // 함수 호출
+        startHiking();
+      }
+      console.log("messages : ", messages);
+      setMessages(null);
+    }
+  }, [messages]);
+
   // 요청해서 아이디 받으면
   useEffect(() => {
     if (startedHikingId !== null) {
@@ -148,8 +293,65 @@ function Timer() {
     }
   }, [startedHikingId]);
 
+  const handleExtensionMemoMessage = async (data) => {
+    // 익스텍션에서 받은 메모 저장
+    console.log("handleExtensionMemoMessage: ", data);
+    // setExtensionMemoData(data);
+    createPostMemo(data);
+  };
+
+  const createPostMemo = async (data) => {
+    try {
+      // 프리셋 생성 Post 요청을 보내기
+      // Request Body 데이터 가공
+      console.log("받고싶은 데이터 data", data);
+      console.log("받고싶은 데이터 data의 타이틀", data.title);
+      console.log("받고싶은 데이터 data컨텐츠", data.content);
+      const requestData = {
+        title: data.title,
+        content: data.content,
+      };
+      const response = await memosApi.post(``, requestData);
+      console.log("CreateMemoPostApi: ", response.data);
+    } catch (error) {
+      console.error("Error create Memo:", error);
+      throw error;
+    }
+  };
+
+  const handleExtensionUrlMessage = async (data) => {
+    // 익스텍션에서 받은 url 저장
+    console.log("handleExtensionurlMessage: ", data);
+    // setExtensionMemoData(data);
+    addUrlPost(data);
+  };
+
+  const addUrlPost = async (data) => {
+    try {
+      // 프리셋 단일 추가 Post 요청을 보내기
+      // Request Body 데이터 가공
+      console.log("받고싶은 데이터 data", data);
+      console.log("데이터 data 프리셋 아이디", data.presetId);
+      console.log("받고싶은 데이터 data url", data.url);
+      const requestData = {
+        url: data.url,
+      };
+      const response = await presetsApi.post(`${data.presetId}`, requestData);
+      console.log("addUrlPostApi: ", response.data);
+    } catch (error) {
+      console.error("Error addurl:", error);
+      throw error;
+    }
+  };
+
+  // onWebSocketMessage 이벤트 리스너 등록
   useEffect(() => {
     window.electronAPI.onAllDone(allDone);
+
+    // 이벤트 리스너 등록
+    window.electronAPI.onSaveMemo(handleExtensionMemoMessage);
+
+    window.electronAPI.onAddUrl(handleExtensionUrlMessage);
 
     presetsApi
       .get("")
@@ -158,7 +360,6 @@ function Timer() {
       })
       .catch();
 
-    setBaseUrl();
     startNow();
   }, []);
 
@@ -204,7 +405,7 @@ function Timer() {
   };
   // 다 됐을떄
   const allDone = (data) => {
-    console.log("야진짜 다됐다", data);
+    console.log("allDone", data);
   };
   return (
     <>
@@ -334,47 +535,49 @@ function Timer() {
                 *분 단위로 입력해주세요.<br></br>최소 30분부터 240분까지
                 가능합니다.
               </label>
-              <div
-                tabIndex={0}
-                className={`mt-5 relative w-[60%] h-[60%] rounded-lg bg-white border border-gray-300 px-3 py-2 cursor-pointer ${
-                  isOpen ? "focus:ring-4 focus:ring-[#66aadf]" : ""
-                }`}
-              >
+              {user.isRoot && (
                 <div
-                  onClick={() => setIsOpen(!isOpen)}
-                  className="flex justify-between items-center"
+                  tabIndex={0}
+                  className={`mt-5 relative w-[60%] h-[60%] rounded-lg bg-white border border-gray-300 px-3 py-2 cursor-pointer ${
+                    isOpen ? "focus:ring-4 focus:ring-[#66aadf]" : ""
+                  }`}
                 >
-                  <p>
-                    {selectedOption
-                      ? selectedOption.title
-                      : "프리셋을 선택하세요."}
-                  </p>
-                  <IoIosArrowDown />
-                </div>
-                {isOpen && (
-                  <ul
-                    className="absolute left-0 right-0 mt-3 bg-white border
-                  border-gray-300 rounded-lg shadow-lg"
+                  <div
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="flex justify-between items-center"
                   >
-                    {presetList.map((preset, index) => (
-                      <div key={preset.presetId}>
-                        <li
-                          onClick={() => {
-                            setSelectedOption(preset);
-                            setIsOpen(false);
-                          }}
-                          className="px-3 py-2 hover:bg-[#66aadf] cursor-pointer rounded-lg hover:font-bold"
-                        >
-                          {preset.title}
-                        </li>
-                        {index < presetList.length - 1 && (
-                          <hr className="border-gray-200" />
-                        )}
-                      </div>
-                    ))}
-                  </ul>
-                )}
-              </div>
+                    <p>
+                      {selectedOption
+                        ? selectedOption.title
+                        : "프리셋을 선택하세요."}
+                    </p>
+                    <IoIosArrowDown />
+                  </div>
+                  {isOpen && (
+                    <ul
+                      className="absolute left-0 right-0 mt-3 bg-white border
+                  border-gray-300 rounded-lg shadow-lg"
+                    >
+                      {presetList.map((preset, index) => (
+                        <div key={preset.presetId}>
+                          <li
+                            onClick={() => {
+                              setSelectedOption(preset);
+                              setIsOpen(false);
+                            }}
+                            className="px-3 py-2 hover:bg-[#66aadf] cursor-pointer rounded-lg hover:font-bold"
+                          >
+                            {preset.title}
+                          </li>
+                          {index < presetList.length - 1 && (
+                            <hr className="border-gray-200" />
+                          )}
+                        </div>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
               <label htmlFor="" className="text-sm text-white">
                 *적용할 프리셋을 선택해주세요.
               </label>
