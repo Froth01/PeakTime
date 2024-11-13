@@ -1,43 +1,298 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import authApi from "../api/authApi";
 import Swal from "sweetalert2"; // 모달 라이브러리
 
 function SignupPage() {
   // 라우팅 설정
   const navigate = useNavigate();
 
-  // 입력 변수
+  // 입력 변수 (for 양방향 바인딩)
   const [inputId, setInputId] = useState("");
-  const [inputNickname, setInputNickname] = useState("");
   const [inputPassword, setInputPassword] = useState("");
   const [inputConfirmPassword, setInputConfirmPassword] = useState("");
+  const [inputNickname, setInputNickname] = useState("");
   const [inputEmail, setInputEmail] = useState("");
   const [inputCode, setInputCode] = useState("");
 
-  // 변수 상태
-  const [isOK, setIsOK] = useState(true);
+  // 경고 문구
+  const [idAlertMessage, setIdAlertMessage] = useState("");
+  const [passwordAlertMessage, setPasswordAlertMessage] = useState("");
+  const [confirmPasswordAlertMessage, setConfirmPasswordAlertMessage] = useState("");
+  const [nicknameAlertMessage, setNicknameAlertMessage] = useState("");
+  const [emailAlertMessage, setEmailAlertMessage] = useState("");
+  const [codeAlertMessage, setCodeAlertMessage] = useState("");
+
+  // 변수 상태 -> 전부 true가 되어야 `가입완료` 버튼 활성화
+  const [idFormatIsOK, setIdFormatIsOK] = useState(false);
+  const [idDuplicationIsOK, setIdDuplicationIsOK] = useState(false); // 주의할 것 : true이면 중복 X
+  const [nicknameFormatIsOK, setNicknameFormatIsOK] = useState(false);
+  const [passwordFormatIsOK, setPasswordFormatIsOK] = useState(false);
+  const [confirmPasswordFormatIsOK, setConfirmPasswordFormatIsOK] = useState(false);
+  const [emailFormatIsOK, setEmailFormatIsOK] = useState(false);
+  const [emailDuplicationIsOK, setEmailDuplicationIsOK] = useState(false); // 주의할 것 : true이면 중복 X
+  const [emailSendingIsOK, setEmailSendingIsOK] = useState(false);
+  const [emailCodeIsValid, setEmailCodeIsValid] = useState(false);
+
+  // 색상과 관련된 변수 상태 필요
+  const [idAlertMessageColor, setIdAlertMessageColor] = useState(false);
+  const [emailAlertMessageColor, setEmailAlertMessageColor] = useState(false);
 
   // 입력시 처리 함수
   useEffect(() => {
     // inputId 입력시 처리 로직
-    console.log("굿");
+    const idRegex = /^[a-zA-Z0-9]{5,15}$/;
+    if (idRegex.test(inputId)) {
+      setIdFormatIsOK(true);
+      setIdAlertMessageColor(true);
+      setIdAlertMessage("아이디 중복 확인을 진행해주세요.");
+    } else {
+      setIdFormatIsOK(false);
+      setIdAlertMessageColor(false);
+      setIdAlertMessage("* 5자 이상 15자 이하  * 영문, 숫자 사용 가능");
+    }
+    setIdDuplicationIsOK(false);
   }, [inputId]);
 
-  // 변경 확인 모달
-  const openResultModal = () => {
-    Swal.fire({
-      title: "가입완료 모달",
-      text: "가입완료",
-      icon: "success",
-      confirmButtonColor: "green",
-      didClose: () => navigate(-1),
-    });
+  useEffect(() => {
+    // inputNickname 입력시 처리 로직
+    const nicknameRegex = /^[가-힣a-zA-Z0-9]{2,8}$/;
+    if (nicknameRegex.test(inputNickname)) {
+      setNicknameFormatIsOK(true);
+      setNicknameAlertMessage("사용 가능한 닉네임입니다.");
+    } else {
+      setNicknameFormatIsOK(false);
+      setNicknameAlertMessage("* 2자 이상 8자 이하  * 한글, 영문, 숫자 사용 가능");
+    }
+  }, [inputNickname]);
+
+  useEffect(() => {
+    // inputPassword 입력시 처리 로직
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-\[\]{};':"\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_+\-\[\]{};':"\\|,.<>\/?]{8,}$/;
+    if (passwordRegex.test(inputPassword)) {
+      setPasswordFormatIsOK(true);
+      setPasswordAlertMessage("사용 가능한 비밀번호입니다.");
+    } else {
+      setPasswordFormatIsOK(false);
+      setPasswordAlertMessage(`* 최소 8자 이상  * 영문 대문자, 영문 소문자, 숫자, 특수문자를 모두 포함`);
+    }
+  }, [inputPassword]);
+
+  useEffect(() => {
+    // inputConfirmPassword 입력시 처리 로직
+    if ((inputPassword === inputConfirmPassword) && inputConfirmPassword) {
+      setConfirmPasswordFormatIsOK(true);
+      setConfirmPasswordAlertMessage("확인되었습니다.");
+    } else {
+      setConfirmPasswordFormatIsOK(false);
+      setConfirmPasswordAlertMessage("비밀번호가 일치하지 않습니다.");
+    }
+  }, [inputConfirmPassword]);
+
+  useEffect(() => {
+    // inputEmail 입력시 처리 로직
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (emailRegex.test(inputEmail)) {
+      setEmailFormatIsOK(true);
+      setEmailAlertMessageColor(true);
+      setEmailAlertMessage("이메일 중복 확인을 진행해주세요.");
+    } else {
+      setEmailFormatIsOK(false);
+      setEmailAlertMessageColor(false);
+      setEmailAlertMessage("* example@example.com");
+    }
+    setEmailDuplicationIsOK(false);
+    setEmailSendingIsOK(false);
+    setEmailCodeIsValid(false);
+    setCodeAlertMessage("");
+  }, [inputEmail]);
+
+  // 가입완료
+  const signup = async () => {
+    const signupData = {
+      userLoginId: inputId,
+      password: inputPassword,
+      confirmPassword: inputConfirmPassword,
+      nickname: inputNickname,
+      email: inputEmail,
+    }
+    try {
+      await authApi.post("/signup", signupData);
+      // 성공하면 이어서 진행
+      Swal.fire({
+        title: "회원가입이 완료되었습니다.",
+        text: "이어서 로그인을 진행해주세요.",
+        icon: "success",
+        confirmButtonColor: "green",
+        didClose: () => navigate(-1),
+      });
+    } catch (error) {
+      Swal.fire({
+        title: "회원가입에 실패하였습니다. 다시 시도해주세요.",
+        text: `${error.response.data.message}`,
+        icon: "error",
+        confirmButtonColor: "green",
+        confirmButtonText: "확인",
+      });
+    }
   };
 
   // 뒤로가기
   const goBack = () => {
     navigate(-1);
   };
+
+  // 아이디 중복 확인 API 호출
+  const isDuplicatedUserLoginId = async () => {
+    const userLoginId = inputId;
+    try {
+      const isDuplicatedUserLoginIdResponse = await authApi.get("/user-login-id", {
+        params: {
+          userLoginId,
+        }
+      });
+      // 성공하면 이어서 진행
+      const isDuplicated = isDuplicatedUserLoginIdResponse.data.data.isDuplicated;
+      if (isDuplicated) {
+        setIdDuplicationIsOK(false);
+        setIdAlertMessageColor(false);
+        setIdAlertMessage("이미 존재하는 아이디입니다.");
+        Swal.fire({
+          title: "이미 존재하는 아이디입니다.",
+          icon: "error",
+          confirmButtonColor: "green",
+          confirmButtonText: "확인",
+        });
+      } else {
+        setIdDuplicationIsOK(true);
+        setIdAlertMessageColor(true);
+        setIdAlertMessage("사용 가능한 아이디입니다.");
+        Swal.fire({
+          title: "사용 가능한 아이디입니다.",
+          icon: "success",
+          confirmButtonColor: "green",
+          confirmButtonText: "확인",
+        });
+      }
+    } catch (error) {
+      // 에러가 발생하면 여기로 진입
+      Swal.fire({
+        title: "다시 시도해주세요.",
+        text: `${error.response.data.message}`,
+        icon: "error",
+        confirmButtonColor: "green",
+        confirmButtonText: "확인",
+      });
+    }
+  }
+
+  // 이메일 중복 확인 API 호출
+  const isDuplicatedEmail = async () => {
+    setEmailSendingIsOK(false);
+    setEmailCodeIsValid(false);
+    setCodeAlertMessage("");
+    const email = inputEmail;
+    try {
+      const isDuplicatedEmailResponse = await authApi.get("/email", {
+        params: {
+          email,
+        }
+      });
+      // 성공하면 이어서 진행
+      const isDuplicated = isDuplicatedEmailResponse.data.data.isDuplicated;
+      if (isDuplicated) {
+        setEmailDuplicationIsOK(false);
+        setEmailAlertMessageColor(false);
+        setEmailAlertMessage("이미 존재하는 이메일입니다.");
+        Swal.fire({
+          title: "이미 존재하는 이메일입니다.",
+          icon: "error",
+          confirmButtonColor: "green",
+          confirmButtonText: "확인",
+        });
+      } else {
+        setEmailDuplicationIsOK(true);
+        setEmailAlertMessageColor(true);
+        setEmailAlertMessage("사용 가능한 이메일입니다. 이메일 인증을 진행해주세요.");
+        Swal.fire({
+          title: "사용 가능한 이메일입니다.",
+          text: "이메일 인증을 진행해주세요.",
+          icon: "success",
+          confirmButtonColor: "green",
+          confirmButtonText: "확인",
+        });
+      }
+    } catch (error) {
+      // 에러가 발생하면 여기로 진입
+      Swal.fire({
+        title: "다시 시도해주세요.",
+        text: `${error.response.data.message}`,
+        icon: "error",
+        confirmButtonColor: "green",
+        confirmButtonText: "확인",
+      });
+    }
+  }
+
+  // 인증 코드 전송 API 호출
+  const sendCode = async () => {
+    setEmailCodeIsValid(false);
+    setCodeAlertMessage("");
+    const sendCodeData = {
+      email: inputEmail,
+    };
+    try {
+      await authApi.post("/code/send", sendCodeData);
+      // 성공하면 이어서 진행
+      setEmailSendingIsOK(true);
+      Swal.fire({
+        title: "인증 코드가 전송되었습니다.",
+        icon: "success",
+        confirmButtonColor: "green",
+        confirmButtonText: "확인",
+      });
+    } catch (error) {
+      // 에러가 발생하면 여기로 진입
+      setEmailSendingIsOK(false);
+      Swal.fire({
+        title: "다시 시도해주세요.",
+        text: `${error.response.data.message}`,
+        icon: "error",
+        confirmButtonColor: "green",
+        confirmButtonText: "확인",
+      });
+    }
+  }
+
+  // 인증 코드 확인 API 호출
+  const checkCode = async () => {
+    const checkCodeData = {
+      email: inputEmail,
+      code: inputCode,
+    };
+    try {
+      await authApi.post("/code/check", checkCodeData);
+      // 성공하면 이어서 진행
+      setEmailCodeIsValid(true);
+      setCodeAlertMessage("이메일 인증에 성공하였습니다.");
+      Swal.fire({
+        title: "이메일 인증에 성공하였습니다.",
+        icon: "success",
+        confirmButtonColor: "green",
+        confirmButtonText: "확인",
+      });
+    } catch (error) {
+      setEmailCodeIsValid(false);
+      setCodeAlertMessage(error.response.data.message);
+      Swal.fire({
+        title: "다시 시도해주세요.",
+        text: `${error.response.data.message}`,
+        icon: "error",
+        confirmButtonColor: "green",
+        confirmButtonText: "확인",
+      });
+    }
+  }
 
   return (
     <div className="h-[100vh] flex justify-center items-center">
@@ -68,14 +323,16 @@ function SignupPage() {
                 </label>
                 {/* 경고메시지 */}
                 <div
-                  className={`absolute top-[115%] font-bold text-${
-                    isOK ? "[#03c777]" : "[#f40000]"
-                  }`}
+                  className={`absolute top-[115%] font-bold text-${idAlertMessageColor ? "[#03c777]" : "[#f40000]"
+                    }`}
                 >
-                  경고메세지가 이렇게 뜹니다.
+                  {idAlertMessage}
                 </div>
               </div>
-              <button className="bg-[#66aadf] rounded-xl px-5 py-2 hover:bg-[#4d90d8] focus:ring-4 focus:ring-[#66aadf] mb-5 ms-0">
+              <button
+                className="bg-[#66aadf] rounded-xl px-5 py-2 hover:bg-[#4d90d8] focus:ring-4 focus:ring-[#66aadf] mb-5 ms-0"
+                disabled={!idFormatIsOK}
+                onClick={isDuplicatedUserLoginId}>
                 중복 확인
               </button>
             </div>
@@ -96,6 +353,13 @@ function SignupPage() {
               >
                 닉네임
               </label>
+              {/* 경고메시지 */}
+              <div
+                className={`absolute top-[115%] font-bold text-${nicknameFormatIsOK ? "[#03c777]" : "[#f40000]"
+                  }`}
+              >
+                {nicknameAlertMessage}
+              </div>
             </div>
           </div>
           <div className="flex justify-between w-[90%] h-[45%] mt-[7%]">
@@ -117,8 +381,14 @@ function SignupPage() {
                 >
                   비밀번호
                 </label>
+                {/* 경고메시지 */}
+                <div
+                  className={`absolute top-[115%] font-bold text-${passwordFormatIsOK ? "[#03c777]" : "[#f40000]"
+                    }`}
+                >
+                  {passwordAlertMessage}
+                </div>
               </div>
-
               <div className="relative z-0 w-full group text-start">
                 <input
                   type="password"
@@ -136,9 +406,15 @@ function SignupPage() {
                 >
                   비밀번호확인
                 </label>
+                {/* 경고메시지 */}
+                <div
+                  className={`absolute top-[115%] font-bold text-${confirmPasswordFormatIsOK ? "[#03c777]" : "[#f40000]"
+                    }`}
+                >
+                  {confirmPasswordAlertMessage}
+                </div>
               </div>
             </div>
-
             <div className="flex flex-col items-start justify-between w-[60%]">
               <div className="flex justify-between w-full">
                 <div className="relative z-0 w-[58%] group text-start">
@@ -158,11 +434,24 @@ function SignupPage() {
                   >
                     이메일
                   </label>
+                  {/* 경고메시지 */}
+                  <div
+                    className={`absolute top-[115%] font-bold text-${emailAlertMessageColor ? "[#03c777]" : "[#f40000]"
+                      }`}
+                  >
+                    {emailAlertMessage}
+                  </div>
                 </div>
-                <button className="bg-[#66aadf] rounded-xl px-5 py-2 hover:bg-[#4d90d8] focus:ring-4 focus:ring-[#66aadf] my-2 ms-0 me-3">
+                <button
+                  className="bg-[#66aadf] rounded-xl px-5 py-2 hover:bg-[#4d90d8] focus:ring-4 focus:ring-[#66aadf] my-2 ms-0 me-3"
+                  disabled={!emailFormatIsOK}
+                  onClick={isDuplicatedEmail}>
                   중복 확인
                 </button>
-                <button className="bg-[#66aadf] rounded-xl px-5 py-2 hover:bg-[#4d90d8] focus:ring-4 focus:ring-[#66aadf] my-2 ms-0">
+                <button
+                  className="bg-[#66aadf] rounded-xl px-5 py-2 hover:bg-[#4d90d8] focus:ring-4 focus:ring-[#66aadf] my-2 ms-0"
+                  disabled={!emailFormatIsOK || !emailDuplicationIsOK}
+                  onClick={sendCode}>
                   인증코드 전송
                 </button>
               </div>
@@ -184,8 +473,18 @@ function SignupPage() {
                   >
                     인증코드 확인
                   </label>
+                  {/* 경고메시지 */}
+                  <div
+                    className={`absolute top-[115%] font-bold text-${emailCodeIsValid ? "[#03c777]" : "[#f40000]"
+                      }`}
+                  >
+                    {codeAlertMessage}
+                  </div>
                 </div>
-                <button className="bg-[#66aadf] rounded-xl px-5 py-2 hover:bg-[#4d90d8] focus:ring-4 focus:ring-[#66aadf]">
+                <button
+                  className="bg-[#66aadf] rounded-xl px-5 py-2 hover:bg-[#4d90d8] focus:ring-4 focus:ring-[#66aadf]"
+                  disabled={!emailFormatIsOK || !emailDuplicationIsOK || !emailSendingIsOK}
+                  onClick={checkCode}>
                   확인
                 </button>
               </div>
@@ -194,7 +493,8 @@ function SignupPage() {
         </div>
         <div className="footer-content flex justify-around w-[30%]">
           <button
-            onClick={openResultModal}
+            disabled={!idFormatIsOK || !idDuplicationIsOK || !nicknameFormatIsOK || !passwordFormatIsOK || !confirmPasswordFormatIsOK || !emailFormatIsOK || !emailDuplicationIsOK || !emailSendingIsOK || !emailCodeIsValid}
+            onClick={signup}
             className="bg-[#03c777] rounded-xl px-5 py-2 hover:bg-[#02a566] focus:ring-4 focus:ring-[#03c777] font-bold"
           >
             가입 완료
