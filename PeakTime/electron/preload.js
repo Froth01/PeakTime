@@ -25,6 +25,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
   onAllDone: (callback) => {
     ipcRenderer.on("all-done", (event, data) => callback(data));
   },
+
+  sendStartMessage: (message) => ipcRenderer.send("set-start-hiking", message),
+
   sendSaveMemo: (data) => {
     console.log("sendSaveMemo", data);
     ipcRenderer.send("save-memo", data);
