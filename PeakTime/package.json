@@ -27,6 +27,7 @@
     "d3": "^7.9.0",
     "dotenv": "^16.4.5",
     "electron-store": "^10.0.0",
+    "event-source-polyfill": "^1.0.31",
     "flowbite-react": "^0.10.2",
     "gsap": "^3.12.5",
     "node-gyp": "^10.2.0",
