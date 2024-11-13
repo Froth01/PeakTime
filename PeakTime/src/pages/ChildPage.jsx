@@ -5,70 +5,60 @@ import UpdateChild from "../components/Child/UpdateChild";
 import AddGroup from "../components/Child/AddGroup";
 import UpdateGroup from "../components/Child/UpdateGroup";
 import Title from "../components/common/Title";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { useGroupStore } from "../stores/GroupStore";
 import groupsApi from "../api/groupsApi";
+import presetsApi from "../api/presetsApi";
+import "../styles/daily-report-custom-swal.css";
+import Swal from "sweetalert2";
 
 function ChildPage() {
-  // 현재 창 변수
-  const [showNow, setShowNow] = useState(null);
-  // 손볼 그룹이나 계정 id
-  const [updateId, setUpdateId] = useState(null);
-  // 보여주는 창이 변할 때
-  const onChangeContent = (content, id = null) => {
-    setShowNow(content);
-    if (id) {
-      setUpdateId(id);
-    }
-    console.log(showNow);
-  };
+  const { showNow, setGroupList, setPresetList, resetAll } = useGroupStore();
 
-  // 그룹 리스트 > 차일드 리스트
-  const [groupList, setGroupList] = useState([]);
-
-  const onChangeGroupList = (group) => {
-    setGroupList(group);
-  };
-
-  // 페이지 진입 시 그룹 전체 조회 API 호출
+  // 페이지 진입 시 그룹 전체 조회, 프리셋 조회 API 호출
   useEffect(() => {
     groupsApi
       .get("")
       .then((result) => setGroupList(result.data.data.groupList))
-      .catch((err) => console.log(err));
+      .catch(() => {
+        Swal.fire({
+        title: "그룹 정보 조회 실패",
+        text: "그룹 정보를 가져오는 데 실패했습니다. 잠시 후 다시 시도해주세요.",
+        icon: "error",
+        confirmButtonText: "확인",
+        confirmButtonColor: "#03C777",
+        customClass: {
+          popup: "custom-swal-popup",
+        }
+      })});
+
+    presetsApi
+      .get("")
+      .then((result) => setPresetList(result.data.data.presetList))
+      .catch();
+
+  // unmount 시 상태 모두 초기화
+    return () => {
+      resetAll();
+    }
   }, []);
 
   return (
     <div className="h-[100vh] flex flex-col">
       <Title title={"서브계정 관리"} />
       <div className="h-[90vh] top-[10vh]">
-        <ChildList onChangeContent={onChangeContent} groupList={groupList} />
+        <ChildList />
         {showNow === "addChild" && (
-          <AddChild
-            groupList={groupList}
-            onChangeContent={onChangeContent}
-            onChangeGroupList={onChangeGroupList}
-          />
+          <AddChild />
         )}
         {showNow === "updateChild" && (
-          <UpdateChild
-            childId={updateId}
-            groupList={groupList}
-            onChangeContent={onChangeContent}
-            onChangeGroupList={onChangeGroupList}
-          />
+          <UpdateChild />
         )}
         {showNow === "addGroup" && (
-          <AddGroup
-            onChangeContent={onChangeContent}
-            onChangeGroupList={onChangeGroupList}
-          />
+          <AddGroup />
         )}
         {showNow === "updateGroup" && (
-          <UpdateGroup
-            groupId={updateId}
-            onChangeContent={onChangeContent}
-            onChangeGroupList={onChangeGroupList}
-          />
+          <UpdateGroup />
         )}
       </div>
     </div>

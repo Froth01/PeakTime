@@ -1,8 +1,11 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { MdAccessTimeFilled } from "react-icons/md";
+import { useGroupStore } from "../../stores/GroupStore";
 
-function AddGroupTimer({ groupId, onSave }) {
+function AddGroupTimer({ onSave }) {
+  const { groupId } = useGroupStore();
+
   const [startTime, setStartTime] = useState("00:00");
   const [attentionTime, setAttentionTime] = useState(0);
   const [repeatDay, setRepeatDay] = useState(0);
@@ -141,7 +144,6 @@ function AddGroupTimer({ groupId, onSave }) {
 }
 
 AddGroupTimer.propTypes = {
-  groupId: PropTypes.number.isRequired,
   onSave: PropTypes.func.isRequired,
 };
 

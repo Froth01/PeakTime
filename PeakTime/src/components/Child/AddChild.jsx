@@ -1,9 +1,9 @@
-import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import authApi from "../../api/authApi";
 import groupsApi from "../../api/groupsApi";
 import childrenApi from "../../api/childrenApi";
+import { useGroupStore } from "../../stores/GroupStore";
 import {
   errorToCheckIsIdDuplicated,
   errorBeforeConfirm,
@@ -11,7 +11,8 @@ import {
 } from "../../utils/Child/AddChildAlertMessage";
 import { IoIosArrowDown } from "react-icons/io";
 
-function AddChild({ groupList, onChangeContent, onChangeGroupList }) {
+function AddChild() {
+  const { groupList, setGroupList, setContent } = useGroupStore();
   const [groupId, setGroupId] = useState("");
   const [childLoginId, setChildLoginId] = useState("");
   const [childPassword, setChildPassword] = useState("");
@@ -106,7 +107,7 @@ function AddChild({ groupList, onChangeContent, onChangeGroupList }) {
         Swal.fire(addChildAlertMessage()).then(() => {
           groupsApi
             .get("")
-            .then((result) => onChangeGroupList(result.data.data.groupList))
+            .then((result) => setGroupList(result.data.data.groupList))
             .catch();
         });
       })
@@ -118,11 +119,6 @@ function AddChild({ groupList, onChangeContent, onChangeGroupList }) {
   useEffect(() => {
     setPasswordCheck(childPassword === childConfirmPassword);
   }, [childPassword, childConfirmPassword]);
-
-  // 닫기 클릭
-  const handleCancel = () => {
-    onChangeContent(null);
-  };
 
   return (
     <div className="absolute left-[43vw] w-[54vw] h-[84vh] my-[3vh] bg-[#333333] bg-opacity-70 rounded-lg p-5 flex flex-col items-center justify-between">
@@ -212,8 +208,8 @@ function AddChild({ groupList, onChangeContent, onChangeGroupList }) {
             {duplicatedMessage()}
             {isDuplicate !== "checked" && (
               <button
-                onClick={handleCheckId}
-                className="absolute top-[90%] bg-[#4d90d8] rounded-xl px-5 py-2 hover:bg-[#3476d0] focus:ring-4 focus:ring-[#4d90d8]"
+                onClick={() => handleCheckId()}
+                className="absolute font-bold text-white top-[90%] bg-[#4d90d8] rounded-xl px-5 py-2 hover:bg-[#3476d0] focus:ring-4 focus:ring-[#4d90d8]"
               >
                 아이디 중복 확인
               </button>
@@ -254,13 +250,13 @@ function AddChild({ groupList, onChangeContent, onChangeGroupList }) {
 
       <div className="w-full flex justify-end gap-5">
         <button
-          onClick={handleConfirm}
+          onClick={() =>handleConfirm()}
           className="bg-[#03c777] rounded-xl px-5 py-2 hover:bg-[#02a566] focus:ring-4 focus:ring-[#03c777] text-white font-bold"
         >
           생성하기
         </button>
         <button
-          onClick={handleCancel}
+          onClick={() => setContent(null)}
           className="bg-[#7c7c7c] rounded-xl px-5 py-2 hover:bg-[#5c5c5c] focus:ring-4 focus:ring-[#c5c5c5] text-white font-bold"
         >
           닫기
@@ -269,24 +265,5 @@ function AddChild({ groupList, onChangeContent, onChangeGroupList }) {
     </div>
   );
 }
-
-// props validation 추가
-AddChild.propTypes = {
-  groupList: PropTypes.arrayOf(
-    PropTypes.shape({
-      groupId: PropTypes.number.isRequired,
-      groupTitle: PropTypes.string.isRequired,
-      childList: PropTypes.arrayOf(
-        PropTypes.shape({
-          userId: PropTypes.number.isRequired,
-          userLoginId: PropTypes.string.isRequired,
-          nickname: PropTypes.string.isRequired,
-        })
-      ).isRequired,
-    })
-  ).isRequired,
-  onChangeContent: PropTypes.func.isRequired,
-  onChangeGroupList: PropTypes.func.isRequired,
-};
 
 export default AddChild;
