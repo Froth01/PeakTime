@@ -33,7 +33,7 @@ function LoginPage() {
           title: "다시 시도해주세요.",
           text: `${error.response.data.message}`,
           icon: "error",
-          confirmButtonColor: "green",
+          confirmButtonColor: "#03C777",
           confirmButtonText: "확인",
         });
       }
@@ -42,7 +42,7 @@ function LoginPage() {
         title: "다시 시도해주세요.",
         text: "아이디와 비밀번호를 입력해 주세요.",
         icon: "error",
-        confirmButtonColor: "green",
+        confirmButtonColor: "#03C777",
         confirmButtonText: "확인",
       });
     }
