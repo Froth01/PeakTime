@@ -1,23 +1,32 @@
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { TiDelete } from "react-icons/ti";
 import presetsApi from "../../api/presetsApi";
 import Swal from "sweetalert2";
+import ReactDOM from "react-dom/client";
+import usePresetStore from "../../stores/PresetStore";
+import AddSite from "./AddSite";
+import AddProgram from "./AddProgram";
+import "../../styles/daily-report-custom-swal.css";
 import "../../styles/custom-scrollbar.css";
 
-function PresetSetting({ preset, onCancel, setUpdateTrigger }) {
-  const [title, setTitle] = useState(preset.title);
+function PresetSetting({ onCancel, setUpdateTrigger }) {
+  const { selectedPreset, presetList } = usePresetStore();
+  const [title, setTitle] = useState(selectedPreset.title);
 
   // 받아온 array []형태로 처리해주기
   const [blockWebsiteArray, setBlockWebsiteArray] = useState([
-    ...(preset.blockWebsiteArray || []),
+    ...(selectedPreset.blockWebsiteArray || []),
   ]);
   const [blockProgramArray, setBlockProgramArray] = useState([
-    ...(preset.blockProgramArray || []),
+    ...(selectedPreset.blockProgramArray || []),
   ]);
 
-  // 새 버튼 추가
-  const [newSite, setNewSite] = useState(""); // 새로운 사이트 추가 입력 필드 상태
-  const [newProgram, setNewProgram] = useState(""); // 새로운 사이트 추가 입력 필드 상태
+  useEffect(() => {
+    setTitle(selectedPreset.title);
+    setBlockWebsiteArray([...(selectedPreset.blockWebsiteArray || [])]);
+    setBlockProgramArray([...(selectedPreset.blockProgramArray || [])]);
+  }, [selectedPreset]);
 
   // 프리셋 아이디로 정보조회해야함
   // 취소버튼 클릭
@@ -39,47 +48,86 @@ function PresetSetting({ preset, onCancel, setUpdateTrigger }) {
 
   // 사이트, 프로그램 한 줄 추가 처리
   const openAddSiteModal = () => {
+    let root;
+    let newSite;
+
     Swal.fire({
       title: "사이트 추가",
-      input: "text",
-      inputPlaceholder: "사이트 주소를 입력하세요",
-      showCancelButton: true,
-      confirmButtonText: "저장하기",
-      confirmButtonColor: "#90B7DA",
-      cancelButtonText: "취소",
-      cancelButtonColor: "red",
-      preConfirm: (site) => {
-        if (!site) {
-          Swal.showValidationMessage("사이트 주소를 입력하세요");
+      html: `
+        <div id="add-site" />
+      `,
+      width: "40%",
+      willOpen: () => {
+        root = ReactDOM.createRoot(document.getElementById("add-site"));
+        const onAddSite = (value, isDisabled) => {
+          newSite = value;
+          Swal.getConfirmButton().disabled = isDisabled;
+        };
+        root.render(
+          <AddSite
+            blockWebsiteArray={blockWebsiteArray}
+            onAddSite={onAddSite}
+          />
+        );
+      },
+      preConfirm: () => {
+        handleAddSite(newSite);
+      },
+      didClose: () => {
+        if (root) {
+          root.unmount();
         }
       },
-    }).then((result) => {
-      if (result.isConfirmed && result.value) {
-        handleAddSite(result.value);
-      }
+      showCancelButton: true,
+      confirmButtonText: "저장하기",
+      confirmButtonColor: "#66AADF",
+      cancelButtonText: "취소",
+      cancelButtonColor: "#F40000",
+      customClass: {
+        popup: "custom-swal-popup",
+      },
     });
   };
 
   const openAddProgramModal = () => {
+    let root;
+    let newProgram;
+
     Swal.fire({
       title: "프로그램 추가",
-      input: "text",
-      inputPlaceholder: "프로그램명을 입력하세요(exe 파일 지원)",
-      showCancelButton: true,
-      confirmButtonText: "저장하기",
-      confirmButtonColor: "#90B7DA",
-      cancelButtonText: "취소",
-      cancelButtonColor: "red",
-      preConfirm: (programName) => {
-        if (!programName) {
-          Swal.showValidationMessage("프로그램명을 입력하세요");
+      html: `
+        <div id="add-program" />
+      `,
+      width: "40%",
+      willOpen: () => {
+        root = ReactDOM.createRoot(document.getElementById("add-program"));
+        const onAddProgram = (value, isDisabled) => {
+          newProgram = value;
+          Swal.getConfirmButton().disabled = isDisabled;
+        };
+        root.render(
+          <AddProgram
+            blockProgramArray={blockProgramArray}
+            onAddProgram={onAddProgram}
+          />
+        );
+      },
+      preConfirm: () => {
+        handleAddProgram(newProgram);
+      },
+      didClose: () => {
+        if (root) {
+          root.unmount();
         }
       },
-    }).then((result) => {
-      console.log(result.value);
-      if (result.isConfirmed && result.value) {
-        handleAddProgram(result.value);
-      }
+      showCancelButton: true,
+      confirmButtonText: "저장하기",
+      confirmButtonColor: "#66AADF",
+      cancelButtonText: "취소",
+      cancelButtonColor: "#F40000",
+      customClass: {
+        popup: "custom-swal-popup",
+      },
     });
   };
 
@@ -92,6 +140,40 @@ function PresetSetting({ preset, onCancel, setUpdateTrigger }) {
 
   // 수정하기 클릭 시 값 변경시키기(전체 조회는 이후 또 진행되어서 상관없음)
   const updatePresetPut = async () => {
+    // 프리셋명 길이 확인
+    if (title.length < 2 || title.length > 8) {
+      Swal.fire({
+        icon: "error",
+        title: "프리셋명 양식 오류",
+        text: "프리셋명은 2자 이상 8자 이하여야 합니다.",
+        confirmButtonColor: "#03C777",
+        confirmButtonText: "확인",
+        customClass: {
+          popup: "custom-swal-popup",
+        },
+      });
+      return false;
+    }
+
+    // 프리셋명 중복 확인
+    if (
+      presetList.some(
+        (p) => p.presetId !== selectedPreset.presetId && p.title === title
+      )
+    ) {
+      Swal.fire({
+        icon: "error",
+        title: "프리셋명 중복 오류",
+        text: "중복된 프리셋명을 가진 프리셋이 있습니다.",
+        confirmButtonColor: "#03C777",
+        confirmButtonText: "확인",
+        customClass: {
+          popup: "custom-swal-popup",
+        },
+      });
+      return false;
+    }
+
     try {
       // 프리셋 생성 Post 요청을 보내기
       // Request Body 데이터 가공
@@ -100,7 +182,10 @@ function PresetSetting({ preset, onCancel, setUpdateTrigger }) {
         blockWebsiteList: blockWebsiteArray,
         blockProgramList: blockProgramArray,
       };
-      const response = await presetsApi.put(`/${preset.presetId}`, requestData);
+      const response = await presetsApi.put(
+        `/${selectedPreset.presetId}`,
+        requestData
+      );
       console.log("presetUpdatePutApi: ", response.data);
       // 업데이트 후 트리거 변경
       setUpdateTrigger((prev) => !prev); // 상태 변화시키기
@@ -117,52 +202,93 @@ function PresetSetting({ preset, onCancel, setUpdateTrigger }) {
 
   return (
     <div className="absolute left-[43vw] w-[54vw] h-[84vh] my-[3vh] bg-[#333333] bg-opacity-70 rounded-lg p-5 flex flex-col items-center justify-between text-white">
-      <h2 className="text-[30px] font-bold">{title} 설정</h2>
-      <input
-        type="text"
-        value={title}
-        className="rounded-lg text-black focus:ring-4 focus:ring-[#66aadf] focus:outline-none ps-3"
-        onChange={(event) => setTitle(event.target.value)}
-      />
+      <h2 className="text-[30px] font-bold w-full pb-3 border-b">
+        {selectedPreset.title}
+      </h2>
+
+      <div className="flex flex-col gap-3 text-start">
+        <label className="text-[20px] text-white font-bold">프리셋명</label>
+        <input
+          type="text"
+          value={title}
+          className="rounded-lg text-black focus:ring-4 focus:ring-[#66aadf] focus:outline-none ps-3"
+          onChange={(event) => setTitle(event.target.value)}
+        />
+      </div>
+
       <div className="grid gap-5 grid-cols-2 w-full">
         <div>
-          <h3 className="text-[30px] font-bold mb-5">사이트 차단 목록</h3>
+          <h3 className="text-[20px] font-bold mb-4">사이트 차단 목록</h3>
           <div className="h-[40vh] overflow-y-scroll border border-white p-3 custom-scrollbar">
             {blockWebsiteArray.map((site, idx) => (
-              <li key={idx} className="flex items-center gap-2">
+              <li key={idx} className="flex items-center text-[20px] gap-3">
                 <span>{site}</span>
-                <button onClick={() => handleDeleteSite(idx)}>x</button>
+                <button
+                  className="text-[20px]"
+                  onClick={() => handleDeleteSite(idx)}
+                >
+                  <TiDelete />
+                </button>
               </li>
             ))}
           </div>
-          <button onClick={openAddSiteModal}>+ 사이트 추가</button>
+          <div className="w-full flex justify-start mt-3">
+            <button
+              className="text-white font-bold text-[20px]"
+              onClick={openAddSiteModal}
+            >
+              +사이트 추가
+            </button>
+          </div>
         </div>
         <div>
-          <h3 className="text-[30px] font-bold mb-5">프로그램 차단 목록</h3>
+          <h3 className="text-[20px] font-bold mb-4">프로그램 차단 목록</h3>
           <div className="h-[40vh] overflow-y-scroll border border-white p-3 custom-scrollbar">
             {blockProgramArray.map((program, idx) => (
-              <li key={idx} className="flex items-center gap-2">
+              <li key={idx} className="flex items-center text-[20px] gap-3">
                 <span>{program}</span>
-                <button onClick={() => handleDeleteProgram(idx)}>x</button>
+                <button
+                  className="text-[20px]"
+                  onClick={() => handleDeleteProgram(idx)}
+                >
+                  <TiDelete />
+                </button>
               </li>
             ))}
           </div>
-          <button onClick={openAddProgramModal}>+ 프로그램 추가</button>
+          <div className="w-full flex justify-start mt-3">
+            <button
+              className="text-white font-bold text-[20px]"
+              onClick={openAddProgramModal}
+            >
+              +프로그램 추가
+            </button>
+          </div>
         </div>
       </div>
-      <button onClick={handleUpdatePreset}>수정완료</button>
-      <button onClick={handleCancel}>돌아가기</button>
+
+      <div className="w-full flex justify-end items-end gap-5">
+        <p className="text-gray-400 text-[18px] right-5 top-5">
+          *수정 사항은 수정하기 버튼을 눌러야 최종 반영됩니다
+        </p>
+        <button
+          className="bg-[#03c777] rounded-xl px-5 py-2 hover:bg-[#02a566] focus:ring-4 focus:ring-[#03c777] text-white font-bold"
+          onClick={handleUpdatePreset}
+        >
+          수정하기
+        </button>
+        <button
+          className="bg-[#7c7c7c] rounded-xl px-5 py-2 hover:bg-[#5c5c5c] focus:ring-4 focus:ring-[#c5c5c5] text-white font-bold"
+          onClick={handleCancel}
+        >
+          닫기
+        </button>
+      </div>
     </div>
   );
 }
 // props validation 추가
 PresetSetting.propTypes = {
-  preset: PropTypes.shape({
-    presetId: PropTypes.number.isRequired,
-    title: PropTypes.string.isRequired,
-    blockWebsiteArray: PropTypes.arrayOf(PropTypes.string),
-    blockProgramArray: PropTypes.arrayOf(PropTypes.string),
-  }).isRequired,
   onCancel: PropTypes.func.isRequired,
   setUpdateTrigger: PropTypes.func.isRequired,
 };
