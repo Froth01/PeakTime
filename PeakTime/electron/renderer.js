@@ -94,4 +94,14 @@ function handleParsedMessage(parsedMessage) {
     // sendHikingInfo 호출을 분리한 처리로 이동
     window.electronAPI.sendHikingInfo(parsedMessage);
   }
+  if (parsedMessage.action === "saveMemo") {
+    console.log("savememo renderer");
+    console.log(parsedMessage);
+    window.electronAPI.sendSaveMemo(parsedMessage); // preload에서 electronAPi 설정한 곳으로 이동
+  }
+  if (parsedMessage.action === "addUrl") {
+    console.log("addUrl renderer");
+    console.log(parsedMessage);
+    window.electronAPI.sendAddUrl(parsedMessage); // preload에서 electronAPi 설정한 곳으로 이동
+  }
 }

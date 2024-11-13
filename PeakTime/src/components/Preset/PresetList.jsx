@@ -41,7 +41,7 @@ function PresetList({ onPresetClick, updateTrigger }) {
       };
       const response = await presetsApi.post(``, requestData);
       console.log("presetPostApi: ", response.data);
-      await fetchGetPresets(); // 보낸 뒤 새로운 PresetList를 다시 받아옴
+      setPresetList((presetList) => [...presetList, requestData]); // 상태를 업데이트하여 UI에 반영
     } catch (error) {
       console.error("Error post Preset:", error);
       throw error;
@@ -54,7 +54,7 @@ function PresetList({ onPresetClick, updateTrigger }) {
       console.log("delete 프리셋 아이디 ", presetId);
       const response = await presetsApi.delete(`/${presetId}`);
       console.log("presetDeleteApi: ", response.data);
-      await fetchGetPresets(); // 보낸 뒤 새로운 PresetList를 다시 받아옴
+      handleDelete(presetId); //
     } catch (error) {
       console.error("Error delete Preset:", error);
       throw error;
@@ -99,9 +99,9 @@ function PresetList({ onPresetClick, updateTrigger }) {
   };
 
   // 삭제버튼 클릭
-  // const handleDelete = (presetId) => {
-  //   setPresetList(presetList.filter((one, _) => one.presetId !== presetId));
-  // };
+  const handleDelete = (presetId) => {
+    setPresetList(presetList.filter((one, _) => one.presetId !== presetId));
+  };
 
   return (
     <div className="absolute left-[10vw] w-[15vw] h-[100vh] flex flex-col justify-between bg-gray-400">

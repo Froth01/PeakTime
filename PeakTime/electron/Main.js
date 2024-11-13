@@ -151,6 +151,21 @@ ipcMain.on("sendAccessToken", (event, token) => {
   store.set("accessToken", token);
 });
 
+// 메모저장 신호받기
+ipcMain.on("save-memo", (event, data) => {
+  console.log("this is save-memo in main:", data);
+
+  // 메모 정보를 렌더러로 응답으로 보내기
+  event.reply("save-memo-response", data);
+});
+
+// 프리셋 url 추가하기
+ipcMain.on("add-url", (event, data) => {
+  console.log("this is add-url in main:", data);
+  // 추가한 url 정보를 렌더러로 응답으로 보내기
+  event.reply("add-url-response", data);
+});
+
 // 차단 프로그램 종료
 ipcMain.on("end-block-program", async (event, data) => {
   try {
