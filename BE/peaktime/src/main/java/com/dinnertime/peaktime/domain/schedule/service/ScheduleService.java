@@ -88,7 +88,7 @@ public class ScheduleService {
                     .data(data));
         } catch (IOException e) {
             emitterRepository.deleteById(emitterId);
-            throw new CustomException(ErrorCode.FAIL_SEND_SSE_MESSAGE);
+            emitter.completeWithError(e);
         }
     }
 

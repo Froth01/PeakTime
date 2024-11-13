@@ -2,16 +2,19 @@ package com.dinnertime.peaktime.domain.hiking.service;
 
 import com.dinnertime.peaktime.domain.content.entity.Content;
 import com.dinnertime.peaktime.domain.content.repository.ContentRepository;
+import com.dinnertime.peaktime.domain.group.entity.Group;
+import com.dinnertime.peaktime.domain.group.repository.GroupRepository;
 import com.dinnertime.peaktime.domain.hiking.entity.Hiking;
 import com.dinnertime.peaktime.domain.hiking.repository.HikingRepository;
-import com.dinnertime.peaktime.domain.hiking.service.dto.query.UsingInfo;
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingCalendarDetailQueryDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingCalendarQueryDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingDetailQueryDto;
-import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingStatisticQueryDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.request.EndHikingRequestDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.request.StartHikingRequestDto;
 import com.dinnertime.peaktime.domain.hiking.service.dto.response.*;
+import com.dinnertime.peaktime.domain.statistic.entity.Statistic;
+import com.dinnertime.peaktime.domain.statistic.entity.StatisticContent;
+import com.dinnertime.peaktime.domain.statistic.repository.StatisticRepository;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
 import com.dinnertime.peaktime.domain.usergroup.entity.UserGroup;
@@ -26,11 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -41,6 +42,8 @@ public class HikingService {
     private final ContentRepository contentRepository;
     private final UserGroupRepository userGroupRepository;
     private final RedisService redisService;
+    private final StatisticRepository statisticRepository;
+    private final GroupRepository groupRepository;
 
     private static final int DAY = 7;
     private static final int DAY_MINUTE = 1440;
@@ -141,8 +144,8 @@ public class HikingService {
         //없으면 null 반환
         if(hikingDetail==null) return null;
 
-        List<UsingInfo> visitedSiteList = contentRepository.getTopUsingInfoList("site", hikingId);
-        List<UsingInfo> visitedProgramList = contentRepository.getTopUsingInfoList("program", hikingId);
+        List<StatisticContent> visitedSiteList = contentRepository.getTopUsingInfoList("site", hikingId);
+        List<StatisticContent> visitedProgramList = contentRepository.getTopUsingInfoList("program", hikingId);
 
         hikingDetail.setVisitedSiteList(visitedSiteList);
         hikingDetail.setVisitedProgramList(visitedProgramList);
@@ -154,42 +157,49 @@ public class HikingService {
     }
 
     @Transactional(readOnly = true)
-    public HikingStatisticResponseDto getHikingStatistic(Long userId, Long childUserId) {
+    public HikingStatisticResponseDto getHikingStatistic(Long userId) {
 
-        Long findUserId = Optional.ofNullable(childUserId).orElse(userId);
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        User findUser = null;
-
-        //자식계정인 경우 체크
-        if(childUserId!=null) {
-            findUser = userRepository.findUserByRootUserInGroup(userId, childUserId).orElseThrow(
-                    () -> new CustomException(ErrorCode.CHILD_USER_NOT_FOUND)
-            );
-        }
-        //루트 계정인 경우
-        if(findUser==null) {
-            findUser = userRepository.findByUserIdAndIsDeleteFalse(findUserId).orElseThrow(
-                    () -> new CustomException(ErrorCode.USER_NOT_FOUND)
-            );
+        // 자식 계정일 경우
+        if (!user.getIsRoot()) {
+            return createChildStatisticResponse(user);
         }
 
-        HikingStatisticQueryDto hikingStatistic = hikingRepository.getHikingStatistic(findUserId);
-
-        if(hikingStatistic==null) return HikingStatisticResponseDto.createNoHiking(findUser.getNickname());
-        //전체 차단 접근 횟수
-        Long totalBlockedCount = hikingRepository.getTotalBlockedCount(findUserId);
-        //사이트 리스트 조회
-        List<UsingInfo> siteList = contentRepository.getTopUsingInfoListByUserId("site", findUserId);
-        //프로그램 리스트 조회
-        List<UsingInfo> programList = contentRepository.getTopUsingInfoListByUserId("program", findUserId);
-        //시작 시간 리스트 조회
-        List<LocalDateTime> startDateTimeList = hikingRepository.getStartTimeListByUserId(findUserId);
-
-        List<String> startTimeList = startDateTimeList.stream()
-                .map(localDateTime -> localDateTime.toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")))
-                .collect(Collectors.toList());
-
-        return HikingStatisticResponseDto.createHikingStatisticResponseDto(hikingStatistic, totalBlockedCount, findUser.getNickname(), siteList, programList, startTimeList);
-
+        // 루트 계정일 경우
+        return createRootStatisticResponse(user);
     }
+
+    //자식계정 생성
+    private HikingStatisticResponseDto createChildStatisticResponse(User user) {
+        Optional<Statistic> statistic = statisticRepository.findByUser_UserId(user.getUserId());
+        HikingStatisticWrapperResponseDto root = statistic
+                .map(HikingStatisticWrapperResponseDto::createHikingStatisticResponseDto)
+                .orElseGet(() -> HikingStatisticWrapperResponseDto.createNoHiking(user));
+        return HikingStatisticResponseDto.createChildHikingStatisticResponseDto(root);
+    }
+
+    //루트계정 생성
+    private HikingStatisticResponseDto createRootStatisticResponse(User user) {
+        Optional<Statistic> rootStatistic = statisticRepository.findByUser_UserId(user.getUserId());
+        HikingStatisticWrapperResponseDto root = rootStatistic
+                .map(HikingStatisticWrapperResponseDto::createHikingStatisticResponseDto)
+                .orElseGet(() -> HikingStatisticWrapperResponseDto.createNoHiking(user));
+
+        List<HikingGroupStatisticResponseDto> responseDtoList = groupRepository.findByUser_UserIdAndIsDeleteFalse(user.getUserId())
+                .stream()
+                .map(group -> {
+                    List<User> userList = groupRepository.findUserListByGroupId(group.getGroupId());
+                    List<Statistic> statisticList = statisticRepository.findAllByUserIn(userList);
+                    List<HikingStatisticWrapperResponseDto> wrapperList = statisticList.stream()
+                            .map(HikingStatisticWrapperResponseDto::createHikingStatisticResponseDto)
+                            .toList();
+                    return HikingGroupStatisticResponseDto.createGroupResponseDto(group, wrapperList);
+                })
+                .toList();
+
+        return HikingStatisticResponseDto.createRootHikingStatisticResponseDto(root, responseDtoList);
+    }
+
 }

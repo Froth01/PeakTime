@@ -34,12 +34,6 @@ public class SchedulerService {
         redisService.addFirstSchedule(scheduleList);
     }
 
-    //매일 1시에 실행
-    @Scheduled(cron = "0 0 1 * * *", zone = "Asia/Seoul")
-    public void updateStatistics() {
-        hikingRepository.getHikingStatistic();
-    }
-
     //1분마다 실행
     @Scheduled(cron = "0 0/1 * * * *")
     public void send() {
