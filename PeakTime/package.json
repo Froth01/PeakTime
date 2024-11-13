@@ -63,24 +63,7 @@
     "productName": "PeakTime",
     "files": [
       "dist/**/*",
-      "electron/**/*",
-      "public/**/*"
-    ],
-    "extraResources": [
-      {
-        "from": "electron",
-        "to": "electron",
-        "filter": [
-          "**/*"
-        ]
-      },
-      {
-        "from": "dist/build",
-        "to": "build",
-        "filter": [
-          "**/*"
-        ]
-      }
+      "electron/**/*"
     ],
     "directories": {
       "buildResources": "public"
@@ -88,6 +71,9 @@
     "win": {
       "icon": "public/Logo/Logo.ico",
       "target": "nsis"
+    },
+    "nsis": {
+      "allowToChangeInstallationDirectory": true
     }
   }
 }
