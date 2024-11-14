@@ -18,6 +18,7 @@ import ReportPage from "./pages/ReportPage"; // 내역 페이지
 import ChildPage from "./pages/ChildPage"; // 차일드 관리
 import MemoPage from "./pages/MemoPage"; // 메모 페이지
 import { useEffect, useState } from "react";
+import Timer from "./components/Timer/Timer";
 
 // 로그인 필요한 페이지
 const protectedRoutes = [
@@ -53,6 +54,7 @@ function App() {
     <div className="relative">
       <Router>
         {user && <Toolbar />}
+        {user && <Timer />}
         <Routes>
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/passwordreissue" element={<PasswordReissuePage />} />

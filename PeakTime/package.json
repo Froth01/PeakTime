@@ -67,7 +67,18 @@
       "dist/**/*",
       "electron/**/*"
     ],
-    "asar": true,
+    "extraResources": [
+      {
+        "from": "dist/build/",
+        "to": "build/",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "directories": {
+      "buildResources": "public"
+    },
     "win": {
       "icon": "public/Logo/Logo.ico",
       "target": [
