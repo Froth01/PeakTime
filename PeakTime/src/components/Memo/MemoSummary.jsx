@@ -1,12 +1,14 @@
-import PropTypes from "prop-types";
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
+import { useMemoStore } from "../../stores/MemoStore";
 import summariesApi from "../../api/summariesApi";
 import "../../styles/daily-report-custom-swal.css";
+import "../../styles/custom-scrollbar.css";
 import html2pdf from "html2pdf.js";
 
-function MemoSummary({ data }) {
-  const { summaryId, content, updatedAt } = data;
+function MemoSummary() {
+  const { summaryData, resetSummaryData } = useMemoStore();
+  const { summaryId, content, updatedAt } = summaryData;
 
   // 생성날짜 바로 보이게 처리
   const formatDate = (date) => {
@@ -105,9 +107,10 @@ function MemoSummary({ data }) {
   const deleteSummary = async (summaryId) => {
     try {
       // 메모 삭제 delete 요청 보내기
-      const response = await summariesApi.delete(`${summaryId}`);
+      const response = await summariesApi.delete(`/${summaryId}`);
       console.log("summaryDeleteApi: ", response.data);
-      handleDelete(summaryId);
+
+      resetSummaryData();
     } catch (error) {
       console.error("error delete summary api", error);
     }
@@ -134,32 +137,33 @@ function MemoSummary({ data }) {
   };
 
   return (
-    <div className="h-72 overflow-y-scroll border border-gray-300 p-2">
-      {summaryId ? (
-        <div>
-          <h2>요약 ID: {summaryId}</h2>
-          <p>{content}</p>
-          <p>업데이트 날짜: {formatDate(updatedAt)}</p>
-          <button onClick={() => openDeleteWarn(summaryId)}>
-            요약 삭제하기
-          </button>
-          <button onClick={showMarkdownModal} style={{ marginLeft: "10px" }}>
-            Markdown 미리보기 및 다운로드
-          </button>
-        </div>
-      ) : (
-        <p>요약한 정보가 없습니다.</p>
-      )}
+    <div className="h-full flex flex-col">
+      <h2 className="text-white text-[20px] font-bold mb-3">
+        요약
+      </h2>
+      <div className="flex-grow flex flex-col justify-between">
+        {summaryId ? (
+          <div className="h-full flex flex-col justify-between">
+            <div className="flex-1 overflow-auto">
+              <textarea readOnly className="h-[92%] rounded-xl p-2 w-full custom-scrollbar">{content}</textarea>
+              <div className="text-[#C5C5C5] text-start text-[15px] mb-1">작성일시: {formatDate(updatedAt)}</div>
+            </div>
+
+            <div className="w-full flex justify-center mt-3 gap-x-3">
+              <button className="bg-[#03c777] rounded-xl px-5 py-2 hover:bg-[#02a566] focus:ring-4 focus:ring-[#03c777] text-white font-bold" onClick={() => showMarkdownModal()}>
+                Markdown 미리보기 및 다운로드
+              </button>
+              <button className="bg-[#f40000] rounded-xl px-5 py-2 hover:bg-[#d60000] focus:ring-4 focus:ring-[#f40000] text-white font-bold" onClick={() => openDeleteWarn(summaryId)}>
+                요약삭제
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="h-full flex justify-center items-center font-bold text-[20px] text-[#C5C5C5]">요약 기록이 없습니다.</div>
+        )}
+      </div>
     </div>
   );
 }
-
-MemoSummary.propTypes = {
-  data: PropTypes.shape({
-    summaryId: PropTypes.number,
-    content: PropTypes.string,
-    updatedAt: PropTypes.string,
-  }),
-};
 
 export default MemoSummary;
