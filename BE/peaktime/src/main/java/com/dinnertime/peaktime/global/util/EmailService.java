@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,6 +26,7 @@ public class EmailService {
     private final JavaMailSender javaMailSender;
 
     // 랜덤 인증 코드 보내기
+    @Async
     public void sendCode(String rx, String code) {
         LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(3);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH:mm");
@@ -39,6 +41,7 @@ public class EmailService {
     }
 
     // 랜덤 비밀번호 보내기
+    @Async
     public void sendPassword(String rx, String password) {
         String title = "Peaktime 임시 비밀번호 발급 메일입니다!";
         String content = "회원님의 임시 비밀번호는 " + password + "입니다.";
@@ -56,7 +59,7 @@ public class EmailService {
             helper.setText(content, true);
             javaMailSender.send(mimeMessage);
         } catch (Exception e) {
-            throw new EmailServerException();
+            throw new CustomException(ErrorCode.FAILED_SEND_EMAIL);
         }
     }
 

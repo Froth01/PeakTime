@@ -236,8 +236,7 @@ public class AuthService {
     }
 
     // 인증 코드 전송
-    @Async
-    @Retryable(retryFor = { EmailServerException.class, RedisConnectionFailureException.class, DataAccessException.class }, backoff = @Backoff(delay = 1500))
+    @Transactional
     public void sendCode(SendCodeRequest sendCodeRequest) {
         // 1. 인증 코드 생성
         String code = this.generateCode();
@@ -246,12 +245,6 @@ public class AuthService {
         emailService.sendCode(lowerEmail, code);
         // 3. Redis에 Key가 emailCode라는 prefix와 이메일 주소(소문자)로 이루어져 있고, Value가 랜덤 인증 코드인 정보를 저장하기
         redisService.saveEmailCode(lowerEmail, code);
-    }
-
-    // @Retryable의 기본 시도 횟수 3회 실패 시 실행되는 메서드
-    @Recover
-    public void recover() {
-        throw new CustomException(ErrorCode.FAILED_SEND_EMAIL);
     }
 
     // 인증 코드 확인
@@ -275,8 +268,6 @@ public class AuthService {
     }
 
     // 비밀번호 재발급
-    @Async
-    @Retryable(retryFor = { EmailServerException.class }, backoff = @Backoff(delay = 1500))
     @Transactional
     public void resetPassword(ResetPasswordRequest resetPasswordRequest) {
         // 1. 클라이언트의 요청에서 userLoginId과 email 추출하기
