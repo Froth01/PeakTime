@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function () {
   chrome.storage.local.get({ savedTitle: "메모명" }, function (data) {
     title.value = data.savedTitle;
     document.querySelector(".title_length").textContent =
-      title.value.length || "3";
+      title.value.length || "0";
   });
 
   // "reset" 버튼 클릭 이벤트
@@ -81,8 +81,13 @@ document.addEventListener("DOMContentLoaded", function () {
         //버튼 클릭시 전체 url 보내기
         chrome.runtime.sendMessage({ action: "addUrl", url: fullUrl });
 
-        //페이지 리로드
-        // chrome.tabs.reload(tabs[0].id);
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          if (tabs.length > 0) {
+            chrome.tabs.sendMessage(tabs[0].id, { action: "showSaveUrlModal" });
+          } else {
+            console.error("활성 탭이 없습니다.");
+          }
+        });
       });
     };
   }
@@ -91,6 +96,19 @@ document.addEventListener("DOMContentLoaded", function () {
     saveMemoButton.onclick = function () {
       const content = textarea.value;
       const memoTitle = title.value;
+
+      if (memoTitle.length < 2) {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          if (tabs.length > 0) {
+            chrome.tabs.sendMessage(tabs[0].id, {
+              action: "showSaveMemoFailModal",
+            });
+          } else {
+            console.error("활성 탭이 없습니다.");
+          }
+        });
+        return; // 제목이 2글자 미만일 경우 함수 종료
+      }
 
       //내용 소켓 통신으로 보내기
       chrome.runtime.sendMessage({
@@ -101,6 +119,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
       //내용 초기화
       clearStorage(textarea, title);
+
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs.length > 0) {
+          chrome.tabs.sendMessage(tabs[0].id, {
+            action: "showSaveMemoSuccessModal",
+          });
+        } else {
+          console.error("활성 탭이 없습니다.");
+        }
+      });
     };
   }
 
@@ -127,9 +155,9 @@ document.addEventListener("DOMContentLoaded", function () {
   if (title) {
     title.addEventListener("input", function () {
       const content = this.value;
-      // 8자 초과 시 제한
-      if (content.length > 8) {
-        this.value = content.substring(0, 8);
+      // 15자 초과 시 제한
+      if (content.length > 15) {
+        this.value = content.substring(0, 15);
       }
 
       document.querySelector(".title_length").textContent =

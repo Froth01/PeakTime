@@ -25,7 +25,7 @@ async function recordTime(url) {
     const shouldBlock = websiteList.some((urlPattern) =>
       fullUrl.includes(urlPattern)
     );
-    
+
     const isBlock = shouldBlock;
 
     const newUrlData = {
@@ -109,16 +109,16 @@ function startTracking() {
   isTracking = true;
   console.log("Tracking started");
 
-  // 현재 활성 탭의 ID를 설정하고 URL 추적
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    if (tabs.length > 0) {
-      currentTabId = tabs[0].id;
-      handleUrlChange(tabs[0].url);
+  // // 현재 활성 탭의 ID를 설정하고 URL 추적
+  // chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+  //   if (tabs.length > 0) {
+  //     currentTabId = tabs[0].id;
+  //     handleUrlChange(tabs[0].url);
 
-      // currentTabId가 설정된 후에 새로 고침 실행
-      // chrome.tabs.reload(currentTabId);
-    }
-  });
+  //     // currentTabId가 설정된 후에 새로 고침 실행
+  //     chrome.tabs.reload(currentTabId);
+  //   }
+  // });
 
   // 활성화된 탭 변경 이벤트 리스너 추가
   chrome.tabs.onActivated.addListener(handleTabActivation);

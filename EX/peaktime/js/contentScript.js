@@ -29,5 +29,104 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     const selectedText = window.getSelection().toString();
     sendResponse({ text: selectedText || null });
   }
+  if (msg.action === "showSaveUrlModal") {
+    const modal = document.getElementById("save-url-modal");
+    if (modal) {
+      modal.style.display = "block"; // 모달 표시
+      setTimeout(() => {
+        modal.style.display = "none"; // 2초 후 자동 숨김
+      }, 1000);
+    }
+  }
+  if (msg.action === "showSaveMemoFailModal") {
+    const modal = document.getElementById("save-fail-memo-modal");
+    if (modal) {
+      modal.style.display = "block"; // 모달 표시
+      setTimeout(() => {
+        modal.style.display = "none"; // 2초 후 자동 숨김
+      }, 1000);
+    }
+  }
+  if (msg.action === "showSaveMemoSuccessModal") {
+    const modal = document.getElementById("save-success-memo-modal");
+    if (modal) {
+      modal.style.display = "block"; // 모달 표시
+      setTimeout(() => {
+        modal.style.display = "none"; // 2초 후 자동 숨김
+      }, 1000);
+    }
+  }
+
   return true;
 });
+
+// 모달이 이미 추가되어 있지 않다면 추가
+if (!document.getElementById("save-fail-memo-modal")) {
+  const modal = document.createElement("div");
+  modal.id = "save-memo-modal";
+  modal.style.position = "fixed";
+  modal.style.top = "50%";
+  modal.style.left = "50%";
+  modal.style.transform = "translate(-50%, -50%)";
+  modal.style.backgroundColor = "white";
+  modal.style.padding = "20px";
+  modal.style.boxShadow = "0px 0px 10px rgba(0, 0, 0, 0.5)";
+  modal.style.zIndex = "1000";
+  modal.style.display = "none"; // 모달을 초기에는 숨겨둠
+
+  modal.innerHTML = "<h2>제목은 2글자 이상 되어야합니다.</h2>";
+  document.body.appendChild(modal);
+}
+
+// 모달이 이미 추가되어 있지 않다면 추가
+if (!document.getElementById("save-success-memo-modal")) {
+  const modal = document.createElement("div");
+  modal.id = "save-memo-modal";
+  modal.style.position = "fixed";
+  modal.style.top = "50%";
+  modal.style.left = "50%";
+  modal.style.transform = "translate(-50%, -50%)";
+  modal.style.backgroundColor = "white";
+  modal.style.padding = "20px";
+  modal.style.boxShadow = "0px 0px 10px rgba(0, 0, 0, 0.5)";
+  modal.style.zIndex = "1000";
+  modal.style.display = "none"; // 모달을 초기에는 숨겨둠
+
+  modal.innerHTML = "<h2>메모가 성공적으로 저장되었습니다.</h2>";
+  document.body.appendChild(modal);
+}
+
+if (!document.getElementById("save-memo-modal")) {
+  const modal = document.createElement("div");
+  modal.id = "save-memo-modal";
+  modal.style.position = "fixed";
+  modal.style.top = "50%";
+  modal.style.left = "50%";
+  modal.style.transform = "translate(-50%, -50%)";
+  modal.style.backgroundColor = "white";
+  modal.style.padding = "20px";
+  modal.style.boxShadow = "0px 0px 10px rgba(0, 0, 0, 0.5)";
+  modal.style.zIndex = "1000";
+  modal.style.display = "none"; // 모달을 초기에는 숨겨둠
+
+  modal.innerHTML = "<h2>제목은 2글자 이상 되어야합니다.</h2>";
+  document.body.appendChild(modal);
+}
+
+// 모달이 이미 추가되어 있지 않다면 추가
+if (!document.getElementById("save-url-modal")) {
+  const modal = document.createElement("div");
+  modal.id = "save-url-modal";
+  modal.style.position = "fixed";
+  modal.style.top = "50%";
+  modal.style.left = "50%";
+  modal.style.transform = "translate(-50%, -50%)";
+  modal.style.backgroundColor = "white";
+  modal.style.padding = "20px";
+  modal.style.boxShadow = "0px 0px 10px rgba(0, 0, 0, 0.5)";
+  modal.style.zIndex = "1000";
+  modal.style.display = "none"; // 모달을 초기에는 숨겨둠
+
+  modal.innerHTML = "<h2>url이 추가되었습니다.</h2>";
+  document.body.appendChild(modal);
+}

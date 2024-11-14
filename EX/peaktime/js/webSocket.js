@@ -86,6 +86,11 @@ function sendSocketMessage(data) {
         const response = JSON.parse(event.data);
         console.log("Received response:", response);
 
+        if (response.action === "start") {
+          // 현재 활성 탭의 ID를 설정하고 URL 추적
+          socketConnected = true;
+        }
+
         // 응답을 받았으므로 Promise를 resolve하고 리스너를 제거합니다.
         resolve(response);
         socket.removeEventListener("message", handleMessage);
