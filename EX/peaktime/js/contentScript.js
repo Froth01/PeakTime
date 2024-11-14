@@ -33,6 +33,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     const modal = document.getElementById("save-url-modal");
     if (modal) {
       modal.style.display = "block"; // 모달 표시
+      modal.textContent = msg.currentUrl + "가 추가되었습니다.";
       setTimeout(() => {
         modal.style.display = "none"; // 2초 후 자동 숨김
       }, 1000);
