@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useUserStore } from "../stores/UserStore";
 import Timer from "../components/Timer/Timer";
+import { useBackgroundStore } from "../stores/BackgroundStore";
 
 function HomePage() {
   // 테스트용 유저스토어
