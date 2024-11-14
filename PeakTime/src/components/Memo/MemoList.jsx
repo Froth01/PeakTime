@@ -3,6 +3,7 @@ import Swal from "sweetalert2";
 import memosApi from "../../api/memosApi";
 import PropTypes from "prop-types";
 import dayjs from "dayjs";
+import "../../styles/daily-report-custom-swal.css";
 
 function MemoList({ onMemoClick, updateCountGPT }) {
   // 메모 리스트
@@ -58,6 +59,9 @@ function MemoList({ onMemoClick, updateCountGPT }) {
   const openDeleteWarn = (title, memoId) => {
     Swal.fire({
       title: `${title}을 정말로 삭제하시겠습니까?`,
+      customClass: {
+        popup: "custom-swal-popup",
+      },
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "삭제",
