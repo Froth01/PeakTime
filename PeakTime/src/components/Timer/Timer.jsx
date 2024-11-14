@@ -136,7 +136,7 @@ function Timer() {
                 startedHikingId: responseStartHiking.data.data.hikingId,
                 selectedPreset: selectedOption,
                 backUrl: hikingsApi.defaults.baseURL,
-                isRoot : user.isRoot ? "root" : "child"
+                isRoot: user.isRoot ? "root" : "child",
               },
             });
           } else {
@@ -146,7 +146,7 @@ function Timer() {
                 startedHikingId: responseStartHiking.data.data.hikingId,
                 selectedPreset: presetList[0],
                 backUrl: hikingsApi.defaults.baseURL,
-                isRoot : user.isRoot ? "root" : "child"
+                isRoot: user.isRoot ? "root" : "child",
               },
             });
           }
@@ -281,7 +281,7 @@ function Timer() {
                 startedHikingId: responseStartHiking.data.data.hikingId,
                 selectedPreset: messages,
                 backUrl: hikingsApi.defaults.baseURL,
-                isRoot : user.isRoot ? "root" : "child"
+                isRoot: user.isRoot ? "root" : "child",
               },
             });
             const startBtn = document.getElementById("start");
@@ -360,7 +360,13 @@ function Timer() {
         url: data.url,
       };
       const response = await presetsApi.post(`${data.presetId}`, requestData);
-      console.log("addUrlPostApi: ", response.data);
+      // 커스텀 이벤트 발생시키기
+      const sendUrlList = new CustomEvent("sendUrlList", {
+        bubbles: true,
+        detail: { urlList: response.data.data.blockWebsiteArray },
+      });
+      const clockDiv = document.getElementById("clock");
+      clockDiv.dispatchEvent(sendUrlList);
     } catch (error) {
       console.error("Error addurl:", error);
       throw error;
@@ -531,7 +537,10 @@ function Timer() {
           <div className="timer overflow-hidden">
             <div className="mask"></div>
           </div>
-          <div className="absolute top-[70%] left-[50%] translate-x-[-50%] remain text-3xl">
+          <div
+            id="clock"
+            className="absolute top-[70%] left-[50%] translate-x-[-50%] remain text-3xl"
+          >
             {isRunning
               ? formatTime(remainTime)
               : `${("00" + now.getHours().toString()).slice(-2)}:${(
