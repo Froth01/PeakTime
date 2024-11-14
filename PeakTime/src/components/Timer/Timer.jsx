@@ -133,7 +133,7 @@ function Timer() {
                 startedHikingId: responseStartHiking.data.data.hikingId,
                 selectedPreset: selectedOption,
                 backUrl: hikingsApi.defaults.baseURL,
-                isRoot : user.isRoot
+                isRoot : user.isRoot ? "root" : "child"
               },
             });
           }
