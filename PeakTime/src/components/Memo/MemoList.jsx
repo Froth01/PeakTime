@@ -1,22 +1,17 @@
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import memosApi from "../../api/memosApi";
-import PropTypes from "prop-types";
 import dayjs from "dayjs";
 import { TiDelete } from "react-icons/ti";
 import { FaTrashAlt } from "react-icons/fa";
+import { useMemoStore } from "../../stores/MemoStore";
 import "../../styles/daily-report-custom-swal.css";
 
-function MemoList({ onMemoClick, updateCountGPT }) {
-  // 메모 리스트
-  const [memoList, setMemoList] = useState([]);
-  const [countGPT, setCountGPT] = useState(0);
-  const [showDeleteButton, setShowDeleteButton] = useState(false);
+function MemoList() {
+  const { memoList, setMemoList, memoListLimit, summaryCount, setSummaryCount, summaryCountLimit, setSelected } = useMemoStore();
 
-  // 휴지통 버튼을 눌렀을 때 `X` 버튼을 표시하도록 설정
-  const handleTrashButtonClick = () => {
-    setShowDeleteButton(!showDeleteButton);
-  };
+  // 메모 리스트
+  const [showDeleteButton, setShowDeleteButton] = useState(false);
 
   useEffect(() => {
     fetchGetMemoList();
@@ -28,18 +23,14 @@ function MemoList({ onMemoClick, updateCountGPT }) {
       const response = await memosApi.get(``);
       console.log("memoListGetApi: ", response.data);
       const memoList = response.data.data.memoList;
-      const countGPT = response.data.data.summaryCount;
+      const summaryCount = response.data.data.summaryCount;
       setMemoList([...memoList]); // 상태를 업데이트하여 UI에 반영
-      setCountGPT(countGPT);
-      updateCountGPT(countGPT); // list -> page -> detail로 보내기위해 page의 count update하기
+      setSummaryCount(summaryCount);
     } catch (error) {
       console.error("Error fetching memoList:", error);
       throw error;
     }
   };
-  useEffect(() => {
-    updateCountGPT(countGPT);
-  }, [countGPT]);
 
   const deleteMemo = async (memoId) => {
     try {
@@ -68,18 +59,13 @@ function MemoList({ onMemoClick, updateCountGPT }) {
       showCancelButton: true,
       confirmButtonText: "삭제",
       cancelButtonText: "취소",
-      confirmButtonColor: "red",
+      confirmButtonColor: "#F40000",
       cancelButtonColor: "#3085d6",
     }).then((result) => {
       if (result.isConfirmed) {
         deleteMemo(memoId);
       }
     });
-  };
-
-  // 메모 클릭
-  const handleClickSetting = (index) => {
-    onMemoClick(index);
   };
 
   // 삭제버튼 클릭
@@ -92,11 +78,11 @@ function MemoList({ onMemoClick, updateCountGPT }) {
       <div className="flex flex-col">
         <div className="flex justify-between text-white mb-3">
           <h2 className="text-[30px] font-bold">
-            메모({memoList?.length} / 10)
+            메모({memoList?.length} / {memoListLimit})
           </h2>
           <button
             className="text-white text-[30px]"
-            onClick={handleTrashButtonClick}
+            onClick={() => setShowDeleteButton(!showDeleteButton)}
           >
             <FaTrashAlt />
           </button>
@@ -112,7 +98,7 @@ function MemoList({ onMemoClick, updateCountGPT }) {
             >
               <button
                 className="w-[90%] flex flex-col"
-                onClick={() => handleClickSetting(memo.memoId)}
+                onClick={() => setSelected(memo.memoId)}
               >
                 <div className="font-bold mb-2">{memo.title}</div>
                 <div className="text-[18px]">{formatDate(memo.createdAt)}</div>
@@ -133,16 +119,12 @@ function MemoList({ onMemoClick, updateCountGPT }) {
 
         <div className="w-full text-white text-[25px] flex justify-end mb-3">
           <div className="text-white font-bold text-[20px]">
-            남은 요약 횟수: {3 - countGPT} / 3
+            남은 요약 횟수: {summaryCountLimit - summaryCount} / {summaryCountLimit}
           </div>
         </div>
       </div>
     </div>
   );
 }
-// props validation 추가
-MemoList.propTypes = {
-  onMemoClick: PropTypes.func.isRequired,
-  updateCountGPT: PropTypes.func.isRequired,
-};
+
 export default MemoList;
