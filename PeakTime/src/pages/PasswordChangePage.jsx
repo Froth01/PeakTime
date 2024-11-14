@@ -88,7 +88,7 @@ function PasswordChangePage() {
           <div className="flex gap-3 text-start w-full relative">
             <div className="flex flex-col gap-3 w-[40%]">
               <label htmlFor="nickname" className="text-white font-bold">
-                새 비밀번호 확인 (비밀번호를 재입력해주세요.)
+                새 비밀번호 확인 (비밀번호를 재입력해주세요)
               </label>
               <input
                 id="confirmNewPassword"

@@ -98,7 +98,7 @@ function UserSettingPage() {
       },
       icon: "warning",
       confirmButtonColor: "#F40000",
-      confirmButtonText: "삭제",
+      confirmButtonText: "탈퇴",
       showDenyButton: true,
       denyButtonText: `취소`,
       denyButtonColor: `#5C5C5C`,
