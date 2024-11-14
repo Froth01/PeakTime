@@ -26,8 +26,8 @@ function createWindow() {
     webPreferences: {
       preload: path.join(
         __dirname,
-        "resources",
-        "build",
+        // "resources",
+        // "build",
         "electron",
         "preload.js"
       ),

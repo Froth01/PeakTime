@@ -83,7 +83,7 @@ const Loft = () => {
 
     // 배경 설정
     new RGBELoader().load(
-      "../../resources/build/models/loft/satara_night_no_lamps_2k.hdr",
+      "/models/loft/satara_night_no_lamps_2k.hdr",
       (texture) => {
         texture.mapping = THREE.EquirectangularReflectionMapping;
         scene.background = texture;
@@ -99,7 +99,7 @@ const Loft = () => {
     // FBX 모델 로드
     const loader = new FBXLoader();
     loader.load(
-      "../../resources/build/models/loft/lobbyloft.fbx", // FBX 파일 경로로 변경
+      "/models/loft/lobbyloft.fbx", // FBX 파일 경로로 변경
       (object) => {
         // 모델 로드 후 처리
         model = object; // 모델 저장

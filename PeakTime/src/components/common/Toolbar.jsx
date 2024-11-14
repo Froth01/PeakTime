@@ -75,7 +75,7 @@ function Toolbar() {
             <MdStickyNote2 />
           </button>
         </Tooltip>
-        {localUser.isRoot && (
+        {localUser && localUser.isRoot && (
           <>
             <Tooltip
               content="차단 관리"
@@ -135,7 +135,7 @@ function Toolbar() {
         <Tooltip
           content={
             <div className="flex flex-col">
-              {localUser.isRoot && (
+              {localUser && localUser.isRoot && (
                 <>
                   <button
                     onClick={() => handleMenu("/usersetting")}
