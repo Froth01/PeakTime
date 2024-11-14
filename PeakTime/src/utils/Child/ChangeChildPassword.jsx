@@ -1,9 +1,14 @@
+import "../../styles/daily-report-custom-swal.css";
+
 const successToChange = {
   title: "비밀번호 수정 성공",
   text: "비밀번호를 성공적으로 수정했습니다.",
   icon: "success",
   confirmButtonText: "확인",
   confirmButtonColor: "#03C777",
+  customClass: {
+    popup: "custom-swal-popup",
+  }
 };
 
 // 404
@@ -13,6 +18,9 @@ const invalidPassword = {
   icon: "error",
   confirmButtonText: "확인",
   confirmButtonColor: "#03C777",
+  customClass: {
+    popup: "custom-swal-popup",
+  }
 };
 
 // 404
@@ -22,6 +30,9 @@ const notEqualPassword = {
   icon: "error",
   confirmButtonText: "확인",
   confirmButtonColor: "#03C777",
+  customClass: {
+    popup: "custom-swal-popup",
+  }
 };
 
 const defaultMessage = {
@@ -30,6 +41,9 @@ const defaultMessage = {
   icon: "error",
   confirmButtonText: "확인",
   confirmButtonColor: "#03C777",
+  customClass: {
+    popup: "custom-swal-popup",
+  }
 };
 
 const handle404Message = (message) => {

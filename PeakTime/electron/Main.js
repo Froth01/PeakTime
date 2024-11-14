@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain, dialog, session } from "electron";
 import path from "path";
 import url from "url";
 import WebSocket, { WebSocketServer } from "ws";
@@ -83,6 +83,15 @@ ipcMain.on("set-start-hiking", (event, message) => {
 app.whenReady().then(() => {
   createWindow();
   console.log(__dirname);
+
+  session.defaultSession.cookies
+    .get({ url: "http://localhost:5173" }) // 실제 URL로 변경
+    .then((cookies) => {
+      console.log(cookies); // 쿠키 확인
+    })
+    .catch((error) => {
+      console.error("쿠키 조회 중 오류 발생:", error);
+    });
 
   // WebSocket 서버 생성
   const port = 12345;

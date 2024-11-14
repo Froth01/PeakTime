@@ -5,6 +5,7 @@ import memosApi from "../../api/memosApi";
 import summariesApi from "../../api/summariesApi";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
+import "../../styles/daily-report-custom-swal.css";
 
 function MemoDetail({ memoId, countGPT, updateCountGPT }) {
   // 메모 id로 정보조회해야함
@@ -83,6 +84,9 @@ function MemoDetail({ memoId, countGPT, updateCountGPT }) {
 
       Swal.fire({
         title: "요약 성공",
+        customClass: {
+          popup: "custom-swal-popup",
+        },
         text: "요약이 완료되었습니다.",
         icon: "success",
         confirmButtonText: "확인",
@@ -92,6 +96,9 @@ function MemoDetail({ memoId, countGPT, updateCountGPT }) {
     } catch (error) {
       Swal.fire({
         title: "요약 실패",
+        customClass: {
+          popup: "custom-swal-popup",
+        },
         text: "요약 요청 중 오류가 발생했습니다.",
         icon: "error",
         confirmButtonText: "확인",
@@ -110,6 +117,9 @@ function MemoDetail({ memoId, countGPT, updateCountGPT }) {
   const openSummaryModal = (title, keywords) => {
     Swal.fire({
       title: `📝 ${title} 요약하기`,
+      customClass: {
+        popup: "custom-swal-popup",
+      },
       text: `추가 키워드: ${keywords.join(
         ", "
       )}\n해당 내용으로 요약을 진행하시겠습니까?`,
@@ -139,6 +149,9 @@ function MemoDetail({ memoId, countGPT, updateCountGPT }) {
     if (countGPT >= 3) {
       Swal.fire({
         title: "요약은 하루 최대 3번이 가능합니다.",
+        customClass: {
+          popup: "custom-swal-popup",
+        },
         icon: "error",
         confirmButtonColor: "green",
       });
@@ -148,6 +161,9 @@ function MemoDetail({ memoId, countGPT, updateCountGPT }) {
     if (inputText.trim().length === 0) {
       Swal.fire({
         title: "요약 내용이 비어있습니다.",
+        customClass: {
+          popup: "custom-swal-popup",
+        },
         icon: "error",
         confirmButtonColor: "green",
       });
@@ -163,6 +179,9 @@ function MemoDetail({ memoId, countGPT, updateCountGPT }) {
     if (newTextLength > 1000) {
       Swal.fire({
         title: "글자 수 초과",
+        customClass: {
+          popup: "custom-swal-popup",
+        },
         text: "복사한 텍스트를 추가하면 1000자를 초과합니다.",
         icon: "error",
         confirmButtonText: "확인",
@@ -177,6 +196,9 @@ function MemoDetail({ memoId, countGPT, updateCountGPT }) {
       );
       Swal.fire({
         title: "복사 완료",
+        customClass: {
+          popup: "custom-swal-popup",
+        },
         text: "선택한 텍스트가 입력란에 복사되었습니다.",
         icon: "success",
         confirmButtonText: "확인",
@@ -184,6 +206,9 @@ function MemoDetail({ memoId, countGPT, updateCountGPT }) {
     } else {
       Swal.fire({
         title: "텍스트 선택 필요",
+        customClass: {
+          popup: "custom-swal-popup",
+        },
         text: "먼저 메모 내용에서 텍스트를 선택하세요.",
         icon: "warning",
         confirmButtonText: "확인",
@@ -196,6 +221,9 @@ function MemoDetail({ memoId, countGPT, updateCountGPT }) {
     if (text.length > 1000) {
       Swal.fire({
         title: "글자 수 초과",
+        customClass: {
+          popup: "custom-swal-popup",
+        },
         text: "최대 1000자까지만 입력할 수 있습니다.",
         icon: "warning",
         confirmButtonColor: "#3085d6",
@@ -216,6 +244,9 @@ function MemoDetail({ memoId, countGPT, updateCountGPT }) {
     if (keywordInput.length > 10) {
       Swal.fire({
         title: "키워드 글자 수 초과",
+        customClass: {
+          popup: "custom-swal-popup",
+        },
         text: "키워드 글자 수는 최대 10자까지만 입력할 수 있습니다.",
         icon: "warning",
         confirmButtonColor: "#3085d6",
@@ -227,6 +258,9 @@ function MemoDetail({ memoId, countGPT, updateCountGPT }) {
     if (keywords.length >= 3) {
       Swal.fire({
         title: "추가 키워드 초과",
+        customClass: {
+          popup: "custom-swal-popup",
+        },
         text: "키워드는 최대 3개까지 추가할 수 있습니다.",
         icon: "warning",
         confirmButtonColor: "#3085d6",
@@ -238,6 +272,9 @@ function MemoDetail({ memoId, countGPT, updateCountGPT }) {
     if (keywordInput.trim() === "" || keywords.includes(keywordInput.trim())) {
       Swal.fire({
         title: "중복 또는 빈 키워드",
+        customClass: {
+          popup: "custom-swal-popup",
+        },
         text: "이미 추가된 키워드거나 비어있는 키워드입니다. 다른 키워드를 입력해주세요/",
         icon: "warning",
         confirmButtonColor: "#3085d6",

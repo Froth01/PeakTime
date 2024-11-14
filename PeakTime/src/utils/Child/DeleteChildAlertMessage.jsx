@@ -1,3 +1,5 @@
+import "../../styles/daily-report-custom-swal.css";
+
 const checkToDelete = {
   title: "계정 삭제 확인",
   text: "선택한 계정을 삭제하시겠습니까?",
@@ -7,6 +9,9 @@ const checkToDelete = {
   showDenyButton: true,
   denyButtonText: "아니오",
   denyButtonColor: "#C5C5C5",
+  customClass: {
+    popup: "custom-swal-popup",
+  }
 };
 
 const successToDelete = {
@@ -15,6 +20,9 @@ const successToDelete = {
   icon: "success",
   confirmButtonText: "확인",
   confirmButtonColor: "#03C777",
+  customClass: {
+    popup: "custom-swal-popup",
+  }
 };
 
 // 404
@@ -24,6 +32,9 @@ const userNotFound = {
   icon: "error",
   confirmButtonText: "확인",
   confirmButtonColor: "#03C777",
+  customClass: {
+    popup: "custom-swal-popup",
+  }
 };
 
 const defaultMessage = {
@@ -32,6 +43,9 @@ const defaultMessage = {
   icon: "error",
   confirmButtonText: "확인",
   confirmButtonColor: "#03C777",
+  customClass: {
+    popup: "custom-swal-popup",
+  }
 };
 
 const handle404Message = (message) => {

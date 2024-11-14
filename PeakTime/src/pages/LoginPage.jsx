@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUserStore } from "../stores/UserStore";
 import authApi from "../api/authApi";
+import Swal from "sweetalert2";
 
 function LoginPage() {
   // 스토어 불러오기
@@ -13,27 +14,39 @@ function LoginPage() {
 
   // 로그인 버튼 클릭
   const handleLogin = async () => {
-    console.log("로그인 시도 중");
+    console.log("로그인 시작");
 
     if (username && password) {
       const loginData = {
         userLoginId: username,
         password: password,
       };
-      const loginResponse = await authApi.post("/login", loginData); // 비동기 처리를 시뮬레이션
-      userActions.setUser(loginResponse.data.data);
-      localStorage.setItem("user", JSON.stringify(loginResponse.data.data));
-
-      if (loginResponse.data.data.accessToken) {
+      try {
+        const loginResponse = await authApi.post("/login", loginData, {
+        withCredentials: true
+        });
+        // 성공하면 이어서 진행
+        userActions.setUser(loginResponse.data.data);
+        localStorage.setItem("user", JSON.stringify(loginResponse.data.data));
         navigate("/");
-      } else {
-        userActions.setUser(null);
-        localStorage.removeItem("user");
-        window.location.href = "/login";
-        navigate("/login");
+      } catch (error) {
+        // 에러 코드가 발생하면 여기로 진입
+        Swal.fire({
+          title: "다시 시도해주세요.",
+          text: `${error.response.data.message}`,
+          icon: "error",
+          confirmButtonColor: "#03C777",
+          confirmButtonText: "확인",
+        });
       }
     } else {
-      console.error("아이디와 비밀번호를 입력하세요.");
+      Swal.fire({
+        title: "다시 시도해주세요.",
+        text: "아이디와 비밀번호를 입력해 주세요.",
+        icon: "error",
+        confirmButtonColor: "#03C777",
+        confirmButtonText: "확인",
+      });
     }
   };
 
@@ -47,14 +60,10 @@ function LoginPage() {
     navigate("/passwordreissue");
   };
 
-  useEffect(() => {
-    console.log("Updated user state:", user);
-  }, [user]);
-
   return (
     <div className="h-[100vh] flex justify-center items-center">
       <div className="w-[30vw] h-[60vh] flex flex-col justify-around items-center bg-[#333333] bg-opacity-90 p-5 rounded-lg text-white">
-        <h1>로그인</h1>
+        <h1 className="text-[30px] font-bold">로그인</h1>
         <div className="relative z-0 w-full mb-5 group text-start ms-[30%]">
           <input
             type="text"

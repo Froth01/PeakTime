@@ -58,7 +58,9 @@ function Calendar({ selectedDay, onDayClick }) {
   return (
     <div className="absolute bg-[#333333] bg-opacity-70 left-[11vw] w-[29vw] h-[84vh] my-[3vh] rounded-lg flex flex-col p-5">
       <div className="flex items-start mb-5">
-        <div className="text-[40px] font-bold text-white">캘린더</div>
+        <h2 className="self-start mb-3 text-white font-bold text-[30px]">
+          캘린더
+        </h2>
       </div>
 
       <div className="flex flex-col">
@@ -75,7 +77,7 @@ function Calendar({ selectedDay, onDayClick }) {
         </div>
 
         <div className="flex justify-center">
-          <div className="inline-grid grid-cols-5 gap-2 justify-center items-center">
+          <div className="inline-grid grid-cols-5 gap-2 justify-center items-center font-bold text-[20px]">
             {hikingList.map((item, idx) => (
               <button
                 key={idx + 1}
@@ -90,9 +92,12 @@ function Calendar({ selectedDay, onDayClick }) {
                   e.currentTarget.style.animation = "subtlePing 0.25s forwards";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.animation = "subtlePingReverse 0.25s forwards";
+                  e.currentTarget.style.animation =
+                    "subtlePingReverse 0.25s forwards";
                 }}
-              />
+              >
+                {idx + 1}
+              </button>
             ))}
           </div>
         </div>

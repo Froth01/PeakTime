@@ -1,15 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Swal from "sweetalert2";
 import PropTypes from "prop-types";
 import presetsApi from "../../api/presetsApi";
-import PresetSetting from "./PresetSetting";
+import ReactDOM from "react-dom/client";
+import { FaTrashAlt } from "react-icons/fa";
+import AddPreset from "./AddPreset";
+import usePresetStore from "../../stores/PresetStore";
+import "../../styles/daily-report-custom-swal.css";
 
 function PresetList({ onPresetClick, updateTrigger }) {
   // 프리셋 리스트 api 요청 필요
 
   // 선택한 프리셋의 정보를 setting에 보내주기
-  const [presetList, setPresetList] = useState([]);
-  const [selectedPreset, setSelectedPreset] = useState(null);
+  const { presetList, setPresetList, selectPreset, deletePreset } =
+    usePresetStore();
 
   useEffect(() => {
     // 컴포넌트 마운트 시 전체 조회를 수행하여 초기 데이터를 설정
@@ -21,6 +25,7 @@ function PresetList({ onPresetClick, updateTrigger }) {
       // 프리셋 전체 조회 GET 요청을 보내기
       const response = await presetsApi.get(``);
       console.log("presetGetApi: ", response.data);
+
       const presetList = response.data.data.presetList;
       setPresetList([...presetList]); // 상태를 업데이트하여 UI에 반영
       return response;
@@ -30,25 +35,30 @@ function PresetList({ onPresetClick, updateTrigger }) {
     }
   };
 
-  const makePresetPost = async () => {
+  const makePresetPost = async (title) => {
     try {
       // 프리셋 생성 Post 요청을 보내기
       // Request Body 데이터 가공
       const requestData = {
-        title: "새 프리셋",
+        title,
         blockWebsiteList: [],
         blockProgramList: [],
       };
       const response = await presetsApi.post(``, requestData);
       console.log("presetPostApi: ", response.data);
-      setPresetList((presetList) => [...presetList, requestData]); // 상태를 업데이트하여 UI에 반영
+      // setPresetList((presetList) => [...presetList, requestData]); // 상태를 업데이트하여 UI에 반영
+
+      // 생성 후 목록 조회
+      if (response.data.status === 200) {
+        fetchGetPresets();
+      }
     } catch (error) {
       console.error("Error post Preset:", error);
       throw error;
     }
   };
 
-  const deletePreset = async (presetId) => {
+  const makePresetDelete = async (presetId) => {
     try {
       // 프리셋 delete 요청을 보내기
       console.log("delete 프리셋 아이디 ", presetId);
@@ -64,16 +74,20 @@ function PresetList({ onPresetClick, updateTrigger }) {
   // 삭제 버튼 클릭
   const openDeleteWarn = (title, presetId) => {
     Swal.fire({
-      title: `${title}을 정말로 삭제하시겠습니까?`,
+      title: "차단 프리셋 삭제",
+      text: `선택한 프리셋을 삭제하시겠습니까?`,
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "삭제",
+      confirmButtonText: "확인",
+      confirmButtonColor: "#03C777",
       cancelButtonText: "취소",
-      confirmButtonColor: "red",
-      cancelButtonColor: "#3085d6",
+      cancelButtonColor: "#F40000",
+      customClass: {
+        popup: "custom-swal-popup",
+      },
     }).then((result) => {
       if (result.isConfirmed) {
-        deletePreset(presetId);
+        makePresetDelete(presetId);
       }
     });
   };
@@ -85,47 +99,103 @@ function PresetList({ onPresetClick, updateTrigger }) {
 
   // 추가버튼 클릭 api 요청 추가
   const handleAddBtn = () => {
-    if (presetList.length < 5) {
-      makePresetPost();
-      // setPresetList([...presetList]);
-      // 프리셋 생성 api 진행
-    } else {
+    if (presetList.length >= 5) {
       Swal.fire({
-        title: "프리셋 최대 5개까지 생성이 가능합니다.",
+        title: "프리셋은 최대 5개까지 생성이 가능합니다.",
         icon: "error",
+        confirmButtonText: "확인",
         confirmButtonColor: "green",
       });
+
+      return false;
     }
+
+    let root;
+    let title = "";
+
+    Swal.fire({
+      title: "차단 프리셋 추가",
+      html: `<div id="add-preset" />`,
+      width: "30%",
+      heightAuto: false,
+      willOpen: () => {
+        root = ReactDOM.createRoot(document.getElementById("add-preset"));
+        const onSave = (value, isDuplicated) => {
+          title = value;
+          Swal.getConfirmButton().disabled = isDuplicated;
+        };
+        root.render(<AddPreset onSave={onSave} />);
+      },
+      preConfirm: () => {
+        makePresetPost(title).then(() => {
+          fetchGetPresets();
+        });
+      },
+      didClose: () => {
+        if (root) {
+          root.unmount();
+        }
+      },
+      confirmButtonColor: "#03C777",
+      confirmButtonText: "생성",
+      showCancelButton: true,
+      cancelButtonColor: "#F40000",
+      cancelButtonText: "취소",
+      customClass: {
+        popup: "custom-swal-popup",
+      },
+    });
   };
 
   // 삭제버튼 클릭
   const handleDelete = (presetId) => {
-    setPresetList(presetList.filter((one, _) => one.presetId !== presetId));
+    deletePreset(presetId);
+    selectPreset(null);
   };
 
   return (
-    <div className="absolute left-[10vw] w-[15vw] h-[100vh] flex flex-col justify-between bg-gray-400">
-      <div className="flex flex-col gap-5">
+    <div className="absolute bg-[#333333] bg-opacity-70 left-[11vw] w-[29vw] h-[84vh] my-[3vh] rounded-lg flex flex-col justify-start items-center text-start p-5">
+      <div className="w-full mb-3 flex justify-between items-start">
+        <h2 className="self-start text-white font-bold text-[30px]">
+          차단 프리셋 목록
+        </h2>
+        <h2 className="text-white font-bold text-[30px]">
+          ({presetList.length} / 5)
+        </h2>
+      </div>
+
+      <div className="flex flex-col gap-5 bg-white text-[20px] w-[25vw] h-[70vh] overflow-y-auto rounded-lg p-5 font-bold">
         {presetList.map((preset, index) => (
-          <div className="gap-5" key={index}>
+          <div className="gap-5 flex justify-between" key={index}>
             <button onClick={() => handleClickSetting(preset)}>
               {preset.title}
             </button>
-            |
             <button
+              className="text-[25px]"
               onClick={() => openDeleteWarn(preset.title, preset.presetId)}
             >
-              X
+              <FaTrashAlt />
             </button>
           </div>
         ))}
       </div>
-      <button onClick={handleAddBtn}>프리셋 추가</button>
+
+      <div className="self-start mt-3">
+        {presetList.length < 5 ? (
+          <button
+            className="text-white font-bold text-[20px]"
+            onClick={handleAddBtn}
+          >
+            +차단 프리셋 추가
+          </button>
+        ) : null}
+      </div>
     </div>
   );
 }
 // props validation 추가
 PresetList.propTypes = {
   onPresetClick: PropTypes.func.isRequired,
+  updateTrigger: PropTypes.func.isRequired,
 };
 export default PresetList;
