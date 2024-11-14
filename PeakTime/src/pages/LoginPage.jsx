@@ -22,7 +22,9 @@ function LoginPage() {
         password: password,
       };
       try {
-        const loginResponse = await authApi.post("/login", loginData);
+        const loginResponse = await authApi.post("/login", loginData, {
+        withCredentials: true
+        });
         // 성공하면 이어서 진행
         userActions.setUser(loginResponse.data.data);
         localStorage.setItem("user", JSON.stringify(loginResponse.data.data));

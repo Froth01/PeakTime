@@ -7,6 +7,7 @@ import PropTypes from "prop-types";
 import Swal from "sweetalert2";
 import ReactDOM from "react-dom/client";
 import { IoIosArrowDown } from "react-icons/io";
+import "../../styles/daily-report-custom-swal.css";
 
 function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
   const [groupTitle, setGroupTitle] = useState(null);
@@ -291,6 +292,9 @@ function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
       showDenyButton: true,
       denyButtonColor: "#F40000",
       denyButtonText: "취소",
+      customClass: {
+        popup: "custom-swal-popup",
+      },
     }).then((result) => {
       if (result.isConfirmed && result.value) {
         // 성공적으로 타이머가 추가되어 두 팝업을 모두 닫는 경우
@@ -456,6 +460,12 @@ function UpdateGroup({ groupId, onChangeContent, onChangeGroupList }) {
           className="bg-[#03c777] rounded-xl px-5 py-2 hover:bg-[#02a566] focus:ring-4 focus:ring-[#03c777] text-white font-bold"
         >
           적용하기
+        </button>
+        <button
+          onClick={() => onChangeContent(null)}
+          className="bg-[#7c7c7c] rounded-xl px-5 py-2 hover:bg-[#5c5c5c] focus:ring-4 focus:ring-[#c5c5c5] text-white font-bold"
+        >
+          닫기
         </button>
       </div>
     </div>

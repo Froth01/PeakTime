@@ -39,7 +39,7 @@ function ChildPage() {
 
   return (
     <div className="h-[100vh] flex flex-col">
-      <Title title={"서브계정 설정"} />
+      <Title title={"서브계정 관리"} />
       <div className="h-[90vh] top-[10vh]">
         <ChildList onChangeContent={onChangeContent} groupList={groupList} />
         {showNow === "addChild" && (

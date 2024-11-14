@@ -112,12 +112,13 @@ function DailyReport({ day, onCancel }) {
 
   return (
     <div className="relative bg-[#333333] bg-opacity-70 left-[43vw] w-[54vw] h-[84vh] my-[3vh] flex flex-col justify-start items-center p-5">
-      <div className="flex w-full justify-between items-end mb-5">
-        <h2 className="text-[40px] font-bold text-white">일간 리포트</h2>
+      <div className="flex w-full grid grid-cols-3 items-end pb-3 mb-3 border-b">
+        <div />
         {/* YYYY년 MM월 DD일 */}
         <h3 className="text-[30px] font-bold text-white">
           {expression(day, "YMD")}
         </h3>
+        <h2 className="text-[30px] font-bold text-white">일간 리포트</h2>
       </div>
       <div
         className={`flex flex-col h-[65vh] w-full mb-5 p-10 overflow-y-scroll custom-scrollbar ${
