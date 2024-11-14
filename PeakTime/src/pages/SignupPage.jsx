@@ -123,7 +123,7 @@ function SignupPage() {
         title: "회원가입이 완료되었습니다.",
         text: "이어서 로그인을 진행해주세요.",
         icon: "success",
-        confirmButtonColor: "green",
+        confirmButtonColor: "#03C777",
         didClose: () => navigate(-1),
       });
     } catch (error) {
@@ -131,7 +131,7 @@ function SignupPage() {
         title: "회원가입에 실패하였습니다. 다시 시도해주세요.",
         text: `${error.response.data.message}`,
         icon: "error",
-        confirmButtonColor: "green",
+        confirmButtonColor: "#03C777",
         confirmButtonText: "확인",
       });
     }
@@ -160,7 +160,7 @@ function SignupPage() {
         Swal.fire({
           title: "이미 존재하는 아이디입니다.",
           icon: "error",
-          confirmButtonColor: "green",
+          confirmButtonColor: "#03C777",
           confirmButtonText: "확인",
         });
       } else {
@@ -170,7 +170,7 @@ function SignupPage() {
         Swal.fire({
           title: "사용 가능한 아이디입니다.",
           icon: "success",
-          confirmButtonColor: "green",
+          confirmButtonColor: "#03C777",
           confirmButtonText: "확인",
         });
       }
@@ -180,7 +180,7 @@ function SignupPage() {
         title: "다시 시도해주세요.",
         text: `${error.response.data.message}`,
         icon: "error",
-        confirmButtonColor: "green",
+        confirmButtonColor: "#03C777",
         confirmButtonText: "확인",
       });
     }
@@ -207,7 +207,7 @@ function SignupPage() {
         Swal.fire({
           title: "이미 존재하는 이메일입니다.",
           icon: "error",
-          confirmButtonColor: "green",
+          confirmButtonColor: "#03C777",
           confirmButtonText: "확인",
         });
       } else {
@@ -218,7 +218,7 @@ function SignupPage() {
           title: "사용 가능한 이메일입니다.",
           text: "이메일 인증을 진행해주세요.",
           icon: "success",
-          confirmButtonColor: "green",
+          confirmButtonColor: "#03C777",
           confirmButtonText: "확인",
         });
       }
@@ -228,7 +228,7 @@ function SignupPage() {
         title: "다시 시도해주세요.",
         text: `${error.response.data.message}`,
         icon: "error",
-        confirmButtonColor: "green",
+        confirmButtonColor: "#03C777",
         confirmButtonText: "확인",
       });
     }
@@ -248,7 +248,7 @@ function SignupPage() {
       Swal.fire({
         title: "인증 코드가 전송되었습니다.",
         icon: "success",
-        confirmButtonColor: "green",
+        confirmButtonColor: "#03C777",
         confirmButtonText: "확인",
       });
     } catch (error) {
@@ -258,7 +258,7 @@ function SignupPage() {
         title: "다시 시도해주세요.",
         text: `${error.response.data.message}`,
         icon: "error",
-        confirmButtonColor: "green",
+        confirmButtonColor: "#03C777",
         confirmButtonText: "확인",
       });
     }
@@ -278,7 +278,7 @@ function SignupPage() {
       Swal.fire({
         title: "이메일 인증에 성공하였습니다.",
         icon: "success",
-        confirmButtonColor: "green",
+        confirmButtonColor: "#03C777",
         confirmButtonText: "확인",
       });
     } catch (error) {
@@ -288,7 +288,7 @@ function SignupPage() {
         title: "다시 시도해주세요.",
         text: `${error.response.data.message}`,
         icon: "error",
-        confirmButtonColor: "green",
+        confirmButtonColor: "#03C777",
         confirmButtonText: "확인",
       });
     }
