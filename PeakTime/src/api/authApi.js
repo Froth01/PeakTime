@@ -1,9 +1,6 @@
 import axios from "axios";
 import { useUserStore } from "../stores/UserStore";
 
-// 스토어 불러오기
-const { user, userActions } = useUserStore;
-
 // axios 객체 만들기
 const authApi = axios.create({
   baseURL: `${import.meta.env.VITE_BACK_URL}/api/v1/auth`,
@@ -23,6 +20,7 @@ authApi.interceptors.response.use(
           .then((response) => {
             const accessToken = response.data.data.accessToken;
             // Access Token을 Zustand(Store)와 LocalStorage에 저장
+            const { user, userActions } = useUserStore.getState();
             userActions.setUser({ ...user, accessToken: accessToken });
             localStorage.setItem("user", user);
             // 성공했다면 Refresh Token은 브라우저의 쿠키 저장소에 저장되어 있을 것이다.
@@ -34,6 +32,7 @@ authApi.interceptors.response.use(
           .catch((error) => {
             console.error("JWT 재발급 API 요청 실패 - Refresh Token이 유효하지 않음", error);
             // Zustand(Store)에 존재하는 Access Token 삭제
+            const { userActions } = useUserStore.getState();
             userActions.setUser(null);
             // LocalStorage에 존재하는 Access Token 삭제
             localStorage.removeItem("user");

@@ -22,11 +22,11 @@ function PasswordChangePage() {
   };
 
   return (
-    <>
+    <div className="h-[100vh] flex justify-center items-center">
       <div>PasswordChangePage</div>
       <button onClick={openResultModal}>변경하기</button>
       <button onClick={goBack}>돌아가기</button>
-    </>
+    </div>
   );
 }
 

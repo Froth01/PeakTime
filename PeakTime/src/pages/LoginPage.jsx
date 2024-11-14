@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useUserStore } from "../stores/UserStore";
 import authApi from "../api/authApi";
 import Swal from "sweetalert2";
+import "../styles/daily-report-custom-swal.css";
 
 function LoginPage() {
   // 스토어 불러오기
@@ -23,7 +24,7 @@ function LoginPage() {
       };
       try {
         const loginResponse = await authApi.post("/login", loginData, {
-        withCredentials: true
+          withCredentials: true
         });
         // 성공하면 이어서 진행
         userActions.setUser(loginResponse.data.data);
@@ -33,6 +34,9 @@ function LoginPage() {
         // 에러 코드가 발생하면 여기로 진입
         Swal.fire({
           title: "다시 시도해주세요.",
+          customClass: {
+            popup: 'custom-swal-popup',
+          },
           text: `${error.response.data.message}`,
           icon: "error",
           confirmButtonColor: "#03C777",
@@ -42,6 +46,9 @@ function LoginPage() {
     } else {
       Swal.fire({
         title: "다시 시도해주세요.",
+        customClass: {
+          popup: 'custom-swal-popup',
+        },
         text: "아이디와 비밀번호를 입력해 주세요.",
         icon: "error",
         confirmButtonColor: "#03C777",
