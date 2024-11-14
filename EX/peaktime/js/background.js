@@ -28,7 +28,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         // 현재 URL을 크롬 저장소에 저장
         const data = await chrome.storage.local.get({ websiteList: [] });
         const websiteList = data.websiteList;
-        websiteList.push(msg.url);
+        // websiteList.push(msg.url);
 
         await chrome.storage.local.set({ websiteList });
         console.log("Website list updated:", websiteList);
@@ -38,9 +38,13 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         const presetId = presetData.presetId || null;
 
         // 일렉트론으로 URL과 presetId를 전송
-        const response = await sendSocketMessage({ action: "addUrl", url: msg.url, presetId });
+        const response = await sendSocketMessage({
+          action: "addUrl",
+          url: msg.url,
+          presetId,
+        });
 
-        console.log("response",response)
+        console.log("response", response);
 
         // 비동기 작업이 완료되었음을 응답으로 알림
         sendResponse({ success: true });

@@ -63,6 +63,10 @@ function receivedSocketMessage(data) {
 
     stopAndClearTracking();
   }
+  if (data.action === "sendUrlList") {
+    console.log("sendUrlList");
+    chrome.storage.local.set({ websiteList: data.websiteList });
+  }
 }
 
 //소켓으로 json 보내기
@@ -94,7 +98,6 @@ function sendSocketMessage(data) {
     socket.addEventListener("message", handleMessage);
   });
 }
-
 
 // 초기 WebSocket 연결 설정
 connectWebSocket();
