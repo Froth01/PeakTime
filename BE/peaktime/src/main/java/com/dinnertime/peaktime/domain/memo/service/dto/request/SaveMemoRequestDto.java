@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SaveMemoRequestDto {
 
-    @Size(min = 2, max = 8, message = "제목은 2글자 이상 8글자 이하로 입력해주세요.")
+    @Size(min = 2, max = 15, message = "제목은 2글자 이상 15글자 이하로 입력해주세요.")
     @NotNull
     private String title;
 
