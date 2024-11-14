@@ -20,7 +20,7 @@ public class Memo {
     @Column(name="memo_id")
     private Long memoId;
 
-    @Column(name="title", nullable = false)
+    @Column(name="title", nullable = false,length = 20)
     private String title;
 
     @Column(name="create_at", nullable = false)
