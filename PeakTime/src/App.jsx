@@ -42,11 +42,8 @@ function App() {
   const { bg, bgActions } = useBackgroundStore();
 
   useEffect(() => {
-    console.log("is user null?")
     if (!user) {
-      console.log("user is null")
       if (localUser) {
-        console.log(localUser);
         userActions.setUser(localUser);
       }
     }
@@ -60,13 +57,13 @@ function App() {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/passwordreissue" element={<PasswordReissuePage />} />
           <Route path="/login" element={<LoginPage />} />
-          {user ? protectedRoutes.map((route, index) => (
+          {protectedRoutes.map((route, index) => (
             <Route
               key={index}
               path={route.path}
               element={<PrivateRoute>{route.element}</PrivateRoute>}
             />
-          )) : null}
+          ))}
         </Routes>
       </Router>
       {bg === "loft" && <Loft />}
