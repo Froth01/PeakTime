@@ -2,25 +2,25 @@ import axios from "axios";
 
 // axios 객체 만들기
 const electronApi = axios.create({
-  baseURL: "",
+  baseURL: "https://k11b309.p.ssafy.io/api/v1/hikings",
 });
 
 // ipcRenderer로 값을 받아오기
-export function setBaseUrl() {
-  try {
-    if (typeof window !== "undefined" && window.electronAPI) {
-      // 렌더러 프로세스에서 Electron API 사용
-      window.electronAPI.getBackUrl().then((url) => {
-        electronApi.defaults.baseURL = `${url}`; // API URL 설정
-      });
-    } else {
-      // Node.js 환경에서 실행
-      electronApi.defaults.baseURL = `${process.env.BACK_URL}/api/v1/hikings`; // 환경 변수 사용
-    }
-  } catch (error) {
-    console.error("Error in setBaseUrl:", error);
-  }
-}
+// export function setBaseUrl() {
+//   try {
+//     if (typeof window !== "undefined" && window.electronAPI) {
+//       // 렌더러 프로세스에서 Electron API 사용
+//       window.electronAPI.getBackUrl().then((url) => {
+//         electronApi.defaults.baseURL = `${url}`; // API URL 설정
+//       });
+//     } else {
+//       // Node.js 환경에서 실행
+//       electronApi.defaults.baseURL = `${process.env.BACK_URL}/api/v1/hikings`; // 환경 변수 사용
+//     }
+//   } catch (error) {
+//     console.error("Error in setBaseUrl:", error);
+//   }
+// }
 // axios 객체에 응답 인터셉터 추가하기 (로그인 화면으로 보내기)
 electronApi.interceptors.response.use(
   (response) => response,
