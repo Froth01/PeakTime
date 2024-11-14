@@ -7,7 +7,7 @@ function ChildList() {
   return (
     <div className="absolute bg-[#333333] bg-opacity-70 left-[11vw] w-[29vw] h-[84vh] my-[3vh] rounded-lg flex flex-col justify-start items-center text-start p-5">
       <h2 className="self-start mb-3 text-white font-bold text-[30px]">
-        그룹 목록
+        그룹 목록({groupList?.length} / 5)
       </h2>
       <p className="text-gray-400 text-[18px] absolute right-5 top-5">
         *설정할 그룹이나 유저의 이름을 눌러주세요
@@ -19,7 +19,7 @@ function ChildList() {
               onClick={() => setContent("updateGroup", group.groupId)}
               className="text-left font-bold ml-2"
             >
-              {group.groupTitle}
+              {group.groupTitle} ({group.childList.length} / 30)
             </button>
             {group.childList.map((child, childIdx) => (
               <div

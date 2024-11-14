@@ -77,7 +77,7 @@ function Calendar({ selectedDay, onDayClick }) {
         </div>
 
         <div className="flex justify-center">
-          <div className="inline-grid grid-cols-5 gap-2 justify-center items-center">
+          <div className="inline-grid grid-cols-5 gap-2 justify-center items-center font-bold text-[20px]">
             {hikingList.map((item, idx) => (
               <button
                 key={idx + 1}
@@ -95,7 +95,9 @@ function Calendar({ selectedDay, onDayClick }) {
                   e.currentTarget.style.animation =
                     "subtlePingReverse 0.25s forwards";
                 }}
-              />
+              >
+                {idx + 1}
+              </button>
             ))}
           </div>
         </div>
