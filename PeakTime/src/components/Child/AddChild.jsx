@@ -250,7 +250,7 @@ function AddChild() {
 
       <div className="w-full flex justify-end gap-5">
         <button
-          onClick={() =>handleConfirm()}
+          onClick={() => handleConfirm()}
           className="bg-[#03c777] rounded-xl px-5 py-2 hover:bg-[#02a566] focus:ring-4 focus:ring-[#03c777] text-white font-bold"
         >
           생성하기
