@@ -83,7 +83,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
           if (tabs.length > 0) {
-            chrome.tabs.sendMessage(tabs[0].id, { action: "showSaveUrlModal" });
+            chrome.tabs.sendMessage(tabs[0].id, {
+              action: "showSaveUrlModal",
+              currentUrl: url,
+            });
           } else {
             console.error("활성 탭이 없습니다.");
           }
@@ -141,9 +144,9 @@ document.addEventListener("DOMContentLoaded", function () {
       document.querySelector(".comment_length").textContent =
         this.value.length || "0";
 
-      // 1000자 초과 시 제한
-      if (content.length > 1000) {
-        this.value = content.substring(0, 1000);
+      // 3000자 초과 시 제한
+      if (content.length > 3000) {
+        this.value = content.substring(0, 3000);
       }
       // 로컬 스토리지에 저장
       console.log("CONTENT", content);
