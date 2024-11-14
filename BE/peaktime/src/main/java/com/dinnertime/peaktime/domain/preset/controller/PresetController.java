@@ -5,6 +5,7 @@ import com.dinnertime.peaktime.domain.preset.service.dto.request.AddUrlPresetReq
 import com.dinnertime.peaktime.domain.preset.service.dto.request.SavePresetRequestDto;
 import com.dinnertime.peaktime.domain.preset.service.dto.response.PresetResponseDto;
 import com.dinnertime.peaktime.domain.preset.service.dto.response.PresetWrapperResponseDto;
+import com.dinnertime.peaktime.domain.preset.service.dto.response.SaveUrlPresetResponseDto;
 import com.dinnertime.peaktime.global.auth.service.dto.security.UserPrincipal;
 import com.dinnertime.peaktime.global.util.CommonSwaggerResponse;
 import com.dinnertime.peaktime.global.util.ResultDto;
@@ -148,7 +149,7 @@ public class PresetController {
     @Operation(summary = "익스텐션에서 프리셋 웹사이트 추가", description = "익스텐션에서 프리셋 웹사이트 추가해주기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "웹사이트를 프리셋에 추가하기에 성공했습니다.",
-                    content = @Content(schema= @Schema(implementation = ResultDto.class))
+                    content = @Content(schema= @Schema(implementation = PresetResponseDto.class))
             ),
             @ApiResponse(responseCode = "500", description = "웹사이트를 프리셋에 추가하기에 실패했습니다.",
                     content= @Content(schema= @Schema(implementation = ResultDto.class))
@@ -162,9 +163,9 @@ public class PresetController {
         //단순한 데이터 형식과 길이에 대한 유효성 검증은 컨트롤러에서 처리 @Valid
         log.info("addUrl 메서드가 호출되었습니다.");
 
-        presetService.addWebsitePreset(requestDto, presetId);
+        SaveUrlPresetResponseDto responseDto = presetService.addWebsitePreset(requestDto, presetId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(),"웹사이트를 프리셋에 추가하기에 성공했습니다."));
+        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(),"웹사이트를 프리셋에 추가하기에 성공했습니다.", responseDto));
     }
 
 

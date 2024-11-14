@@ -6,6 +6,7 @@ import com.dinnertime.peaktime.domain.preset.service.dto.request.AddUrlPresetReq
 import com.dinnertime.peaktime.domain.preset.service.dto.request.SavePresetRequestDto;
 import com.dinnertime.peaktime.domain.preset.service.dto.response.PresetResponseDto;
 import com.dinnertime.peaktime.domain.preset.service.dto.response.PresetWrapperResponseDto;
+import com.dinnertime.peaktime.domain.preset.service.dto.response.SaveUrlPresetResponseDto;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
 import com.dinnertime.peaktime.domain.usergroup.entity.UserGroup;
@@ -129,7 +130,7 @@ public class PresetService {
 
     // ex에서 받아온 특정 웹사이트 프리셋 추가
     @Transactional
-    public void addWebsitePreset(AddUrlPresetRequestDto requestDto, Long presetId) {
+    public SaveUrlPresetResponseDto addWebsitePreset(AddUrlPresetRequestDto requestDto, Long presetId) {
 
         Preset preset = presetRepository.findByPresetId(presetId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PRESET_NOT_FOUND));
@@ -137,6 +138,11 @@ public class PresetService {
         preset.addWebsitePreset(requestDto);
 
         presetRepository.save(preset);
+
+        Preset responsePreset = presetRepository.findByPresetId(presetId)
+                .orElseThrow(() -> new CustomException(ErrorCode.PRESET_NOT_FOUND));
+
+        return SaveUrlPresetResponseDto.createSaveUrlPresetResponseDto(responsePreset);
     }
 
 }
