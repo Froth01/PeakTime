@@ -14,6 +14,7 @@ function Timer() {
   const [totalTime, setTotalTime] = useState(0); // 타이머 시간 (분 단위)
   const [remainTime, setRemainTime] = useState(null); // 남은 시간 (초 단위)
   const [isRunning, setIsRunning] = useState(false); // 타이머 시작 상태
+  const [isSelf, setIsSelf] = useState(true);
 
   const [startedHikingId, setStartedHikingId] = useState(null); // 시작한 hikingId 정보
   const [presetList, setPresetList] = useState(null); // 프리셋 리스트
@@ -123,6 +124,7 @@ function Timer() {
           setTotalTime(time);
           setRemainTime(time * 60 - 1); // 분 단위로 받은 시간을 초로 변환
           setIsRunning(true);
+          setIsSelf(true);
           stopNow();
 
           let hikingStart;
@@ -134,6 +136,7 @@ function Timer() {
                 startedHikingId: responseStartHiking.data.data.hikingId,
                 selectedPreset: selectedOption,
                 backUrl: hikingsApi.defaults.baseURL,
+                isRoot : user.isRoot ? "root" : "child"
               },
             });
           } else {
@@ -143,6 +146,7 @@ function Timer() {
                 startedHikingId: responseStartHiking.data.data.hikingId,
                 selectedPreset: presetList[0],
                 backUrl: hikingsApi.defaults.baseURL,
+                isRoot : user.isRoot ? "root" : "child"
               },
             });
           }
@@ -266,6 +270,7 @@ function Timer() {
             setStartedHikingId(responseStartHiking.data.data.hikingId);
             setTotalTime(messages.attentionTime);
             setRemainTime(messages.attentionTime * 60 - 1); // 분 단위로 받은 시간을 초로 변환
+            setIsSelf(false);
             setIsRunning(true);
             stopNow();
 
@@ -276,6 +281,7 @@ function Timer() {
                 startedHikingId: responseStartHiking.data.data.hikingId,
                 selectedPreset: messages,
                 backUrl: hikingsApi.defaults.baseURL,
+                isRoot : user.isRoot ? "root" : "child"
               },
             });
             const startBtn = document.getElementById("start");
@@ -608,7 +614,7 @@ function Timer() {
               </button>
             </div>
           )}
-          {isRunning && (
+          {isRunning && isSelf && (
             <div className="flex flex-col mt-[15%] items-center">
               <button
                 className="w-[10vw] h-[6vh] mt-[10%] rounded-xl text-white bg-[#f40000]"

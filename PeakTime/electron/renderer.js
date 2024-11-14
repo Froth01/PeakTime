@@ -17,7 +17,7 @@ document.addEventListener("hikingStart", (event) => {
   const message = JSON.stringify({
     action: "start",
     websiteList: event.detail.selectedPreset.blockWebsiteArray,
-    role: "root",
+    role: event.detail.isRoot,
     presetId: event.detail.selectedPreset.presetId,
     hikingId: event.detail.startedHikingId,
   });
