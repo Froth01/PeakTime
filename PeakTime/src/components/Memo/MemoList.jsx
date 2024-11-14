@@ -3,6 +3,8 @@ import Swal from "sweetalert2";
 import memosApi from "../../api/memosApi";
 import PropTypes from "prop-types";
 import dayjs from "dayjs";
+import { TiDelete } from "react-icons/ti";
+import { FaTrashAlt } from "react-icons/fa";
 import "../../styles/daily-report-custom-swal.css";
 
 function MemoList({ onMemoClick, updateCountGPT }) {
@@ -86,23 +88,54 @@ function MemoList({ onMemoClick, updateCountGPT }) {
   };
 
   return (
-    <div className="absolute left-[10vw] w-[15vw] h-[100vh] flex flex-col justify-between bg-gray-400">
-      <div className="flex flex-col gap-5">
-        <div>남은 요약 횟수: {3 - countGPT} / 3</div>
-        <button onClick={handleTrashButtonClick}>휴지통</button>
-        {memoList.map((memo, index) => (
-          <div className="gap-5" key={index}>
-            <button onClick={() => handleClickSetting(memo.memoId)}>
-              {memo.title}
-              {formatDate(memo.createdAt)}
-            </button>
-            {showDeleteButton && (
-              <button onClick={() => openDeleteWarn(memo.title, memo.memoId)}>
-                X
+    <div className="absolute bg-[#333333] bg-opacity-70 left-[11vw] w-[29vw] h-[84vh] my-[3vh] rounded-lg flex flex-col justify-start items-center text-start p-5">
+      <div className="flex flex-col">
+        <div className="flex justify-between text-white mb-3">
+          <h2 className="text-[30px] font-bold">
+            메모({memoList?.length} / 10)
+          </h2>
+          <button
+            className="text-white text-[30px]"
+            onClick={handleTrashButtonClick}
+          >
+            <FaTrashAlt />
+          </button>
+        </div>
+
+        <div className="flex flex-col gap-5 bg-white text-[20px] w-[25vw] h-[70vh] overflow-y-auto rounded-lg p-5 custom-scrollbar mb-3">
+          {memoList.map((memo, index) => (
+            <div
+              className={`flex justify-between mx-2 pb-2 ${
+                index === memoList.length - 1 ? "" : "border-b"
+              }`}
+              key={index}
+            >
+              <button
+                className="w-[90%] flex flex-col"
+                onClick={() => handleClickSetting(memo.memoId)}
+              >
+                <div className="font-bold mb-2">{memo.title}</div>
+                <div className="text-[18px]">{formatDate(memo.createdAt)}</div>
               </button>
-            )}
+              <div className="flex justify-end w-[10%]">
+                {showDeleteButton && (
+                  <button
+                    className="text-[30px]"
+                    onClick={() => openDeleteWarn(memo.title, memo.memoId)}
+                  >
+                    <TiDelete />
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="w-full text-white text-[25px] flex justify-end mb-3">
+          <div className="text-white font-bold text-[20px]">
+            남은 요약 횟수: {3 - countGPT} / 3
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );

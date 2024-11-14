@@ -6,6 +6,7 @@ import summariesApi from "../../api/summariesApi";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import "../../styles/daily-report-custom-swal.css";
+import "../../styles/custom-scrollbar.css";
 
 function MemoDetail({ memoId, countGPT, updateCountGPT }) {
   // 메모 id로 정보조회해야함
@@ -21,6 +22,8 @@ function MemoDetail({ memoId, countGPT, updateCountGPT }) {
     content: "",
     updatedAt: "",
   });
+
+  const [isSummary, setIsSummary] = useState(false);
 
   const [selectedText, setSelectedText] = useState(""); // 드래그 텍스트 저장
   const [inputText, setInputText] = useState(""); // Input Box 텍스트
@@ -292,12 +295,25 @@ function MemoDetail({ memoId, countGPT, updateCountGPT }) {
   };
 
   return (
-    <div className="absolute right-0 w-[75vw] h-[100vh] flex flex-col bg-white">
-      <div className="h-[50%] w-[100%] flex">
-        <div className="w-[50%] h-[100%] bg-red-100">
-          <h1>{memoData.title}</h1>
+    <div className="absolute left-[43vw] w-[54vw] h-[84vh] my-[3vh] bg-[#333333] bg-opacity-70 rounded-lg p-5 flex flex-col items-center justify-between">
+      <h2 className="w-full text-white text-[30px] font-bold pb-3 border-b mb-5">
+        {memoData.title}
+      </h2>
+
+      <div className="flex h-full w-full gap-x-3">
+        <div className="rounded-lg pl-3 h-full w-full">
+          <div className="flex grid grid-cols-3">
+            <div></div>
+            <h2 className="text-white text-[20px] font-bold mb-3">메모</h2>
+            <button
+              onClick={() => setIsSummary(!isSummary)}
+              className="bg-[#03c777] rounded-xl px-5 py-2 hover:bg-[#02a566] focus:ring-4 focus:ring-[#03c777] text-white font-bold"
+            >
+              {isSummary ? "질문입력" : "요약보기"}
+            </button>
+          </div>
           <div
-            className="h-72 overflow-y-scroll border border-gray-300 p-2"
+            className="h-[85%] text-left overflow-y-scroll p-3 bg-white custom-scrollbar mb-5 mr-5"
             onMouseUp={(event) => {
               event.stopPropagation(); // 이벤트 전파 막기
               handleSelection();
@@ -305,63 +321,83 @@ function MemoDetail({ memoId, countGPT, updateCountGPT }) {
           >
             {memoData.content}
           </div>
-          <button onClick={copyButton}>복사하기</button>
-        </div>
 
-        <div className="w-[50%] h-[100%] bg-blue-100">
-          <h2>질문 입력</h2>
-          <textarea
-            type="text"
-            value={inputText}
-            onChange={handleInputChange}
-            placeholder="요약하고 싶은 내용을 작성하세요"
-            className="h-36 border border-gray-300 p-2 w-full"
-          />
-          <div>현재 내용 글자 수 {inputText.length}/1000</div>
-          {/* 추가 키워드 입력 필드 */}
-          <div className="flex items-center gap-2 mt-2">
-            <input
-              type="text"
-              value={keywordInput}
-              onChange={handleKeywordInputChange}
-              placeholder="추가 키워드를 입력하세요"
-              className="border border-gray-300 p-2 w-full"
-            />
-            {/* 키워드 추가 버튼 (아이콘 형식) */}
+          {!isSummary && (
             <button
-              onClick={addKeyword}
-              className="bg-blue-500 p-2 rounded-full hover:bg-blue-700"
-              aria-label="키워드 추가"
+              onClick={() => copyButton()}
+              className="bg-[#03c777] rounded-xl px-5 py-2 hover:bg-[#02a566] focus:ring-4 focus:ring-[#03c777] text-white font-bold"
             >
-              ✔
+              복사하기
             </button>
-          </div>
-          {/* 추가된 키워드 리스트 표시 */}
-          <div className="mt-2">
-            <h3>추가된 키워드:</h3>
-            <div className="flex flex-wrap gap-2">
-              {keywords.map((keyword, index) => (
-                <span
-                  key={index}
-                  className="bg-gray-200 p-1 rounded cursor-pointer"
-                  onClick={() => removeKeyword(keyword)}
-                >
-                  {keyword} ✕
-                </span>
-              ))}
-            </div>
-            <p className="text-sm text-gray-500">
-              현재 키워드 개수: {keywords.length} / 3
-            </p>
-          </div>
-
-          <button onClick={() => openSummaryModal(memoData.title, keywords)}>
-            요약하기
-          </button>
+          )}
         </div>
-      </div>
-      <div className="w-[100%] h-[50%] bg-green-100">
-        <MemoSummary data={summaryData} />
+
+        <div className="w-[50%] h-[90%]">
+          {!isSummary ? (
+            <>
+              <h2 className="text-white text-[20px] font-bold mb-3">
+                질문 입력
+              </h2>
+              <textarea
+                type="text"
+                value={inputText}
+                onChange={handleInputChange}
+                placeholder="요약하고 싶은 내용을 작성하세요"
+                className="h-[80%] rounded-lb p-2 w-full custom-scrollbar"
+              />
+              <div className="text-white">
+                현재 내용 글자 수 {inputText.length}/1000
+              </div>
+              {/* 추가 키워드 입력 필드 */}
+              <div className="flex items-center gap-2 mt-2">
+                <input
+                  type="text"
+                  value={keywordInput}
+                  onChange={handleKeywordInputChange}
+                  placeholder="추가 키워드를 입력하세요"
+                  className="border border-gray-300 p-2 w-full"
+                />
+                {/* 키워드 추가 버튼 (아이콘 형식) */}
+                <button
+                  onClick={addKeyword}
+                  className="bg-[#66aadf] rounded-xl px-5 py-2 hover:bg-[#4d90d8] focus:ring-4 focus:ring-[#66aadf] font-bold"
+                  aria-label="키워드 추가"
+                >
+                  ✔
+                </button>
+              </div>
+              {/* 추가된 키워드 리스트 표시 */}
+              <div className="mt-2">
+                <h3 className="text-white">추가된 키워드:</h3>
+                <div className="flex flex-wrap gap-2">
+                  {keywords.map((keyword, index) => (
+                    <span
+                      key={index}
+                      className="bg-gray-200 p-1 rounded cursor-pointer"
+                      onClick={() => removeKeyword(keyword)}
+                    >
+                      {keyword} ✕
+                    </span>
+                  ))}
+                </div>
+                <p className="text-sm text-gray-500">
+                  현재 키워드 개수: {keywords.length} / 3
+                </p>
+              </div>
+
+              <button
+                className="bg-[#03c777] rounded-xl px-5 py-2 hover:bg-[#02a566] focus:ring-4 focus:ring-[#03c777] text-white font-bold"
+                onClick={() => openSummaryModal(memoData.title, keywords)}
+              >
+                요약하기
+              </button>
+            </>
+          ) : (
+            <>
+              <MemoSummary data={summaryData} />
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

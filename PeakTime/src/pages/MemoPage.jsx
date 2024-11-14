@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Title from "../components/common/Title";
 import MemoList from "../components/Memo/MemoList"; // 메모 리스트
 import MemoDetail from "../components/Memo/MemoDetail"; // 메모 디테일
 
@@ -15,16 +16,20 @@ function MemoPage() {
   };
 
   return (
-    <>
-      <MemoList onMemoClick={onMemoClick} updateCountGPT={updateCountGPT} />
-      {selected && (
-        <MemoDetail
-          memoId={selected}
-          countGPT={countGPT}
-          updateCountGPT={updateCountGPT}
-        />
-      )}
-    </>
+    <div className="h-[100vh] flex flex-col">
+      <Title title={"메모 및 요약"} />
+
+      <div className="h-[90vh] top-[10vh]">
+        <MemoList onMemoClick={onMemoClick} updateCountGPT={updateCountGPT} />
+        {selected && (
+          <MemoDetail
+            memoId={selected}
+            countGPT={countGPT}
+            updateCountGPT={updateCountGPT}
+          />
+        )}
+      </div>
+    </div>
   );
 }
 
