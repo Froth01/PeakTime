@@ -1,7 +1,6 @@
-import electronApi, { setBaseUrl } from "./electronApi.js";
+import electronApi from "./electronApi.js";
 
 export async function endHikingProcess(sumData, startedHikingId, accessToken) {
-
   // window.electronAPI.sendStartMessage(null);
 
   //현재 시간 포맷 생성
@@ -24,7 +23,7 @@ export async function endHikingProcess(sumData, startedHikingId, accessToken) {
     realEndTime: format,
     contentList: sumData,
   };
-  await setBaseUrl();
+  // await setBaseUrl();
 
   return electronApi
     .put(`/${startedHikingId}`, endHikingData, {
