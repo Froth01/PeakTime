@@ -31,7 +31,7 @@ public class AuthUtil {
     // 닉네임 형식 검사 (형식에 맞으면 true, 형식에 맞지 않으면 false)
     public static boolean checkFormatValidationNickname(String nickname) {
         // 정규식: 한글, 영문 대소문자, 숫자로 이루어진 2자 이상 8자 이하의 문자열
-        String regex = "^[a-zA-Z0-9가-힣]{2,8}$";
+        String regex = "^[a-zA-Z0-9가-힣_\\[\\]]{2,15}$";
         return nickname.matches(regex);
     }
 

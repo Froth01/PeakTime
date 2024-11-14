@@ -14,6 +14,6 @@ public class UpdateChildRequestDto {
     @NotNull
     Long groupId;
     @NotBlank
-    @Length(min = 2, max = 8, message = "2자 이상 8자 이하의 닉네임을 입력주세요.")
+    @Length(min = 2, max = 15, message = "2자 이상 15자 이하의 닉네임을 입력주세요.")
     String childNickName;
 }
