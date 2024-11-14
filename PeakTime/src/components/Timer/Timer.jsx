@@ -6,8 +6,10 @@ import presetsApi from "../../api/presetsApi.js";
 import { IoIosArrowDown } from "react-icons/io";
 import { useUserStore } from "../../stores/UserStore.js";
 import { EventSourcePolyfill } from "event-source-polyfill";
+import { useBackgroundStore } from "../../stores/BackgroundStore.jsx";
 
 function Timer() {
+  const { bg, bgActions } = useBackgroundStore();
   const [inputTime, setInputTime] = useState(""); // 사용자 입력 시간 (분 단위)
   const [totalTime, setTotalTime] = useState(0); // 타이머 시간 (분 단위)
   const [remainTime, setRemainTime] = useState(null); // 남은 시간 (초 단위)
@@ -116,6 +118,7 @@ function Timer() {
           );
 
           // 상태 업데이트
+          bgActions.setBackground("mountain");
           setStartedHikingId(responseStartHiking.data.data.hikingId);
           setTotalTime(time);
           setRemainTime(time * 60 - 1); // 분 단위로 받은 시간을 초로 변환
@@ -124,8 +127,8 @@ function Timer() {
 
           let hikingStart;
           // 커스텀 이벤트
-          if(user.isRoot){
-              hikingStart = new CustomEvent("hikingStart", {
+          if (user.isRoot) {
+            hikingStart = new CustomEvent("hikingStart", {
               bubbles: true,
               detail: {
                 startedHikingId: responseStartHiking.data.data.hikingId,
@@ -133,8 +136,7 @@ function Timer() {
                 backUrl: hikingsApi.defaults.baseURL,
               },
             });
-          }
-          else{
+          } else {
             hikingStart = new CustomEvent("hikingStart", {
               bubbles: true,
               detail: {
@@ -144,7 +146,7 @@ function Timer() {
               },
             });
           }
-         
+
           const startBtn = document.getElementById("start");
           startBtn.dispatchEvent(hikingStart);
         } catch (err) {
@@ -260,6 +262,7 @@ function Timer() {
             );
 
             // 상태 업데이트
+            bgActions.setBackground("mountain");
             setStartedHikingId(responseStartHiking.data.data.hikingId);
             setTotalTime(messages.attentionTime);
             setRemainTime(messages.attentionTime * 60 - 1); // 분 단위로 받은 시간을 초로 변환
@@ -387,6 +390,7 @@ function Timer() {
       confirmButtonText: "포기하기",
       denyButtonText: "취소",
       preConfirm: async () => {
+        bgActions.setBackground("loft");
         try {
           console.log("취소 로직 작동");
 
