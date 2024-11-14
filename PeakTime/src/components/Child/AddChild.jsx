@@ -34,6 +34,7 @@ function AddChild() {
     setChildNickname("");
     setPasswordCheck(true);
     setIsDuplicate(false);
+    setSelectedOption(null);
   };
 
   const duplicatedMessage = () => {
@@ -163,7 +164,7 @@ function AddChild() {
               {isOpen && (
                 <ul
                   className="absolute left-0 right-0 mt-3 bg-white border
-                border-gray-300 rounded-lg shadow-lg"
+                border-gray-300 rounded-lg shadow-lg z-50"
                 >
                   {groupList.map((group, index) => (
                     <div key={group.groupId}>

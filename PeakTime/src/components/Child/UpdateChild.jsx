@@ -7,7 +7,7 @@ import { useGroupStore } from "../../stores/GroupStore";
 import { updateChildAlertMessage } from "../../utils/Child/UpdateChildAlertMessage";
 import { deleteChildAlertMessage } from "../../utils/Child/DeleteChildAlertMessage";
 import { IoIosArrowDown } from "react-icons/io";
-import "../../styles/daily-report-custom-swal.css"
+import "../../styles/daily-report-custom-swal.css";
 
 function UpdateChild() {
   const FAIL_TO_GET_GROUPLIST = {
@@ -18,10 +18,18 @@ function UpdateChild() {
     confirmButtonColor: "#03C777",
     customClass: {
       popup: "custom-swal-popup",
-    }
+    },
   };
 
-  const { groupList, groupId, childId, setGroupList, setGroupId, setContent, getGroupById } = useGroupStore();
+  const {
+    groupList,
+    groupId,
+    childId,
+    setGroupList,
+    setGroupId,
+    setContent,
+    getGroupById,
+  } = useGroupStore();
 
   // 비밀번호 변경 상태 변수
   const [passwordChange, setPasswordChange] = useState(false);
@@ -52,28 +60,27 @@ function UpdateChild() {
 
   // 계정 삭제 모달
   const openDeleteModal = () => {
-    Swal.fire(deleteChildAlertMessage("check"))
-      .then((res) => {
-        // 확인 누르면 삭제, 취소 누르면 모달 닫히고 아무것도 실행하지 않음
-        if (!res.isConfirmed) return;
+    Swal.fire(deleteChildAlertMessage("check")).then((res) => {
+      // 확인 누르면 삭제, 취소 누르면 모달 닫히고 아무것도 실행하지 않음
+      if (!res.isConfirmed) return;
 
-        childrenApi
-          .delete(`/${childId}`)
-          .then(() => {
-            Swal.fire(deleteChildAlertMessage("success"));
+      childrenApi
+        .delete(`/${childId}`)
+        .then(() => {
+          Swal.fire(deleteChildAlertMessage("success"));
 
-            groupsApi
-              .get("")
-              .then((result) => {
-                setGroupList(result.data.data.groupList);
-                setContent(null);
-              })
-              .catch(() => Swal.fire(FAIL_TO_GET_GROUPLIST));
-          })
-          .catch((error) => {
-            Swal.fire(deleteChildAlertMessage("fail", error));
-          });
-      })
+          groupsApi
+            .get("")
+            .then((result) => {
+              setGroupList(result.data.data.groupList);
+              setContent(null);
+            })
+            .catch(() => Swal.fire(FAIL_TO_GET_GROUPLIST));
+        })
+        .catch((error) => {
+          Swal.fire(deleteChildAlertMessage("fail", error));
+        });
+    });
   };
 
   // 계정 수정 (적용하기 클릭)
@@ -106,7 +113,9 @@ function UpdateChild() {
 
   return (
     <div className="absolute left-[43vw] w-[54vw] h-[84vh] my-[3vh] bg-[#333333] bg-opacity-70 rounded-lg p-5 flex flex-col items-center justify-between">
-      <h2 className="w-full text-white text-[30px] font-bold pb-3 border-b">{childNickname} ({child?.userLoginId})</h2>
+      <h2 className="w-full text-white text-[30px] font-bold pb-3 border-b">
+        {childNickname} ({child?.userLoginId})
+      </h2>
 
       <div className="flex flex-col gap-3 justify-between w-[70%]">
         <div className="flex flex-col gap-3 text-start w-[40%]">
@@ -161,7 +170,7 @@ function UpdateChild() {
               {isOpen && (
                 <ul
                   className="absolute left-0 right-0 mt-3 bg-white border
-                border-gray-300 rounded-lg shadow-lg"
+                border-gray-300 rounded-lg shadow-lg z-50"
                 >
                   {groupList.map((group, index) => (
                     <div key={group.groupId}>

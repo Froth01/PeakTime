@@ -1,4 +1,5 @@
 import { useGroupStore } from "../../stores/GroupStore";
+import "../../styles/custom-scrollbar.css";
 
 function ChildList() {
   const { groupList, setContent } = useGroupStore();
@@ -11,7 +12,7 @@ function ChildList() {
       <p className="text-gray-400 text-[18px] absolute right-5 top-5">
         *설정할 그룹이나 유저의 이름을 눌러주세요
       </p>
-      <div className="flex flex-col gap-5 bg-white text-[20px] w-[25vw] h-[70vh] overflow-y-auto rounded-lg p-5">
+      <div className="flex flex-col gap-5 bg-white text-[20px] w-[25vw] h-[70vh] overflow-y-auto rounded-lg p-5 custom-scrollbar">
         {groupList.map((group, groupIdx) => (
           <div key={groupIdx} className="flex flex-col gap-3">
             <button
@@ -26,9 +27,7 @@ function ChildList() {
                 className="flex items-center ml-4 text-[18px]"
               >
                 <button
-                  onClick={() =>
-                    setContent("updateChild", child.userId)
-                  }
+                  onClick={() => setContent("updateChild", child.userId)}
                   className="text-left"
                 >
                   └ {child.nickname}
