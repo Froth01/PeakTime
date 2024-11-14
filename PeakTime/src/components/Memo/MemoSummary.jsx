@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import Swal from "sweetalert2";
 import summariesApi from "../../api/summariesApi";
 import "../../styles/daily-report-custom-swal.css";
+import html2pdf from "html2pdf.js";
 
 function MemoSummary({ data }) {
   const { summaryId, content, updatedAt } = data;
@@ -49,18 +50,25 @@ function MemoSummary({ data }) {
       customClass: {
         popup: "custom-swal-popup",
       },
+      // 3개 버튼 사용
+      showDenyButton: true,
       showCancelButton: true,
-      confirmButtonText: "다운로드",
+      confirmButtonText: "PDF로 다운로드",
+      denyButtonText: "Markdown 파일로 다운로드",
       cancelButtonText: "닫기",
       confirmButtonColor: "#3085d6",
+      denyButtonColor: "green",
       cancelButtonColor: "red",
     }).then((result) => {
       if (result.isConfirmed) {
+        downloadPDFFile(markdownContent);
+      } else if (result.isDenied) {
         downloadMDFile(markdownContent);
       }
     });
   };
 
+  // md파일 다운로드
   const downloadMDFile = (content) => {
     const blob = new Blob([content], { type: "text/markdown;charset=utf-8" });
     const link = document.createElement("a");
@@ -68,6 +76,29 @@ function MemoSummary({ data }) {
     link.download = `summary_${summaryId}.md`;
     link.click();
     URL.revokeObjectURL(link.href);
+  };
+
+  // pdf 파일 다운로드
+  // html 태그로 형성시켜서 pdf로 내보내기
+  const downloadPDFFile = (content) => {
+    // 마지막 줄에 빈 줄 추가 (잘림 방지)
+    content += "\n";
+
+    const element = document.createElement("div");
+    element.innerHTML = content
+      .replace(/#/g, "<h1>")
+      .replace(/\n/g, "<br>")
+      .replace(/- /g, "<li>")
+      .replace(/<\/li><br>/g, "</li>");
+
+    const options = {
+      margin: 1,
+      filename: `summary_${summaryId}.pdf`,
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "in", format: "a4", orientation: "portrait" }, //inch a4크기 portrait(세로 방향)
+    };
+
+    html2pdf().from(element).set(options).save();
   };
 
   // 요약 삭제
