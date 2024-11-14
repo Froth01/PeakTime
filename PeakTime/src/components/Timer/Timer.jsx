@@ -568,7 +568,7 @@ function Timer() {
                 *분 단위로 입력해주세요.<br></br>최소 30분부터 240분까지
                 가능합니다.
               </label>
-              {user.isRoot && (
+              {user && user.isRoot && (
                 <div
                   tabIndex={0}
                   className={`mt-5 relative w-[60%] h-[60%] rounded-lg bg-white border border-gray-300 px-3 py-2 cursor-pointer ${
