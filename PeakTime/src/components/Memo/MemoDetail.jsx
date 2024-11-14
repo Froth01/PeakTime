@@ -39,6 +39,16 @@ function MemoDetail() {
       }
     } catch (error) {
       console.error("Error get detail memo api", error);
+      Swal.fire({
+        title: "메모 조회 실패",
+        customClass: {
+          popup: "custom-swal-popup",
+        },
+        text: "메모 조회 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+        icon: "error",
+        confirmButtonText: "확인",
+        confirmButtonColor: "#7C7C7C",
+      });
       throw error;
     }
   };
@@ -108,9 +118,9 @@ function MemoDetail() {
       )}\n해당 내용으로 요약을 진행하시겠습니까?`,
       showCancelButton: true,
       confirmButtonText: "요약하기",
-      confirmButtonColor: "#90B7DA",
+      confirmButtonColor: "#03C777",
       cancelButtonText: "취소",
-      cancelButtonColor: "red",
+      cancelButtonColor: "#F40000",
     }).then((result) => {
       if (result.isConfirmed) {
         // 조건 검사를 먼저 수행
@@ -136,7 +146,7 @@ function MemoDetail() {
           popup: "custom-swal-popup",
         },
         icon: "error",
-        confirmButtonColor: "green",
+        confirmButtonColor: "#03C777",
       });
       return;
     }
@@ -148,7 +158,7 @@ function MemoDetail() {
           popup: "custom-swal-popup",
         },
         icon: "error",
-        confirmButtonColor: "green",
+        confirmButtonColor: "#03C777",
       });
       return;
     }

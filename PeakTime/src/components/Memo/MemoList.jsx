@@ -13,11 +13,6 @@ function MemoList() {
   // 메모 리스트
   const [showDeleteButton, setShowDeleteButton] = useState(false);
 
-  // 휴지통 버튼을 눌렀을 때 `X` 버튼을 표시하도록 설정
-  const handleTrashButtonClick = () => {
-    setShowDeleteButton(!showDeleteButton);
-  };
-
   useEffect(() => {
     fetchGetMemoList();
   }, []);
@@ -64,7 +59,7 @@ function MemoList() {
       showCancelButton: true,
       confirmButtonText: "삭제",
       cancelButtonText: "취소",
-      confirmButtonColor: "red",
+      confirmButtonColor: "#F40000",
       cancelButtonColor: "#3085d6",
     }).then((result) => {
       if (result.isConfirmed) {
@@ -87,7 +82,7 @@ function MemoList() {
           </h2>
           <button
             className="text-white text-[30px]"
-            onClick={handleTrashButtonClick}
+            onClick={() => setShowDeleteButton(!showDeleteButton)}
           >
             <FaTrashAlt />
           </button>

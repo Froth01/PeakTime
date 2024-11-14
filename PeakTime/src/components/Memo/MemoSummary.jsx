@@ -59,8 +59,8 @@ function MemoSummary() {
       denyButtonText: "Markdown 파일로 다운로드",
       cancelButtonText: "닫기",
       confirmButtonColor: "#3085d6",
-      denyButtonColor: "green",
-      cancelButtonColor: "red",
+      denyButtonColor: "#03C777",
+      cancelButtonColor: "#F40000",
     }).then((result) => {
       if (result.isConfirmed) {
         downloadPDFFile(markdownContent);
@@ -113,6 +113,16 @@ function MemoSummary() {
       resetSummaryData();
     } catch (error) {
       console.error("error delete summary api", error);
+      Swal.fire({
+        title: `요약 삭제를 실패했습니다.`,
+        text: "요약 삭제를 실패했습니다. 잠시 후 다시 시도해주세요.",
+        customClass: {
+          popup: "custom-swal-popup",
+        },
+        icon: "warning",
+        confirmButtonText: "확인",
+        confirmButtonColor: "#7C7C7C",
+      });
     }
   };
 
@@ -127,7 +137,7 @@ function MemoSummary() {
       showCancelButton: true,
       confirmButtonText: "삭제",
       cancelButtonText: "취소",
-      confirmButtonColor: "red",
+      confirmButtonColor: "#F40000",
       cancelButtonColor: "#3085d6",
     }).then((result) => {
       if (result.isConfirmed) {
