@@ -183,8 +183,8 @@ function AddChild() {
 
   // 닉네임 확인 후 메시지
   const nicknameMessage = () => {
-    const nicknameRegex = /^[가-힣a-zA-Z0-9]{2,8}$/;
-
+    const nicknameRegex = /^[가-힣a-zA-Z0-9]{2,15}$/;
+    
     if(nicknameRegex.test(childNickname)){
       return (
         <div className="text-[#03C777] absolute top-[105%]">
@@ -195,7 +195,7 @@ function AddChild() {
   
     return (
       <div className="text-[#f40000] absolute top-[105%]">
-        * 2자 이상 8자 이하  * 한글, 영문, 숫자 사용 가능
+        * 2자 이상 15자 이하  * 한글, 영문, 숫자 사용 가능
       </div>
     );
   };
