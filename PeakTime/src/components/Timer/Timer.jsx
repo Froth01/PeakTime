@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Swal from "sweetalert2";
 import hikingsApi from "../../api/hikingsApi.js";
 import memosApi from "../../api/memosApi.js";
@@ -17,6 +17,7 @@ function Timer() {
   const [remainTime, setRemainTime] = useState(null); // 남은 시간 (초 단위)
   const [isRunning, setIsRunning] = useState(false); // 타이머 시작 상태
   const [isSelf, setIsSelf] = useState(true);
+  const workerRef = useRef(null);
 
   const [startedHikingId, setStartedHikingId] = useState(null); // 시작한 hikingId 정보
   const [presetList, setPresetList] = useState(null); // 프리셋 리스트
@@ -35,32 +36,12 @@ function Timer() {
 
   //현재 시간
   let [now, setNow] = useState(new Date());
-  let nowInterval = null;
 
   const startNow = () => {
-    nowInterval = setInterval(() => {
+    setInterval(() => {
       setNow(new Date());
     }, 5000);
   };
-  const stopNow = () => {
-    clearInterval(nowInterval);
-  };
-
-  const [extensionMemoData, setExtensionMemoData] = useState(null); // extension memo 저장 데이터
-
-  // 시작 상태, 남은 시간 변경시마다 적용
-  useEffect(() => {
-    if (remainTime && remainTime === 0) {
-      setIsRunning(false);
-      startNow();
-    }
-
-    const interval = setInterval(() => {
-      setRemainTime((prevTime) => (prevTime > 0 ? prevTime - 1 : 0));
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [isRunning, remainTime]);
 
   // 시간 'mm:ss' 표시
   const formatTime = (seconds) => {
@@ -72,12 +53,23 @@ function Timer() {
     )}`;
   };
 
+  // 타이머 시작
+  const startTimer = (duration) => {
+    setIsRunning(true);
+    workerRef.current.postMessage({ type: "start", duration });
+  };
+
+  // 타이머 종료
+  const pauseTimer = () => {
+    workerRef.current.postMessage({ type: "pause" });
+  };
+
   // 시작버튼 누르기
   const handleStart = () => {
     // 시간 정수화
     const time = parseInt(inputTime, 10);
     // 입력 시간 유효성 검사
-    if (isNaN(time) || time <= 29) {
+    if (isNaN(time) || time <= 0) {
       Swal.fire({
         title: "올바른 시간을 입력하세요.",
         customClass: {
@@ -103,7 +95,27 @@ function Timer() {
       denyButtonText: "취소",
       preConfirm: async () => {
         try {
-          // 시작 시간 포맷 생성
+          // 시작 확인 후 카운트다운 모달 표시
+          const countdownSwal = await Swal.fire({
+            title: "곧 하이킹이 시작됩니다!",
+            text: "10초 후 자동으로 시작됩니다.",
+            customClass: {
+              popup: "custom-swal-popup",
+            },
+            backdrop: "rgba(0,0,0,0.9)",
+            timer: 10000, // 10초 타이머
+            timerProgressBar: true,
+            didOpen: () => {
+              bgActions.setBackground("mountain");
+
+              Swal.showLoading();
+            },
+            willClose: () => {
+              // 모달이 닫힐 때 추가 로직 필요 시 여기에 작성
+            },
+          });
+
+          // 카운트다운 완료 후 하이킹 시작 로직 실행
           const now = new Date();
           const year = now.getFullYear();
           const month = now.getMonth() + 1;
@@ -131,16 +143,12 @@ function Timer() {
           );
 
           // 상태 업데이트
-          bgActions.setBackground("mountain");
           setStartedHikingId(responseStartHiking.data.data.hikingId);
-          setTotalTime(time);
-          setRemainTime(time * 60 - 1); // 분 단위로 받은 시간을 초로 변환
-          setIsRunning(true);
+          setTotalTime(time * 60);
+          setRemainTime(time * 60);
           setIsSelf(true);
-          stopNow();
 
           let hikingStart;
-          // 커스텀 이벤트
           if (user.isRoot) {
             hikingStart = new CustomEvent("hikingStart", {
               bubbles: true,
@@ -165,10 +173,9 @@ function Timer() {
 
           const startBtn = document.getElementById("start");
           startBtn.dispatchEvent(hikingStart);
+          startTimer(time * 60);
         } catch (err) {
           console.error("API 요청 중 오류 발생:", err);
-
-          // SweetAlert를 사용하여 오류 메시지 표시
           Swal.fire({
             title: "하이킹을 시작하는 데 실패했습니다.",
             customClass: {
@@ -283,11 +290,9 @@ function Timer() {
             // 상태 업데이트
             bgActions.setBackground("mountain");
             setStartedHikingId(responseStartHiking.data.data.hikingId);
-            setTotalTime(messages.attentionTime);
-            setRemainTime(messages.attentionTime * 60 - 1); // 분 단위로 받은 시간을 초로 변환
+            setTotalTime(messages.attentionTime * 60);
+            setRemainTime(messages.attentionTime * 60); // 분 단위로 받은 시간을 초로 변환
             setIsSelf(false);
-            setIsRunning(true);
-            stopNow();
 
             // 커스텀 이벤트 발생
             const hikingStart = new CustomEvent("hikingStart", {
@@ -301,6 +306,7 @@ function Timer() {
             });
             const startBtn = document.getElementById("start");
             startBtn?.dispatchEvent(hikingStart);
+            startTimer(messages.attentionTime * 60);
           } catch (err) {
             console.error("API 요청 중 오류 발생:", err);
 
@@ -319,7 +325,25 @@ function Timer() {
         };
 
         // 함수 호출
-        startHiking();
+        Swal.fire({
+          title: "곧 하이킹이 시작됩니다!",
+          text: "10초 후 자동으로 시작됩니다.",
+          backdrop: "rgba(0,0,0,0.9)",
+          timer: 10000, // 10초 타이머
+          timerProgressBar: true,
+          customClass: {
+            popup: "custom-swal-popup",
+          },
+          didOpen: () => {
+            bgActions.setBackground("mountain");
+
+            Swal.showLoading();
+          },
+          willClose: () => {
+            // 모달이 닫힐 때 추가 로직 필요 시 여기에 작성
+            startHiking();
+          },
+        });
       }
       console.log("messages : ", messages);
       setMessages(null);
@@ -393,6 +417,47 @@ function Timer() {
 
   // onWebSocketMessage 이벤트 리스너 등록
   useEffect(() => {
+    workerRef.current = new Worker(new URL("./worker.js", import.meta.url));
+    workerRef.current.onmessage = (e) => {
+      if (e.data.type === "step") {
+        console.log("react step!");
+        setRemainTime((prev) => prev - 1);
+      } else if (e.data.type === "end") {
+        try {
+          if (isRunning) {
+            setRemainTime(0);
+            console.log("자동종료 로직 작동");
+            // 종료 커스텀 이벤트 발생시키기
+            const hikingEnd = new CustomEvent("hikingEnd", {
+              bubbles: true,
+              detail: { startedHikingId },
+            });
+            const endBtn = document.getElementById("mini");
+            if (endBtn) {
+              endBtn.dispatchEvent(hikingEnd);
+            }
+            pauseTimer();
+            // 상태 업데이트
+            setIsRunning(false);
+          }
+        } catch (err) {
+          console.error("API 요청 중 오류 발생:", err);
+
+          // SweetAlert를 사용하여 오류 메시지 표시
+          Swal.fire({
+            title: "하이킹을 종료하는 데 실패했습니다.",
+            customClass: {
+              popup: "custom-swal-popup",
+            },
+            text: `오류 내용: ${err.response?.data?.message || err.message}`,
+            icon: "error",
+            confirmButtonColor: "#03c777",
+            confirmButtonText: "확인",
+          });
+        }
+      }
+    };
+
     window.electronAPI.onAllDone(allDone);
 
     // 이벤트 리스너 등록
@@ -408,6 +473,9 @@ function Timer() {
       .catch();
 
     startNow();
+    return () => {
+      workerRef.current.terminate();
+    };
   }, []);
 
   // 포기 버튼 누르기
@@ -426,19 +494,21 @@ function Timer() {
         bgActions.setBackground("loft");
         try {
           console.log("취소 로직 작동");
+          if (isRunning) {
+            console.log("종료할때 isRunning판단 : ", isRunning);
+            // 종료 커스텀 이벤트 발생시키기
+            const hikingEnd = new CustomEvent("hikingEnd", {
+              bubbles: true,
+              detail: { startedHikingId },
+            });
+            const endBtn = document.getElementById("giveup");
+            endBtn.dispatchEvent(hikingEnd);
 
-          // 종료 커스텀 이벤트 발생시키기
-          const hikingEnd = new CustomEvent("hikingEnd", {
-            bubbles: true,
-            detail: { startedHikingId },
-          });
-          const endBtn = document.getElementById("giveup");
-          endBtn.dispatchEvent(hikingEnd);
-
-          // 상태 업데이트
-          setTotalTime(0);
-          setRemainTime(null); // 분 단위로 받은 시간을 초로 변환
-          setIsRunning(false);
+            // 상태 업데이트
+            pauseTimer(); // 분 단위로 받은 시간을 초로 변환
+            setRemainTime(null);
+            setIsRunning(false);
+          }
         } catch (err) {
           console.error("API 요청 중 오류 발생:", err);
 
@@ -479,97 +549,82 @@ function Timer() {
       <style>
         {/* 타이머 시계 css */}
         {`
-          .timer {
-            background: ${
-              isRunning
-                ? "-webkit-linear-gradient(left, #eee 50%, #f40000 50%)"
-                : "#eee"
-            };
-            border-radius: 100%;
-            position: relative;
-            height: 100%;
-            width: 100%;
-            transform: ${isRunning ? "rotate(0deg)" : "rotate(180deg)"};
-            animation-name: ${isRunning ? "time" : "none"};
-            animation-duration: ${totalTime * 60}s;
-            animation-timing-function: linear;
-          }
-          .mask {
-            border-radius: 100% 0 0 100% / 50% 0 0 50%;
-            height: 100%;
-            left: 0;
-            position: absolute;
-            top: 0;
-            width: 50%;
-            animation-name: ${isRunning ? "mask" : "none"};
-            animation-duration: ${totalTime * 60}s;
-            animation-timing-function: linear;
-            -webkit-transform-origin: 100% 50%;
-          }
-          .hour-hand, .minute-hand {
-            position: absolute;
-            background-color: black;
-            transform-origin: bottom;
-            left: 50%;
-            bottom: 50%;
-          }
-          .hour-hand {
-            width: 4px;
-            height: 30%;
-            transform: rotate(${(new Date().getHours() % 12) * 30}deg);
-            border-radius: 50px;
-            background: linear-gradient(180deg, #86C8E3 0%, #263439 100%);
-            box-shadow: 0px 0px 15px 3px #7FBFDA;
-          }
-          .minute-hand {
-            width: 2px;
-            height: 45%;
-            transform: rotate(${new Date().getMinutes() * 6}deg);
-            transfrom: translateY(-50%);
-            border-radius: 50px;
-            background: linear-gradient(180deg, #86C8E3 0%, #263439 100%);
-            box-shadow: 0px 0px 15px 3px #7FBFDA;
-          }
-          .middle {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            width: 15px;
-            height: 15px;
-            border-radius: 100%;
-            transform: translate(-50%, -50%);
-          }
-          input[type="number"]::-webkit-outer-spin-button,
-          input[type="number"]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-          }
-          @-webkit-keyframes time {
-            100% {
-              -webkit-transform: rotate(360deg);
-            }
-          }
-          @-webkit-keyframes mask {
-            0% {
-                background: #f40000;
-                -webkit-transform: rotate(0deg);
-            }
-            50% {
-                background: #f40000;
-                -webkit-transform: rotate(-180deg);
-            }
-            50.01% {
-                background: #eee;
-                -webkit-transform: rotate(0deg);
-            }
-            100% {
-                background: #eee;
-                -webkit-transform: rotate(-180deg);
-            }
-          }
-        `}
+        .timer {
+          background: ${
+            isRunning
+              ? "-webkit-linear-gradient(left, #333333 50%, #f40000 50%)"
+              : "#eee"
+          };
+          border-radius: 100%;
+          position: relative;
+          height: 100%;
+          width: 100%;
+          transform: rotate(${
+            isRunning ? `${(1 - remainTime / totalTime) * 360}deg` : "180deg"
+          });
+        }
+
+        .mask {
+          border-radius: 100% 0 0 100% / 50% 0 0 50%;
+          height: 100%;
+          position: absolute;
+          left: ${isRunning ? `${remainTime >= totalTime / 2 ? 0 : "50%"}` : 0};
+          top: 0;
+          width: 50%;
+          background: ${
+            isRunning
+              ? `${remainTime >= totalTime / 2 ? "#f40000" : "#333333"}`
+              : "#eee"
+          };
+          transform-origin: 50% 50%;
+          transform: rotate(${
+            isRunning ? `${remainTime / totalTime >= 0.5 ? 0 : 180}deg` : "0deg"
+          }) !important;
+        }
+        .hour-hand, .minute-hand {
+          position: absolute;
+          background-color: black;
+          transform-origin: bottom;
+          left: 50%;
+          bottom: 50%;
+        }
+        .hour-hand {
+          width: 4px;
+          height: 30%;
+          transform: rotate(${(new Date().getHours() % 12) * 30}deg);
+          border-radius: 50px;
+          background: linear-gradient(180deg, #86C8E3 0%, #263439 100%);
+          box-shadow: 0px 0px 15px 3px #7FBFDA;
+        }
+        .minute-hand {
+          width: 2px;
+          height: 45%;
+          transform: rotate(${new Date().getMinutes() * 6}deg);
+          transfrom: translateY(-50%);
+          border-radius: 50px;
+          background: linear-gradient(180deg, #86C8E3 0%, #263439 100%);
+          box-shadow: 0px 0px 15px 3px #7FBFDA;
+        }
+        .middle {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          width: 15px;
+          height: 15px;
+          border-radius: 100%;
+          transform: translate(-50%, -50%);
+        }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+      `}
       </style>
-      <div className="absolute flex justify-end right-[3vw] top-[1vh] my-[2vh] z-[11]">
+      <div
+        id="mini"
+        className="absolute flex justify-end right-[3vw] top-[1vh] my-[2vh] z-[11]"
+      >
         {isSmall && (
           <div
             className={`me-4 text-5xl font-bold text-${
@@ -595,12 +650,15 @@ function Timer() {
         className="absolute z-10 w-[28%] h-[96%] right-0 bg-[#333333] bg-opacity-90 flex flex-col items-center rounded-lg my-[2vh] mx-[2vw]"
       >
         <div className="w-[40vh] h-[40vh] relative top-[15%]">
-          <div className="timer overflow-hidden">
+          <div className="relative h-[100%] w-[100%]">
+            <div className="timer overflow-hidden"></div>
             <div className="mask"></div>
           </div>
           <div
             id="clock"
-            className="absolute top-[70%] left-[50%] translate-x-[-50%] remain text-3xl"
+            className={`absolute top-[70%] left-[50%] translate-x-[-50%] remain text-3xl text-${
+              isRunning ? "white" : "black"
+            } font-bold`}
           >
             {isRunning
               ? formatTime(remainTime)
