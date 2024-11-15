@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
+// import "flowbite/dist/flowbite.css";
 import { ToggleSwitch } from "flowbite-react";
 
 function AddProgram({ blockProgramArray, onAddProgram }) {
@@ -60,13 +61,12 @@ function AddProgram({ blockProgramArray, onAddProgram }) {
           <div className="flex justify-center">
             <ToggleSwitch
               checked={isFileMode}
-              onChange={setIsFileMode}
-              // className={`${isFileMode ? "bg-[#1F2337]" : "bg-[#ffffff]"}`}
+              onChange={() => setIsFileMode(!isFileMode)}
             />
           </div>
-          <div className="text-sm text-white mt-2">
+          {/* <div className="text-sm text-white mt-2">
             <span>{isFileMode ? "파일 선택" : "직접 입력"}</span>
-          </div>
+          </div> */}
         </div>
 
         <div className="w-[65%]">
