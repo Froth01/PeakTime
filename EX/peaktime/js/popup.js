@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (memoTitle.length < 2) {
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-          if (tabs.length > 0) {
+          if (tabs.length > 0 && tabs[0].id) {
             chrome.tabs.sendMessage(tabs[0].id, {
               action: "showSaveMemoFailModal",
             });

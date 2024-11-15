@@ -28,7 +28,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         // 현재 URL을 크롬 저장소에 저장
         const data = await chrome.storage.local.get({ websiteList: [] });
         const websiteList = data.websiteList;
-        // websiteList.push(msg.url);
+        websiteList.push(msg.url);
 
         await chrome.storage.local.set({ websiteList });
         console.log("Website list updated:", websiteList);
@@ -48,11 +48,6 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
         // 비동기 작업이 완료되었음을 응답으로 알림
         sendResponse({ success: true });
-
-        // 모든 작업이 끝난 후 페이지 새로 고침
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-          chrome.tabs.reload(tabs[0].id);
-        });
       } catch (error) {
         console.error("Error handling addUrl action:", error);
         sendResponse({ success: false, error });

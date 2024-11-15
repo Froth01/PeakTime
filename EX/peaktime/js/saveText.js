@@ -22,10 +22,10 @@ chrome.commands.onCommand.addListener((command) => {
                 // 기존 저장된 텍스트에 새로운 텍스트 추가
                 const updatedTexts = [...data.savedTexts, msg.text].join("");
 
-                // 1000자로 제한
+                // 3000자로 제한
                 const limitedText =
-                  updatedTexts.length > 1000
-                    ? updatedTexts.slice(0, 1000)
+                  updatedTexts.length > 3000
+                    ? updatedTexts.slice(0, 3000)
                     : updatedTexts;
 
                 // 제한된 텍스트 저장

@@ -37,7 +37,7 @@ function connectWebSocket() {
 // WebSocket 재연결 시도 함수
 function retryConnect() {
   reconnectAttempts += 1;
-  const delay = Math.min(Math.pow(2, reconnectAttempts) * 1000, 4000); // 최대 지연 시간 30초
+  const delay = Math.min(Math.pow(2, reconnectAttempts) * 1000, 4000); // 최대 지연 시간 4초
 
   console.log(`Reconnecting in ${delay / 1000} seconds...`);
   setTimeout(connectWebSocket, delay);
@@ -65,7 +65,17 @@ function receivedSocketMessage(data) {
   }
   if (data.action === "sendUrlList") {
     console.log("sendUrlList");
-    chrome.storage.local.set({ websiteList: data.websiteList });
+    // 데이터 저장
+    chrome.storage.local.set({ websiteList: data.websiteList }, () => {
+      // 1초 후 페이지 새로 고침
+      setTimeout(() => {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          if (tabs.length > 0) {
+            chrome.tabs.reload(tabs[0].id, { bypassCache: true });
+          }
+        });
+      }, 1000); // 1000ms = 1초
+    });
   }
 }
 

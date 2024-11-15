@@ -38,6 +38,9 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         modal.style.display = "none"; // 2초 후 자동 숨김
       }, 1000);
     }
+    sendResponse({ message: "url이 추가되었습니다." });
+
+    // return true;
   }
   if (msg.action === "showSaveMemoFailModal") {
     const modal = document.getElementById("save-fail-memo-modal");
@@ -47,6 +50,9 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         modal.style.display = "none"; // 2초 후 자동 숨김
       }, 1000);
     }
+    sendResponse({ message: "메모를 저장하는데 실패하였습니다." });
+
+    // return true;
   }
   if (msg.action === "showSaveMemoSuccessModal") {
     const modal = document.getElementById("save-success-memo-modal");
@@ -56,6 +62,9 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         modal.style.display = "none"; // 2초 후 자동 숨김
       }, 1000);
     }
+    sendResponse({ message: "메모를 저장하는데 성공하였습니다." });
+
+    // return true;
   }
 
   return true;
@@ -64,7 +73,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 // 모달이 이미 추가되어 있지 않다면 추가
 if (!document.getElementById("save-fail-memo-modal")) {
   const modal = document.createElement("div");
-  modal.id = "save-memo-modal";
+  modal.id = "save-fail-memo-modal";
   modal.style.position = "fixed";
   modal.style.top = "50%";
   modal.style.left = "50%";
@@ -82,7 +91,7 @@ if (!document.getElementById("save-fail-memo-modal")) {
 // 모달이 이미 추가되어 있지 않다면 추가
 if (!document.getElementById("save-success-memo-modal")) {
   const modal = document.createElement("div");
-  modal.id = "save-memo-modal";
+  modal.id = "save-success-memo-modal";
   modal.style.position = "fixed";
   modal.style.top = "50%";
   modal.style.left = "50%";
@@ -94,23 +103,6 @@ if (!document.getElementById("save-success-memo-modal")) {
   modal.style.display = "none"; // 모달을 초기에는 숨겨둠
 
   modal.innerHTML = "<h2>메모가 성공적으로 저장되었습니다.</h2>";
-  document.body.appendChild(modal);
-}
-
-if (!document.getElementById("save-memo-modal")) {
-  const modal = document.createElement("div");
-  modal.id = "save-memo-modal";
-  modal.style.position = "fixed";
-  modal.style.top = "50%";
-  modal.style.left = "50%";
-  modal.style.transform = "translate(-50%, -50%)";
-  modal.style.backgroundColor = "white";
-  modal.style.padding = "20px";
-  modal.style.boxShadow = "0px 0px 10px rgba(0, 0, 0, 0.5)";
-  modal.style.zIndex = "1000";
-  modal.style.display = "none"; // 모달을 초기에는 숨겨둠
-
-  modal.innerHTML = "<h2>제목은 2글자 이상 되어야합니다.</h2>";
   document.body.appendChild(modal);
 }
 
