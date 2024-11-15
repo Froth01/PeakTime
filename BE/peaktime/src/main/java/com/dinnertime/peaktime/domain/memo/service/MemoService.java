@@ -12,6 +12,9 @@ import com.dinnertime.peaktime.domain.user.repository.UserRepository;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
 import com.dinnertime.peaktime.global.util.RedisService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -35,14 +38,20 @@ public class MemoService {
     // 메모 리스트 조회
     // UserPrincipal 임시 설정 -> 구현 후 일괄 수정 예정
     @Transactional(readOnly = true)
-    public MemoWrapperResponseDto getMemos(Long userId) {
+    public MemoWrapperResponseDto getMemos(Long userId, int page) {
 
-        List<Memo> memos = memoRepository.findAllByUser_UserIdOrderByMemoIdAsc(userId);
+        Pageable pageable = PageRequest.of(page, 10);
+
+//        List<Memo> memos = memoRepository.findAllByUser_UserIdOrderByMemoIdAsc(userId);
+
+        Page<Memo> memos = memoRepository.findAllByUser_UserId(userId, pageable);
+
+        log.info(memos.toString());
 
         // redis에서 임시 저장되어있는 요약 횟수 가져오기
         Integer count = redisService.getGPTcount(userId);
 
-        return MemoWrapperResponseDto.createMemoWrapperResponseDto(memos, count);
+        return MemoWrapperResponseDto.createMemoWrapperResponseDto(memos.getContent(), count, memos.isLast());
     }
 
     // 메모 삭제
