@@ -30,6 +30,8 @@ export const useMemoStore = create((set) => ({
   memoListLimit: 10, // 메모 최대한도 수
   summaryCountLimit: 3, // 요약 최대한도 수
   inputTextLimit: 1000,
+  keywordInputLimit: 10, // 키워드 하나당 최대 글자 길이
+  keywordsLimit: 3, // 최대 키워드 input 수
 
   setMemoList: (memoList) => set({ memoList: [...memoList] }),
   setSummaryCount: (count) => set({ summaryCount: count }),

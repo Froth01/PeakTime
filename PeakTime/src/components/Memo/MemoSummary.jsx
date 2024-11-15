@@ -148,28 +148,41 @@ function MemoSummary() {
 
   return (
     <div className="h-full flex flex-col">
-      <h2 className="text-white text-[20px] font-bold mb-3">
-        요약
-      </h2>
+      <h2 className="text-white text-[20px] font-bold mb-3">요약</h2>
       <div className="flex-grow flex flex-col justify-between">
         {summaryId ? (
           <div className="h-full flex flex-col justify-between">
             <div className="flex-1 overflow-auto">
-              <textarea readOnly className="h-[92%] rounded-xl p-2 w-full custom-scrollbar">{content}</textarea>
-              <div className="text-[#C5C5C5] text-start text-[15px] mb-1">작성일시: {formatDate(updatedAt)}</div>
+              <textarea
+                readOnly
+                className="h-[92%] rounded-xl p-2 w-full custom-scrollbar"
+              >
+                {content}
+              </textarea>
+              <div className="text-[#C5C5C5] text-start text-[15px] mb-1">
+                작성일시: {formatDate(updatedAt)}
+              </div>
             </div>
 
             <div className="w-full flex justify-center mt-3 gap-x-3">
-              <button className="bg-[#03c777] rounded-xl px-5 py-2 hover:bg-[#02a566] focus:ring-4 focus:ring-[#03c777] text-white font-bold" onClick={() => showMarkdownModal()}>
+              <button
+                className="bg-[#03c777] rounded-xl px-5 py-2 hover:bg-[#02a566] focus:ring-4 focus:ring-[#03c777] text-white font-bold"
+                onClick={() => showMarkdownModal()}
+              >
                 Markdown 미리보기 및 다운로드
               </button>
-              <button className="bg-[#f40000] rounded-xl px-5 py-2 hover:bg-[#d60000] focus:ring-4 focus:ring-[#f40000] text-white font-bold" onClick={() => openDeleteWarn(summaryId)}>
+              <button
+                className="bg-[#f40000] rounded-xl px-5 py-2 hover:bg-[#d60000] focus:ring-4 focus:ring-[#f40000] text-white font-bold"
+                onClick={() => openDeleteWarn(summaryId)}
+              >
                 요약삭제
               </button>
             </div>
           </div>
         ) : (
-          <div className="h-full flex justify-center items-center font-bold text-[20px] text-[#C5C5C5]">요약 기록이 없습니다.</div>
+          <div className="h-full flex justify-center items-center font-bold text-[20px] text-[#C5C5C5]">
+            요약 기록이 없습니다.
+          </div>
         )}
       </div>
     </div>

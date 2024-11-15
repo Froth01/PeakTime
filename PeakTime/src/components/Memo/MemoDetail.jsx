@@ -9,7 +9,31 @@ import "../../styles/daily-report-custom-swal.css";
 import "../../styles/custom-scrollbar.css";
 
 function MemoDetail() {
-  const { memoData, setMemoData, setSummaryData, resetSummaryData, selected, summaryCount, setSummaryCount, summaryCountLimit, isSummary, setIsSummary, inputText, setInputText, inputTextLimit, resetInputText, keywords, setKeywords, resetKeyWords, keywordInput, setKeywordInput, isLoading, setIsLoading } = useMemoStore();
+  const {
+    memoData,
+    setMemoData,
+    setSummaryData,
+    resetSummaryData,
+    selected,
+    summaryCount,
+    setSummaryCount,
+    summaryCountLimit,
+    isSummary,
+    setIsSummary,
+    inputText,
+    setInputText,
+    inputTextLimit,
+    resetInputText,
+    keywords,
+    setKeywords,
+    resetKeyWords,
+    keywordInput,
+    setKeywordInput,
+    isLoading,
+    setIsLoading,
+    keywordInputLimit,
+    keywordsLimit,
+  } = useMemoStore();
 
   const [selectedText, setSelectedText] = useState(""); // 드래그 텍스트 저장
 
@@ -239,13 +263,13 @@ function MemoDetail() {
 
   // 키워드 추가 함수
   const addKeyword = () => {
-    if (keywordInput.length > 10) {
+    if (keywordInput.length > keywordInputLimit) {
       Swal.fire({
         title: "키워드 글자 수 초과",
         customClass: {
           popup: "custom-swal-popup",
         },
-        text: "키워드 글자 수는 최대 10자까지만 입력할 수 있습니다.",
+        text: `키워드 글자 수는 최대 ${keywordInputLimit}자까지만 입력할 수 있습니다.`,
         icon: "warning",
         confirmButtonColor: "#03C777",
         confirmButtonText: "확인",
@@ -253,13 +277,13 @@ function MemoDetail() {
       return;
     }
     // 추가 키워드의 개수는 최대 세 개
-    if (keywords.length >= 3) {
+    if (keywords.length >= keywordsLimit) {
       Swal.fire({
         title: "추가 키워드 초과",
         customClass: {
           popup: "custom-swal-popup",
         },
-        text: "키워드는 최대 3개까지 추가할 수 있습니다.",
+        text: `키워드는 최대 ${keywordsLimit}개까지 추가할 수 있습니다.`,
         icon: "warning",
         confirmButtonColor: "#03C777",
         confirmButtonText: "확인",
@@ -325,7 +349,6 @@ function MemoDetail() {
                 {isSummary ? "질문입력" : "요약보기"}
               </button>
             </div>
-
           </div>
         </div>
 
@@ -370,7 +393,9 @@ function MemoDetail() {
                     </div>
                     {/* 추가된 키워드 리스트 표시 */}
                     <div className="mt-2">
-                      <h3 className="text-[#C5C5C5] text-start text-[15px] mb-1">추가된 키워드({keywords.length} / 3):</h3>
+                      <h3 className="text-[#C5C5C5] text-start text-[15px] mb-1">
+                        추가된 키워드({keywords.length} / {keywordsLimit}):
+                      </h3>
                       <div className="flex flex-wrap grid grid-cols-2 gap-2">
                         {keywords.map((keyword, index) => (
                           <span
@@ -378,7 +403,8 @@ function MemoDetail() {
                             className="flex justify-between items-center bg-[#66aadf] rounded-xl hover:bg-[#4d90d8] focus:ring-4 focus:ring-[#66aadf] font-bold text-white px-2 py-1 mx-1 cursor-pointer"
                             onClick={() => removeKeyword(keyword)}
                           >
-                            {keyword}<TiDelete />
+                            {keyword}
+                            <TiDelete />
                           </span>
                         ))}
                       </div>
@@ -395,7 +421,10 @@ function MemoDetail() {
                   </button>
                   <button
                     className="text-white font-bold px-5 py-2 rounded-xl bg-[#7C7C7C] hover:bg-[#5C5C5C]"
-                    onClick={() => { resetInputText(); resetKeyWords(); }}
+                    onClick={() => {
+                      resetInputText();
+                      resetKeyWords();
+                    }}
                   >
                     내용삭제
                   </button>

@@ -11,8 +11,8 @@ function MemoPage() {
   useEffect(() => {
     return () => {
       resetAll();
-    }
-  }, [])
+    };
+  }, []);
 
   return (
     <div className="h-[100vh] flex flex-col">

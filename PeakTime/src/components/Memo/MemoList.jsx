@@ -8,7 +8,15 @@ import { useMemoStore } from "../../stores/MemoStore";
 import "../../styles/daily-report-custom-swal.css";
 
 function MemoList() {
-  const { memoList, setMemoList, memoListLimit, summaryCount, setSummaryCount, summaryCountLimit, setSelected } = useMemoStore();
+  const {
+    memoList,
+    setMemoList,
+    memoListLimit,
+    summaryCount,
+    setSummaryCount,
+    summaryCountLimit,
+    setSelected,
+  } = useMemoStore();
 
   // 메모 리스트
   const [showDeleteButton, setShowDeleteButton] = useState(false);
@@ -119,7 +127,8 @@ function MemoList() {
 
         <div className="w-full text-white text-[25px] flex justify-end mb-3">
           <div className="text-white font-bold text-[20px]">
-            남은 요약 횟수: {summaryCountLimit - summaryCount} / {summaryCountLimit}
+            남은 요약 횟수: {summaryCountLimit - summaryCount} /{" "}
+            {summaryCountLimit}
           </div>
         </div>
       </div>
