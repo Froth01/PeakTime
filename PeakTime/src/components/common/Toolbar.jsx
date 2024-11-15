@@ -255,7 +255,6 @@ function Toolbar() {
           className="whitespace-nowrap font-bold"
         >
           <button
-            onClick={checkAccessModal}
             className="text-white text-5xl"
           >
             <AiFillSetting
