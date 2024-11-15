@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import authApi from "../api/authApi";
 import Swal from "sweetalert2"; // 모달 라이브러리
+import "../styles/daily-report-custom-swal.css";
 
 function PasswordReissuePage() {
   // 라우팅 설정
@@ -27,6 +28,9 @@ function PasswordReissuePage() {
       // 성공하면 이어서 진행
       Swal.fire({
         title: "임시 비밀번호가 발급되었습니다.",
+        customClass: {
+          popup: 'custom-swal-popup',
+        },
         text: "이어서 로그인을 진행해주세요.",
         icon: "success",
         confirmButtonColor: "#03C777",
@@ -35,6 +39,9 @@ function PasswordReissuePage() {
     } catch (error) {
       Swal.fire({
         title: "다시 시도해주세요.",
+        customClass: {
+          popup: 'custom-swal-popup',
+        },
         text: `${error.response.data.message}`,
         icon: "error",
         confirmButtonColor: "#03C777",
