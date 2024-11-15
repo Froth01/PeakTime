@@ -26,6 +26,9 @@ function EmailChangePage() {
   // 색상과 관련된 변수 상태 필요
   const [emailAlertMessageColor, setEmailAlertMessageColor] = useState(false);
 
+  // Email placeholder 관련 (이메일이 변경될 때마다 이전으로 되돌아가므로 현재 컴포넌트가 마운트 될 때만 조회하면 된다.)
+  const [emailPlaceholder, setEmailPlaceholder] = useState("");
+
   useEffect(() => {
     // inputEmail 입력시 처리 로직
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -47,6 +50,32 @@ function EmailChangePage() {
     setEmailCodeIsValid(false);
     setCodeAlertMessage("");
   }, [inputEmail])
+
+  useEffect(() => {
+    getProfile();
+  }, [])
+
+  // 프로필 조회 API 호출
+  const getProfile = async () => {
+    try {
+      const getProfileResponse = await usersApi.get("");
+      // 성공하면 이어서 진행
+      setEmailPlaceholder(getProfileResponse.data.data.email);
+    } catch (error) {
+      // 실패하면 여기로 진입
+      Swal.fire({
+        title: "프로필 조회에 실패하였습니다. 다시 시도해주세요.",
+        customClass: {
+          popup: 'custom-swal-popup',
+        },
+        text: `${error.response.data.message}`,
+        icon: "error",
+        confirmButtonColor: "#03C777",
+        confirmButtonText: "확인",
+        didClose: () => navigate(-1),
+      });
+    }
+  }
 
   // 이메일 중복 조회 API 호출
   const isDuplicatedEmail = async () => {
@@ -238,6 +267,7 @@ function EmailChangePage() {
                 id="email"
                 name="email"
                 type="text"
+                placeholder={emailPlaceholder}
                 value={inputEmail}
                 onChange={(e) => { setInputEmail(e.target.value); }}
                 className="px-3 py-3 h-[100%] rounded-lg ps-3 bg-opacity-90 text-black font-bold"
