@@ -109,7 +109,7 @@ function MemoDetail() {
       // 요청 성공 후 최신 데이터를 다시 가져오기
       await readDetailMemoGet(selected);
 
-      // 질문 입력 내용, 키워드 삭제하고 요약 내용 띄우기
+      // 요약하기 내용, 키워드 삭제하고 요약 내용 띄우기
       setInputText("");
       setKeywords([]);
       setIsSummary(true);
@@ -324,7 +324,8 @@ function MemoDetail() {
           <h2 className="text-white text-[20px] font-bold mb-3">기록된 메모</h2>
           <div className="h-full flex flex-col justify-between">
             <div
-              className="h-[90%] text-left overflow-y-scroll p-3 bg-white custom-scrollbar mb-5"
+              style={{ whiteSpace: "pre-line" }}
+              className="min-h-[60vh] max-h-[60vh] text-left overflow-y-scroll p-3 bg-white custom-scrollbar mb-5"
               onMouseUp={(event) => {
                 event.stopPropagation(); // 이벤트 전파 막기
                 handleSelection();
@@ -356,7 +357,7 @@ function MemoDetail() {
           {!isSummary ? (
             <>
               <h2 className="text-white text-[20px] font-bold mb-3">
-                질문 입력
+                요약하기
               </h2>
               <div className="h-full flex flex-col justify-between">
                 <div className="flex flex-col justify-between h-[90%] mb-5">
