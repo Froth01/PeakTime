@@ -40,10 +40,12 @@ public class MemoController {
     })
     @CommonSwaggerResponse.CommonResponses
     @GetMapping
-    public ResponseEntity<?> getMemoTitles (@AuthenticationPrincipal UserPrincipal userPrincipal) {
+    public ResponseEntity<?> getMemoTitles (
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestParam("page") int page) {
         log.info("getMemoTitles 메서드가 호출되었습니다.");
 
-        MemoWrapperResponseDto responseDto = memoService.getMemos(userPrincipal.getUserId());
+        MemoWrapperResponseDto responseDto = memoService.getMemos(userPrincipal.getUserId(), page);
 
         return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(),"메모 리스트 조회에 성공했습니다.", responseDto));
     }
