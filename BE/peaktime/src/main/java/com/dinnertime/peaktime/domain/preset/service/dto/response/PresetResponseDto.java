@@ -26,8 +26,18 @@ public class PresetResponseDto {
         return PresetResponseDto.builder()
                 .presetId(preset.getPresetId())
                 .title(preset.getTitle())
-                .blockWebsiteArray(preset.getBlockWebsiteArray())
-                .blockProgramArray(preset.getBlockProgramArray())
+                .blockWebsiteArray(
+                        preset.getBlockWebsiteArray()
+                                .stream()
+                                .sorted()
+                                .toList()
+                )
+                .blockProgramArray(
+                        preset.getBlockProgramArray()
+                                .stream()
+                                .sorted()
+                                .toList()
+                )
                 .build();
     }
 
