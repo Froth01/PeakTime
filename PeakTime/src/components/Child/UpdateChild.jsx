@@ -1,31 +1,43 @@
 import { useEffect, useState } from "react";
-import PropTypes from "prop-types";
 import Swal from "sweetalert2";
 import ChangePassword from "./ChangePassword";
 import groupsApi from "../../api/groupsApi";
 import childrenApi from "../../api/childrenApi";
+import { useGroupStore } from "../../stores/GroupStore";
 import { updateChildAlertMessage } from "../../utils/Child/UpdateChildAlertMessage";
 import { deleteChildAlertMessage } from "../../utils/Child/DeleteChildAlertMessage";
 import { IoIosArrowDown } from "react-icons/io";
+import "../../styles/daily-report-custom-swal.css";
 
-function UpdateChild({
-  childId,
-  groupList,
-  onChangeContent,
-  onChangeGroupList,
-}) {
+function UpdateChild() {
   const FAIL_TO_GET_GROUPLIST = {
     title: "그룹 전체 조회 실패",
     text: "그룹 전체 정보를 조회하는 데 실패했습니다. 잠시 후 다시 시도해주세요.",
     icon: "error",
     confirmButtonText: "확인",
     confirmButtonColor: "#03C777",
+    customClass: {
+      popup: "custom-swal-popup",
+    },
   };
 
-  //비밀번호 변경 상태 변수
+  const {
+    groupList,
+    groupId,
+    childId,
+    setGroupList,
+    setGroupId,
+    setContent,
+    getGroupById,
+  } = useGroupStore();
+
+  // 비밀번호 변경 상태 변수
   const [passwordChange, setPasswordChange] = useState(false);
+
+  // groupList에서 child 찾아 변수로 지정
   const [child, setChild] = useState(null);
-  const [groupId, setGroupId] = useState(null);
+
+  // 화면 최상단에 표시될 닉네임
   const [childNickname, setChildNickname] = useState(null);
 
   // 드롭다운 관련
@@ -40,6 +52,7 @@ function UpdateChild({
         setChild(child);
         setGroupId(group.groupId);
         setChildNickname(child.nickname);
+        setSelectedOption(getGroupById(group.groupId));
         break;
       }
     }
@@ -47,37 +60,27 @@ function UpdateChild({
 
   // 계정 삭제 모달
   const openDeleteModal = () => {
-    Swal.fire(deleteChildAlertMessage("check"))
-      .then((result) => {
-        // 확인 누르면 삭제, 취소 누르면 모달 닫히고 아무것도 실행하지 않음
-        if (result.isConfirmed) {
-          childrenApi
-            .delete(`/${childId}`)
-            .then(() => {
-              Swal.fire(deleteChildAlertMessage("success"));
+    Swal.fire(deleteChildAlertMessage("check")).then((res) => {
+      // 확인 누르면 삭제, 취소 누르면 모달 닫히고 아무것도 실행하지 않음
+      if (!res.isConfirmed) return;
 
-              groupsApi
-                .get("")
-                .then((result) => {
-                  onChangeGroupList(result.data.data.groupList);
-                  onChangeContent(null);
-                })
-                .catch(() => Swal.fire(FAIL_TO_GET_GROUPLIST));
+      childrenApi
+        .delete(`/${childId}`)
+        .then(() => {
+          Swal.fire(deleteChildAlertMessage("success"));
+
+          groupsApi
+            .get("")
+            .then((result) => {
+              setGroupList(result.data.data.groupList);
+              setContent(null);
             })
-            .catch((error) => {
-              Swal.fire(deleteChildAlertMessage("fail", error));
-            });
-        }
-      })
-      .catch((error) => {
-        // 디폴트 에러
-        Swal.fire(deleteChildAlertMessage("fail", error));
-      });
-  };
-
-  // 비밀번호 변경 클릭
-  const handlePassword = () => {
-    setPasswordChange(true);
+            .catch(() => Swal.fire(FAIL_TO_GET_GROUPLIST));
+        })
+        .catch((error) => {
+          Swal.fire(deleteChildAlertMessage("fail", error));
+        });
+    });
   };
 
   // 계정 수정 (적용하기 클릭)
@@ -87,18 +90,12 @@ function UpdateChild({
       .then(() => {
         Swal.fire(updateChildAlertMessage());
 
-        setChildNickname(child.nickname);
         groupsApi
           .get("")
-          .then((result) => onChangeGroupList(result.data.data.groupList))
+          .then((result) => setGroupList(result.data.data.groupList))
           .catch(() => Swal.fire(FAIL_TO_GET_GROUPLIST));
       })
       .catch((error) => Swal.fire(updateChildAlertMessage(error)));
-  };
-
-  // 닫기 클릭
-  const handleCancel = () => {
-    onChangeContent(null);
   };
 
   const handleChange = (content, item) => {
@@ -116,7 +113,9 @@ function UpdateChild({
 
   return (
     <div className="absolute left-[43vw] w-[54vw] h-[84vh] my-[3vh] bg-[#333333] bg-opacity-70 rounded-lg p-5 flex flex-col items-center justify-between">
-      <h2 className="text-white text-[30px] font-bold">{childNickname}</h2>
+      <h2 className="w-full text-white text-[30px] font-bold pb-3 border-b">
+        {childNickname} ({child?.userLoginId})
+      </h2>
 
       <div className="flex flex-col gap-3 justify-between w-[70%]">
         <div className="flex flex-col gap-3 text-start w-[40%]">
@@ -171,7 +170,7 @@ function UpdateChild({
               {isOpen && (
                 <ul
                   className="absolute left-0 right-0 mt-3 bg-white border
-                border-gray-300 rounded-lg shadow-lg"
+                border-gray-300 rounded-lg shadow-lg z-50"
                 >
                   {groupList.map((group, index) => (
                     <div key={group.groupId}>
@@ -198,7 +197,7 @@ function UpdateChild({
       </div>
       <div className="flex gap-3 justify-between w-[70%] relative">
         <button
-          onClick={handlePassword}
+          onClick={() => setPasswordChange(true)}
           className="bg-[#66aadf] rounded-xl px-5 py-2 hover:bg-[#4d90d8] focus:ring-4 focus:ring-[#66aadf] font-bold"
         >
           비밀번호변경
@@ -224,7 +223,7 @@ function UpdateChild({
           적용하기
         </button>
         <button
-          onClick={handleCancel}
+          onClick={() => setContent(null)}
           className="bg-[#7c7c7c] rounded-xl px-5 py-2 hover:bg-[#5c5c5c] focus:ring-4 focus:ring-[#c5c5c5] text-white font-bold"
         >
           닫기
@@ -234,23 +233,4 @@ function UpdateChild({
   );
 }
 
-// props validation 추가
-UpdateChild.propTypes = {
-  childId: PropTypes.number.isRequired,
-  groupList: PropTypes.arrayOf(
-    PropTypes.shape({
-      groupId: PropTypes.number.isRequired,
-      groupTitle: PropTypes.string.isRequired,
-      childList: PropTypes.arrayOf(
-        PropTypes.shape({
-          userId: PropTypes.number.isRequired,
-          userLoginId: PropTypes.string.isRequired,
-          nickname: PropTypes.string.isRequired,
-        })
-      ).isRequired,
-    })
-  ).isRequired,
-  onChangeContent: PropTypes.func.isRequired,
-  onChangeGroupList: PropTypes.func.isRequired,
-};
 export default UpdateChild;

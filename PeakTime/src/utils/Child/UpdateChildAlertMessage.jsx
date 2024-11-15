@@ -1,9 +1,14 @@
+import "../../styles/daily-report-custom-swal.css"
+
 const successToUpdate = {
   title: "계정 상태 수정 성공",
   text: "계정 상태를 성공적으로 변경했습니다.",
   icon: "success",
   confirmButtonText: "확인",
   confirmButtonColor: "#03C777",
+  customClass: {
+    popup: "custom-swal-popup",
+  }
 };
 
 // 404
@@ -13,6 +18,9 @@ const groupNotFound = {
   icon: "error",
   confirmButtonText: "확인",
   confirmButtonColor: "#03C777",
+  customClass: {
+    popup: "custom-swal-popup",
+  }
 };
 
 // 422
@@ -22,6 +30,9 @@ const limitExceeded = {
   icon: "error",
   confirmButtonText: "확인",
   confirmButtonColor: "#03C777",
+  customClass: {
+    popup: "custom-swal-popup",
+  }
 };
 
 // 404
@@ -31,6 +42,9 @@ const invalidNicknameFormat = {
   icon: "error",
   confirmButtonText: "확인",
   confirmButtonColor: "#03C777",
+  customClass: {
+    popup: "custom-swal-popup",
+  }
 };
 
 // 404
@@ -40,6 +54,9 @@ const userNotFound = {
   icon: "error",
   confirmButtonText: "확인",
   confirmButtonColor: "#03C777",
+  customClass: {
+    popup: "custom-swal-popup",
+  }
 };
 
 const defaultMessage = {
@@ -48,6 +65,9 @@ const defaultMessage = {
   icon: "error",
   confirmButtonText: "확인",
   confirmButtonColor: "#03C777",
+  customClass: {
+    popup: "custom-swal-popup",
+  }
 };
 
 const handle404Message = (message) => {

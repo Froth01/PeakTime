@@ -24,7 +24,13 @@ function createWindow() {
     width: 1366,
     height: 768,
     webPreferences: {
-      preload: path.join(__dirname, "electron", "preload.js"),
+      preload: path.join(
+        __dirname,
+        // "resources",
+        // "build",
+        "electron",
+        "preload.js"
+      ),
       contextIsolation: true,
       nodeIntegration: false, // 보안 상 비활성화
       sandbox: true,
@@ -40,7 +46,7 @@ function createWindow() {
   const startUrl =
     process.env.ELECTRON_START_URL ||
     url.format({
-      pathname: path.join(__dirname, "/../build/index.html"),
+      pathname: path.join(__dirname, "resources", "build", "index.html"),
       protocol: "file:",
       slashes: true,
     });

@@ -1,9 +1,14 @@
+import "../../styles/daily-report-custom-swal.css";
+
 const emptyFieldWarning = {
   title: "입력 정보 누락",
   text: "입력하신 정보를 다시 한 번 확인해 주세요.",
   icon: "warning",
   confirmButtonText: "확인",
   confirmButtonColor: "#03C777",
+  customClass: {
+    popup: "custom-swal-popup",
+  }
 };
 
 const groupNotFound = {
@@ -12,6 +17,9 @@ const groupNotFound = {
   icon: "error",
   confirmButtonText: "확인",
   confirmButtonColor: "#03C777",
+  customClass: {
+    popup: "custom-swal-popup",
+  }
 };
 
 const limitExceeded = {
@@ -20,6 +28,9 @@ const limitExceeded = {
   icon: "error",
   confirmButtonText: "확인",
   confirmButtonColor: "#03C777",
+  customClass: {
+    popup: "custom-swal-popup",
+  }
 };
 
 const invalidIdFormat = {
@@ -28,6 +39,9 @@ const invalidIdFormat = {
   icon: "error",
   confirmButtonText: "확인",
   confirmButtonColor: "#03C777",
+  customClass: {
+    popup: "custom-swal-popup",
+  }
 };
 
 const duplicateId = {
@@ -36,6 +50,9 @@ const duplicateId = {
   icon: "error",
   confirmButtonText: "확인",
   confirmButtonColor: "#03C777",
+  customClass: {
+    popup: "custom-swal-popup",
+  }
 };
 
 const invalidPasswordFormat = {
@@ -44,6 +61,9 @@ const invalidPasswordFormat = {
   icon: "error",
   confirmButtonText: "확인",
   confirmButtonColor: "#03C777",
+  customClass: {
+    popup: "custom-swal-popup",
+  }
 };
 
 const passwordMismatch = {
@@ -52,6 +72,9 @@ const passwordMismatch = {
   icon: "error",
   confirmButtonText: "확인",
   confirmButtonColor: "#03C777",
+  customClass: {
+    popup: "custom-swal-popup",
+  }
 };
 
 const invalidNicknameFormat = {
@@ -60,6 +83,9 @@ const invalidNicknameFormat = {
   icon: "error",
   confirmButtonText: "확인",
   confirmButtonColor: "#03C777",
+  customClass: {
+    popup: "custom-swal-popup",
+  }
 };
 
 const successToCreateUser = {
@@ -68,6 +94,9 @@ const successToCreateUser = {
   icon: "success",
   confirmButtonText: "확인",
   confirmButtonColor: "#03C777",
+  customClass: {
+    popup: "custom-swal-popup",
+  }
 };
 
 const defaultMessage = {
@@ -76,6 +105,9 @@ const defaultMessage = {
   icon: "error",
   confirmButtonText: "확인",
   confirmButtonColor: "#03C777",
+  customClass: {
+    popup: "custom-swal-popup",
+  }
 };
 
 const handle404Message = (message) => {
@@ -120,6 +152,9 @@ export const errorToCheckIsIdDuplicated = {
   icon: "error",
   confirmButtonText: "확인",
   confirmButtonColor: "#03C777",
+  customClass: {
+    popup: "custom-swal-popup",
+  }
 };
 
 export const errorBeforeConfirm = {
@@ -128,4 +163,7 @@ export const errorBeforeConfirm = {
   icon: "error",
   confirmButtonText: "확인",
   confirmButtonColor: "#03C777",
+  customClass: {
+    popup: "custom-swal-popup",
+  }
 };

@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import authApi from "../api/authApi";
+import authApi from "../api/authApi"; 
 import Swal from "sweetalert2"; // 모달 라이브러리
+import "../styles/daily-report-custom-swal.css";
 
 function SignupPage() {
   // 라우팅 설정
@@ -56,13 +57,13 @@ function SignupPage() {
 
   useEffect(() => {
     // inputNickname 입력시 처리 로직
-    const nicknameRegex = /^[가-힣a-zA-Z0-9]{2,8}$/;
+    const nicknameRegex = /^[가-힣a-zA-Z0-9]{2,15}$/;
     if (nicknameRegex.test(inputNickname)) {
       setNicknameFormatIsOK(true);
       setNicknameAlertMessage("사용 가능한 닉네임입니다.");
     } else {
       setNicknameFormatIsOK(false);
-      setNicknameAlertMessage("* 2자 이상 8자 이하  * 한글, 영문, 숫자 사용 가능");
+      setNicknameAlertMessage("* 2자 이상 15자 이하  * 한글, 영문, 숫자 사용 가능");
     }
   }, [inputNickname]);
 
@@ -121,17 +122,23 @@ function SignupPage() {
       // 성공하면 이어서 진행
       Swal.fire({
         title: "회원가입이 완료되었습니다.",
+        customClass: {
+          popup: 'custom-swal-popup',
+        },
         text: "이어서 로그인을 진행해주세요.",
         icon: "success",
-        confirmButtonColor: "green",
+        confirmButtonColor: "#03C777",
         didClose: () => navigate(-1),
       });
     } catch (error) {
       Swal.fire({
         title: "회원가입에 실패하였습니다. 다시 시도해주세요.",
+        customClass: {
+          popup: 'custom-swal-popup',
+        },
         text: `${error.response.data.message}`,
         icon: "error",
-        confirmButtonColor: "green",
+        confirmButtonColor: "#03C777",
         confirmButtonText: "확인",
       });
     }
@@ -159,8 +166,11 @@ function SignupPage() {
         setIdAlertMessage("이미 존재하는 아이디입니다.");
         Swal.fire({
           title: "이미 존재하는 아이디입니다.",
+          customClass: {
+            popup: 'custom-swal-popup',
+          },
           icon: "error",
-          confirmButtonColor: "green",
+          confirmButtonColor: "#03C777",
           confirmButtonText: "확인",
         });
       } else {
@@ -169,8 +179,11 @@ function SignupPage() {
         setIdAlertMessage("사용 가능한 아이디입니다.");
         Swal.fire({
           title: "사용 가능한 아이디입니다.",
+          customClass: {
+            popup: 'custom-swal-popup',
+          },
           icon: "success",
-          confirmButtonColor: "green",
+          confirmButtonColor: "#03C777",
           confirmButtonText: "확인",
         });
       }
@@ -178,9 +191,12 @@ function SignupPage() {
       // 에러가 발생하면 여기로 진입
       Swal.fire({
         title: "다시 시도해주세요.",
+        customClass: {
+          popup: 'custom-swal-popup',
+        },
         text: `${error.response.data.message}`,
         icon: "error",
-        confirmButtonColor: "green",
+        confirmButtonColor: "#03C777",
         confirmButtonText: "확인",
       });
     }
@@ -206,8 +222,11 @@ function SignupPage() {
         setEmailAlertMessage("이미 존재하는 이메일입니다.");
         Swal.fire({
           title: "이미 존재하는 이메일입니다.",
+          customClass: {
+            popup: 'custom-swal-popup',
+          },
           icon: "error",
-          confirmButtonColor: "green",
+          confirmButtonColor: "#03C777",
           confirmButtonText: "확인",
         });
       } else {
@@ -216,9 +235,12 @@ function SignupPage() {
         setEmailAlertMessage("사용 가능한 이메일입니다. 이메일 인증을 진행해주세요.");
         Swal.fire({
           title: "사용 가능한 이메일입니다.",
+          customClass: {
+            popup: 'custom-swal-popup',
+          },
           text: "이메일 인증을 진행해주세요.",
           icon: "success",
-          confirmButtonColor: "green",
+          confirmButtonColor: "#03C777",
           confirmButtonText: "확인",
         });
       }
@@ -226,9 +248,12 @@ function SignupPage() {
       // 에러가 발생하면 여기로 진입
       Swal.fire({
         title: "다시 시도해주세요.",
+        customClass: {
+          popup: 'custom-swal-popup',
+        },
         text: `${error.response.data.message}`,
         icon: "error",
-        confirmButtonColor: "green",
+        confirmButtonColor: "#03C777",
         confirmButtonText: "확인",
       });
     }
@@ -247,8 +272,11 @@ function SignupPage() {
       setEmailSendingIsOK(true);
       Swal.fire({
         title: "인증 코드가 전송되었습니다.",
+        customClass: {
+          popup: 'custom-swal-popup',
+        },
         icon: "success",
-        confirmButtonColor: "green",
+        confirmButtonColor: "#03C777",
         confirmButtonText: "확인",
       });
     } catch (error) {
@@ -256,9 +284,12 @@ function SignupPage() {
       setEmailSendingIsOK(false);
       Swal.fire({
         title: "다시 시도해주세요.",
+        customClass: {
+          popup: 'custom-swal-popup',
+        },
         text: `${error.response.data.message}`,
         icon: "error",
-        confirmButtonColor: "green",
+        confirmButtonColor: "#03C777",
         confirmButtonText: "확인",
       });
     }
@@ -277,8 +308,11 @@ function SignupPage() {
       setCodeAlertMessage("이메일 인증에 성공하였습니다.");
       Swal.fire({
         title: "이메일 인증에 성공하였습니다.",
+        customClass: {
+          popup: 'custom-swal-popup',
+        },
         icon: "success",
-        confirmButtonColor: "green",
+        confirmButtonColor: "#03C777",
         confirmButtonText: "확인",
       });
     } catch (error) {
@@ -286,9 +320,12 @@ function SignupPage() {
       setCodeAlertMessage(error.response.data.message);
       Swal.fire({
         title: "다시 시도해주세요.",
+        customClass: {
+          popup: 'custom-swal-popup',
+        },
         text: `${error.response.data.message}`,
         icon: "error",
-        confirmButtonColor: "green",
+        confirmButtonColor: "#03C777",
         confirmButtonText: "확인",
       });
     }

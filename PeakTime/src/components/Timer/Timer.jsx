@@ -6,12 +6,17 @@ import presetsApi from "../../api/presetsApi.js";
 import { IoIosArrowDown } from "react-icons/io";
 import { useUserStore } from "../../stores/UserStore.js";
 import { EventSourcePolyfill } from "event-source-polyfill";
+import { useBackgroundStore } from "../../stores/BackgroundStore.jsx";
+import { MdAccessTimeFilled } from "react-icons/md";
+import "../../styles/daily-report-custom-swal.css";
 
 function Timer() {
+  const { bg, bgActions } = useBackgroundStore();
   const [inputTime, setInputTime] = useState(""); // 사용자 입력 시간 (분 단위)
   const [totalTime, setTotalTime] = useState(0); // 타이머 시간 (분 단위)
   const [remainTime, setRemainTime] = useState(null); // 남은 시간 (초 단위)
   const [isRunning, setIsRunning] = useState(false); // 타이머 시작 상태
+  const [isSelf, setIsSelf] = useState(true);
 
   const [startedHikingId, setStartedHikingId] = useState(null); // 시작한 hikingId 정보
   const [presetList, setPresetList] = useState(null); // 프리셋 리스트
@@ -20,9 +25,13 @@ function Timer() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
 
+  // 최소화
+  const [isSmall, setIsSmall] = useState(false);
+
   // sse messages
   const [messages, setMessages] = useState(null);
   const { user } = useUserStore();
+  const localUser = JSON.parse(localStorage.getItem("user")) || null;
 
   //현재 시간
   let [now, setNow] = useState(new Date());
@@ -71,18 +80,24 @@ function Timer() {
     if (isNaN(time) || time <= 29) {
       Swal.fire({
         title: "올바른 시간을 입력하세요.",
+        customClass: {
+          popup: "custom-swal-popup",
+        },
         icon: "error",
         text: "30분 ~ 240분 사이의 시간을 입력해주세요!",
-        confirmButtonColor: "green",
+        confirmButtonColor: "#03c777",
         confirmButtonText: "확인",
       });
       return;
     }
     // 진짜로 시작하기, api요청
     Swal.fire({
-      title: `${formatTime(time * 60)} 길이의 하이킹을 시작하시겠습니까?`,
+      title: `${formatTime(time * 60)} 길이의 하이킹을 \n 시작하시겠습니까?`,
+      customClass: {
+        popup: "custom-swal-popup",
+      },
       showDenyButton: true,
-      confirmButtonColor: "green",
+      confirmButtonColor: "#03c777",
       denyButtonColor: "gray",
       confirmButtonText: "시작하기",
       denyButtonText: "취소",
@@ -116,35 +131,38 @@ function Timer() {
           );
 
           // 상태 업데이트
+          bgActions.setBackground("mountain");
           setStartedHikingId(responseStartHiking.data.data.hikingId);
           setTotalTime(time);
           setRemainTime(time * 60 - 1); // 분 단위로 받은 시간을 초로 변환
           setIsRunning(true);
+          setIsSelf(true);
           stopNow();
 
           let hikingStart;
           // 커스텀 이벤트
-          if(user.isRoot){
-              hikingStart = new CustomEvent("hikingStart", {
+          if (user.isRoot) {
+            hikingStart = new CustomEvent("hikingStart", {
               bubbles: true,
               detail: {
                 startedHikingId: responseStartHiking.data.data.hikingId,
                 selectedPreset: selectedOption,
                 backUrl: hikingsApi.defaults.baseURL,
+                isRoot: user.isRoot ? "root" : "child",
               },
             });
-          }
-          else{
+          } else {
             hikingStart = new CustomEvent("hikingStart", {
               bubbles: true,
               detail: {
                 startedHikingId: responseStartHiking.data.data.hikingId,
                 selectedPreset: presetList[0],
                 backUrl: hikingsApi.defaults.baseURL,
+                isRoot: user.isRoot ? "root" : "child",
               },
             });
           }
-         
+
           const startBtn = document.getElementById("start");
           startBtn.dispatchEvent(hikingStart);
         } catch (err) {
@@ -153,9 +171,12 @@ function Timer() {
           // SweetAlert를 사용하여 오류 메시지 표시
           Swal.fire({
             title: "하이킹을 시작하는 데 실패했습니다.",
+            customClass: {
+              popup: "custom-swal-popup",
+            },
             text: `오류 내용: ${err.response?.data?.message || err.message}`,
             icon: "error",
-            confirmButtonColor: "green",
+            confirmButtonColor: "#03c777",
             confirmButtonText: "확인",
           });
         }
@@ -260,9 +281,11 @@ function Timer() {
             );
 
             // 상태 업데이트
+            bgActions.setBackground("mountain");
             setStartedHikingId(responseStartHiking.data.data.hikingId);
             setTotalTime(messages.attentionTime);
             setRemainTime(messages.attentionTime * 60 - 1); // 분 단위로 받은 시간을 초로 변환
+            setIsSelf(false);
             setIsRunning(true);
             stopNow();
 
@@ -273,6 +296,7 @@ function Timer() {
                 startedHikingId: responseStartHiking.data.data.hikingId,
                 selectedPreset: messages,
                 backUrl: hikingsApi.defaults.baseURL,
+                isRoot: user.isRoot ? "root" : "child",
               },
             });
             const startBtn = document.getElementById("start");
@@ -283,9 +307,12 @@ function Timer() {
             // SweetAlert를 사용하여 오류 메시지 표시
             Swal.fire({
               title: "하이킹을 시작하는 데 실패했습니다.",
+              customClass: {
+                popup: "custom-swal-popup",
+              },
               text: `오류 내용: ${err.response?.data?.message || err.message}`,
               icon: "error",
-              confirmButtonColor: "green",
+              confirmButtonColor: "#03c777",
               confirmButtonText: "확인",
             });
           }
@@ -351,7 +378,13 @@ function Timer() {
         url: data.url,
       };
       const response = await presetsApi.post(`${data.presetId}`, requestData);
-      console.log("addUrlPostApi: ", response.data);
+      // 커스텀 이벤트 발생시키기
+      const sendUrlList = new CustomEvent("sendUrlList", {
+        bubbles: true,
+        detail: { urlList: response.data.data.blockWebsiteArray },
+      });
+      const clockDiv = document.getElementById("clock");
+      clockDiv.dispatchEvent(sendUrlList);
     } catch (error) {
       console.error("Error addurl:", error);
       throw error;
@@ -380,13 +413,17 @@ function Timer() {
   // 포기 버튼 누르기
   const handleGiveup = () => {
     Swal.fire({
-      title: `진행중인 하이킹을 포기하시겠습니까?`,
+      title: `진행중인 하이킹을 \n 포기하시겠습니까?`,
+      customClass: {
+        popup: "custom-swal-popup",
+      },
       showDenyButton: true,
       confirmButtonColor: "#f40000",
       denyButtonColor: "#c5c5c5",
       confirmButtonText: "포기하기",
       denyButtonText: "취소",
       preConfirm: async () => {
+        bgActions.setBackground("loft");
         try {
           console.log("취소 로직 작동");
 
@@ -408,9 +445,12 @@ function Timer() {
           // SweetAlert를 사용하여 오류 메시지 표시
           Swal.fire({
             title: "하이킹을 종료하는 데 실패했습니다.",
+            customClass: {
+              popup: "custom-swal-popup",
+            },
             text: `오류 내용: ${err.response?.data?.message || err.message}`,
             icon: "error",
-            confirmButtonColor: "green",
+            confirmButtonColor: "#03c777",
             confirmButtonText: "확인",
           });
         }
@@ -421,6 +461,19 @@ function Timer() {
   const allDone = (data) => {
     console.log("allDone", data);
   };
+
+  // 최소화버튼 클릭
+  const handleSmall = () => {
+    const timerDiv = document.getElementById("timer");
+    if (isSmall) {
+      timerDiv.classList.remove("hidden");
+      setIsSmall(false);
+    } else {
+      timerDiv.classList.add("hidden");
+      setIsSmall(true);
+    }
+  };
+
   return (
     <>
       <style>
@@ -429,7 +482,7 @@ function Timer() {
           .timer {
             background: ${
               isRunning
-                ? "-webkit-linear-gradient(left, #eee 50%, red 50%)"
+                ? "-webkit-linear-gradient(left, #eee 50%, #f40000 50%)"
                 : "#eee"
             };
             border-radius: 100%;
@@ -498,11 +551,11 @@ function Timer() {
           }
           @-webkit-keyframes mask {
             0% {
-                background: red;
+                background: #f40000;
                 -webkit-transform: rotate(0deg);
             }
             50% {
-                background: red;
+                background: #f40000;
                 -webkit-transform: rotate(-180deg);
             }
             50.01% {
@@ -516,12 +569,39 @@ function Timer() {
           }
         `}
       </style>
-      <div className="absolute w-[28%] h-[96%] right-0 bg-[#333333] bg-opacity-60 flex flex-col items-center rounded-lg my-[2vh] mx-[2vw]">
+      <div className="absolute flex justify-end right-[3vw] top-[1vh] my-[2vh] z-[11]">
+        {isSmall && (
+          <div
+            className={`me-4 text-5xl font-bold text-${
+              isRunning ? "[#f40000]" : "white"
+            }`}
+          >
+            {isRunning
+              ? formatTime(remainTime)
+              : `${("00" + now.getHours().toString()).slice(-2)}:${(
+                  "00" + now.getMinutes().toString()
+                ).slice(-2)}`}
+          </div>
+        )}
+        <button
+          onClick={handleSmall}
+          className="rounded-full bg-[#66aadf] w-[5vh] h-[5vh] flex justify-center items-center text-2xl text-white shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
+        >
+          <MdAccessTimeFilled />
+        </button>
+      </div>
+      <div
+        id="timer"
+        className="absolute z-10 w-[28%] h-[96%] right-0 bg-[#333333] bg-opacity-90 flex flex-col items-center rounded-lg my-[2vh] mx-[2vw]"
+      >
         <div className="w-[40vh] h-[40vh] relative top-[15%]">
           <div className="timer overflow-hidden">
             <div className="mask"></div>
           </div>
-          <div className="absolute top-[70%] left-[50%] translate-x-[-50%] remain text-3xl">
+          <div
+            id="clock"
+            className="absolute top-[70%] left-[50%] translate-x-[-50%] remain text-3xl"
+          >
             {isRunning
               ? formatTime(remainTime)
               : `${("00" + now.getHours().toString()).slice(-2)}:${(
@@ -549,52 +629,54 @@ function Timer() {
                 *분 단위로 입력해주세요.<br></br>최소 30분부터 240분까지
                 가능합니다.
               </label>
-              {user.isRoot && (
-                <div
-                  tabIndex={0}
-                  className={`mt-5 relative w-[60%] h-[60%] rounded-lg bg-white border border-gray-300 px-3 py-2 cursor-pointer ${
-                    isOpen ? "focus:ring-4 focus:ring-[#66aadf]" : ""
-                  }`}
-                >
+              {user && user.isRoot && (
+                <>
                   <div
-                    onClick={() => setIsOpen(!isOpen)}
-                    className="flex justify-between items-center"
+                    tabIndex={0}
+                    className={`mt-5 relative w-[60%] h-[60%] rounded-lg bg-white border border-gray-300 px-3 py-2 cursor-pointer ${
+                      isOpen ? "focus:ring-4 focus:ring-[#66aadf]" : ""
+                    }`}
                   >
-                    <p>
-                      {selectedOption
-                        ? selectedOption.title
-                        : "프리셋을 선택하세요."}
-                    </p>
-                    <IoIosArrowDown />
-                  </div>
-                  {isOpen && (
-                    <ul
-                      className="absolute left-0 right-0 mt-3 bg-white border
-                  border-gray-300 rounded-lg shadow-lg"
+                    <div
+                      onClick={() => setIsOpen(!isOpen)}
+                      className="flex justify-between items-center"
                     >
-                      {presetList.map((preset, index) => (
-                        <div key={preset.presetId}>
-                          <li
-                            onClick={() => {
-                              setSelectedOption(preset);
-                              setIsOpen(false);
-                            }}
-                            className="px-3 py-2 hover:bg-[#66aadf] cursor-pointer rounded-lg hover:font-bold"
-                          >
-                            {preset.title}
-                          </li>
-                          {index < presetList.length - 1 && (
-                            <hr className="border-gray-200" />
-                          )}
-                        </div>
-                      ))}
-                    </ul>
-                  )}
-                </div>
+                      <p>
+                        {selectedOption
+                          ? selectedOption.title
+                          : "프리셋을 선택하세요."}
+                      </p>
+                      <IoIosArrowDown />
+                    </div>
+                    {isOpen && (
+                      <ul
+                        className="absolute left-0 right-0 mt-3 bg-white border
+                      border-gray-300 rounded-lg shadow-lg"
+                      >
+                        {presetList.map((preset, index) => (
+                          <div key={preset.presetId}>
+                            <li
+                              onClick={() => {
+                                setSelectedOption(preset);
+                                setIsOpen(false);
+                              }}
+                              className="px-3 py-2 hover:bg-[#66aadf] cursor-pointer rounded-lg hover:font-bold"
+                            >
+                              {preset.title}
+                            </li>
+                            {index < presetList.length - 1 && (
+                              <hr className="border-gray-200" />
+                            )}
+                          </div>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                  <label htmlFor="" className="text-sm text-white">
+                    *적용할 프리셋을 선택해주세요.
+                  </label>
+                </>
               )}
-              <label htmlFor="" className="text-sm text-white">
-                *적용할 프리셋을 선택해주세요.
-              </label>
               <button
                 className="w-[10vw] h-[6vh] mt-[10%] rounded-xl text-white bg-[#03c777]"
                 onClick={handleStart}
@@ -604,7 +686,7 @@ function Timer() {
               </button>
             </div>
           )}
-          {isRunning && (
+          {isRunning && isSelf && (
             <div className="flex flex-col mt-[15%] items-center">
               <button
                 className="w-[10vw] h-[6vh] mt-[10%] rounded-xl text-white bg-[#f40000]"
