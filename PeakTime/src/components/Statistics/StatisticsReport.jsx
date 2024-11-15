@@ -31,23 +31,28 @@ const StatisticsReport = () => {
         100 *
         (showStatistics.totalSuccessCount / showStatistics.totalHikingCount)
       ).toFixed(1)
-    : 0;
+    : "0.0";
   const avgHikingTime = showStatistics.totalHikingCount
     ? (
         showStatistics.totalHikingTime / showStatistics.totalHikingCount
       ).toFixed(1)
-    : 0;
+    : "0.0";
   const avgBlockedByHiking = showStatistics.totalHikingCount
     ? (
         showStatistics.totalBlockedCount / showStatistics.totalHikingCount
       ).toFixed(1)
-    : 0;
+    : "0.0";
   const avgBlockedByHour = showStatistics.totalHikingTime
     ? (
         showStatistics.totalBlockedCount /
         (showStatistics.totalHikingTime / 60)
       ).toFixed(1)
-    : 0;
+    : "0.0";
+  const avgBlockedBySuccess = showStatistics.totalSuccessCount
+    ? (
+        showStatistics.totalBlockedCount / showStatistics.totalSuccessCount
+      ).toFixed(1)
+    : "0.0";
 
   return (
     <div className="flex w-[100%] h-[100%]">
@@ -64,74 +69,75 @@ const StatisticsReport = () => {
             unit={"회"}
           />
           <DataFormat
-            title={"성공 횟수 / 성공률"}
+            title={"성공 횟수"}
             data={showStatistics.totalSuccessCount}
             unit={"회"}
-            data2={rateToSuccess}
-            unit2={"%"}
           />
           <DataFormat
-            title={"하이킹 평균 시간"}
+            title={"성공률"}
+            data={rateToSuccess}
+            unit={"%"}
+          />
+          <DataFormat
+            title={"하이킹 회당 평균 시간"}
             data={avgHikingTime}
             unit={"분"}
           />
           <DataFormat
-            title={"하이킹 평균 넘어짐"}
+            title={"단위 시간당 넘어짐"}
+            data={avgBlockedByHour}
+            unit={"회 / 1시간"}
+          />
+          <DataFormat
+            title={"1회당 평균 넘어짐"}
             data={avgBlockedByHiking}
             unit={"회"}
           />
           <DataFormat
-            title={"단위 시간당 넘어짐"}
-            data={avgBlockedByHour}
+            title={"성공 1회당 평균 넘어짐"}
+            data={avgBlockedBySuccess}
             unit={"회"}
-          />
-          <DataFormat
-            title={"가장 많이 접속한 사이트"}
-            data={
-              showStatistics.mostSiteList.length > 0
-                ? showStatistics.mostSiteList[0].name
-                : "-"
-            }
-            unit={""}
-          />
-          <DataFormat
-            title={"가장 많이 사용한 프로그램"}
-            data={
-              showStatistics.mostProgramList.length > 0
-                ? showStatistics.mostProgramList[0].name
-                : "-"
-            }
-            unit={""}
           />
         </div>
       </div>
 
       {/* 차트 */}
-      <div className="flex w-[60%]">
-        <div className="w-[48%] flex flex-col justify-center items-center">
-          <div className="font-bold text-[30px] mb-[3vh]">시작 시간 분석</div>
-          <CircleChart startTimeList={showStatistics.startTimeList} />
-          <div className="text-gray-400 text-[18px] px-3">
-            *통계는 성공한 하이킹에 대해서만 반영됩니다.
+      <div className="flex flex-col items-center w-[60%] h-full">
+        <div className="w-full h-[50%] flex flex-col justify-between items-center">
+          <div className="flex w-full grid grid-cols-3 items-center">
+            <div />
+            <div className="font-bold text-[30px]">시작 시간 분포 차트</div>
+            <div className="text-gray-400 text-[18px]">
+              *차트는 성공한 하이킹 결과만 반영됩니다.
+            </div>
+          </div>
+
+          <div className="flex justify-center items-center w-full h-full">
+            <CircleChart startTimeList={showStatistics.startTimeList} />
           </div>
         </div>
-        <div className="flex flex-col w-[52%] justify-around items-center pl-4 border-l">
-          <div className="font-bold text-[30px] text-left">접속 통계 차트</div>
-          <div className="flex flex-col items-center w-full">
-            <div className="font-bold text-[30px]">사이트</div>
-            <HorizontalBarChart
-              listArray={showStatistics.mostSiteList}
-              ylabel={"사이트"}
-            />
-          </div>
-          <div className="flex flex-col items-center w-full">
-            <div className="font-bold text-[30px]">프로그램</div>
 
-            <HorizontalBarChart
-              listArray={showStatistics.mostProgramList}
-              ylabel={"프로그램"}
-            />
+        <div className="flex flex-col w-full h-[50%] items-center border-t pt-3">
+          <div className="font-bold text-[30px]">접속 시간 통계 차트</div>
+
+          <div className="flex w-full px-5">
+            <div className="flex flex-col items-center w-[50%]">
+              <div className="font-bold text-[30px]">사이트</div>
+              <HorizontalBarChart
+                listArray={showStatistics.mostSiteList}
+                ylabel={"사이트"}
+              />
+            </div>
+            <div className="flex flex-col items-center w-[50%]">
+              <div className="font-bold text-[30px]">프로그램</div>
+
+              <HorizontalBarChart
+                listArray={showStatistics.mostProgramList}
+                ylabel={"프로그램"}
+              />
+            </div>
           </div>
+
         </div>
       </div>
     </div>

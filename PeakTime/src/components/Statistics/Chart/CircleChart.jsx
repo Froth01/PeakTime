@@ -4,203 +4,207 @@ import { useEffect, useRef } from "react";
 
 const CircleChart = ({ startTimeList }) => {
   const svgRef = useRef(null);
+  const containerRef = useRef(null);
 
-  const timeInterval = 1;
-  const numberOfTimeUnit = 60 / timeInterval;
-  const val = 5; // 기준 값
+  const timeInterval = 1; // 분 단위
+  const numberOfTimeUnit = 60 / timeInterval; // 한 시간당 단위 수
+  const val = 5; // 기준값
 
   useEffect(() => {
-    const width = 400;
-    const height = 450; // 범례 공간 포함한 높이 설정
-    const radius = 150;
-    const totalMinutes = 12 * 60;
+    const container = containerRef.current;
+    const { width: containerWidth, height: containerHeight } = container.getBoundingClientRect();
 
-    // 각 시간대의 사용 횟수를 카운트
-    const usageCount = Array(24 * numberOfTimeUnit).fill(0);
+    const vw = containerWidth;
+    const vh = containerHeight;
+
+    const amUsageCount = Array(12 * numberOfTimeUnit).fill(0);
+    const pmUsageCount = Array(12 * numberOfTimeUnit).fill(0);
+
+    // 데이터 가공
     startTimeList.forEach((time) => {
       const [hour, minute] = time.split(":");
       const timeToMinutes = Number(hour) * 60 + Number(minute);
-      const index = Math.floor(timeToMinutes / timeInterval);
-      usageCount[index] += 1; // 해당 시간대 사용 횟수 증가
-    });
+      const isAm = Number(hour) < 12;
 
-    const maxCount = Math.max(...usageCount); // count의 최대값을 계산
-
-    const svg = d3
-      .select(svgRef.current)
-      .attr("width", width)
-      .attr("height", height)
-      .append("g")
-      .attr("transform", `translate(${width / 2}, ${height / 2 - 25})`); // 차트 중앙으로 이동
-
-    // 툴팁 div 생성
-    const tooltip = d3
-      .select("body")
-      .append("div")
-      .style("position", "absolute")
-      .style("background", "#000000")
-      .style("color", "#FFFFFF")
-      .style("padding", "5px")
-      .style("border-radius", "5px")
-      .style("pointer-events", "none")
-      .style("visibility", "hidden")
-      .style("font-size", "20px")
-      .style("top", "0px")
-      .style("left", "0px");
-
-    // 항상 5개의 grid가 나타나도록 설정
-    const numGrids = 5;
-    for (let i = 1; i <= numGrids; i++) {
-      const gridRadius = (radius / numGrids) * i;
-      svg
-        .append("circle")
-        .attr("r", gridRadius)
-        .attr("fill", "none")
-        .attr("stroke", "#e0e0e0")
-        .attr("stroke-dasharray", "1,5");
-    }
-
-    // 눈금
-    const angleStep = (2 * Math.PI) / 12;
-    for (let i = 0; i < 12; i++) {
-      const angle = i * angleStep - Math.PI / 2;
-      const x = Math.cos(angle) * (radius + 25);
-      const y = Math.sin(angle) * (radius + 25);
-
-      svg
-        .append("text")
-        .attr("x", x)
-        .attr("y", y)
-        .attr("text-anchor", "middle")
-        .attr("alignment-baseline", "middle")
-        .attr("fill", "#FFFFFF")
-        .style("font-size", "30px")
-        .text(i === 0 ? 12 : i); // 12시 방향 표시
-    }
-
-    // 방사형 1시간 단위 선 표시
-    for (let i = 0; i < 12; i++) {
-      const angle = i * angleStep - Math.PI / 2;
-      const x = Math.cos(angle) * radius;
-      const y = Math.sin(angle) * radius;
-
-      svg
-        .append("line")
-        .attr("x1", 0)
-        .attr("y1", 0)
-        .attr("x2", x)
-        .attr("y2", y)
-        .attr("stroke", "#FFFFFF")
-        .attr("stroke-width", 1)
-        .attr("stroke-dasharray", "1,5");
-    }
-
-    // AM/PM 시간대 각도 계산 함수
-    const calculateAngle = (minutes) => {
-      const min = minutes % totalMinutes; // AM과 PM을 12시간 기준으로 맞춤
-      return (min / totalMinutes) * 2 * Math.PI - Math.PI / 2;
-    };
-
-    // AM 및 PM 시간대 tic 표시
-    usageCount.forEach((count, idx) => {
-      if (count > 0) {
-        const timeMinutes = idx * timeInterval;
-        const angle = calculateAngle(timeMinutes);
-
-        // innerRadius 계산: val을 기준으로 조건에 따라 조절
-        const outerRadius = radius;
-        const innerRadius =
-          maxCount <= val
-            ? radius - (radius * count) / val
-            : radius - (radius * count) / maxCount;
-
-        const x1 = Math.cos(angle) * outerRadius;
-        const y1 = Math.sin(angle) * outerRadius;
-        const x2 = Math.cos(angle) * innerRadius;
-        const y2 = Math.sin(angle) * innerRadius;
-
-        // 초기 위치를 바깥쪽으로 설정 후 중심으로 이동하는 애니메이션 적용
-        svg
-          .append("line")
-          .attr("x1", x1)
-          .attr("y1", y1)
-          .attr("x2", x1) // 초기 x2 위치는 바깥쪽
-          .attr("y2", y1) // 초기 y2 위치는 바깥쪽
-          .attr("stroke", timeMinutes < totalMinutes ? "#FF4500" : "#3476D0") // AM과 PM 색상 구분
-          .attr("stroke-width", 2)
-          .attr("opacity", 0.8)
-          .on("mouseover", function (event) {
-            tooltip
-              .style("visibility", "visible")
-              .text(
-                `${timeMinutes < totalMinutes ? "AM" : "PM"} ${String(
-                  Math.floor((timeMinutes % totalMinutes) / 60)
-                ).padStart(2, "0")}:${String(timeMinutes % 60).padStart(
-                  2,
-                  "0"
-                )}, 사용 횟수: ${count}`
-              );
-          })
-          .on("mousemove", function (event) {
-            tooltip
-              .style("top", `${event.pageY - 10}px`)
-              .style("left", `${event.pageX + 10}px`);
-          })
-          .on("mouseout", function () {
-            tooltip.style("visibility", "hidden");
-          })
-          .transition()
-          .duration(1000) // 애니메이션 지속 시간
-          .attr("x2", x2) // 최종 위치를 중심 쪽으로 이동
-          .attr("y2", y2);
+      const idx = Math.floor((timeToMinutes % (12 * 60)) / timeInterval);
+      if (isAm) {
+        amUsageCount[idx] += 1;
+      } else {
+        pmUsageCount[idx] += 1;
       }
     });
 
-    // 범례 추가
-    const legend = d3
-      .select(svgRef.current)
-      .append("g")
-      .attr("transform", `translate(${width / 2}, ${height - 40})`); // 범례 위치 조정
+    const maxCount = Math.max(...amUsageCount, ...pmUsageCount); // 최대값 계산
 
-    legend
-      .append("rect")
-      .attr("x", 0)
-      .attr("y", -2)
-      .attr("width", 20)
-      .attr("height", 12)
-      .attr("fill", "#FF4500");
+    const svg = d3.select(svgRef.current).attr("width", vw).attr("height", vh);
 
-    legend
-      .append("text")
-      .attr("x", 30)
-      .attr("y", 10)
-      .text("오전")
-      .style("font-size", "20px")
-      .attr("fill", "#FFFFFF");
+    const centerX = vw / 2;
+    const centerY = vh / 2;
+    const radius = Math.min(centerX, centerY) * 0.7;
 
-    legend
-      .append("rect")
-      .attr("x", 80)
-      .attr("y", -2)
-      .attr("width", 20)
-      .attr("height", 12)
-      .attr("fill", "#3476D0");
+    const drawChart = (usageCount, offsetX, label) => {
+      const group = svg
+        .append("g")
+        .attr("transform", `translate(${offsetX + centerX}, ${centerY})`);
 
-    legend
-      .append("text")
-      .attr("x", 110)
-      .attr("y", 10)
-      .text("오후")
-      .style("font-size", "20px")
-      .attr("fill", "#FFFFFF");
+      // 방사형 grid 추가
+      const numGrids = 5;
+      for (let i = 1; i <= numGrids; i++) {
+        const gridRadius = (radius / numGrids) * i;
+        group
+          .append("circle")
+          .attr("r", gridRadius)
+          .attr("fill", "none")
+          .attr("stroke", "#C5C5C5")
+          .attr("stroke-dasharray", "2,2");
+      }
+
+      // 12시간 눈금 추가
+      const angleStep = (2 * Math.PI) / 12;
+      for (let i = 0; i < 12; i++) {
+        const angle = i * angleStep - Math.PI / 2;
+        const x = Math.cos(angle);
+        const y = Math.sin(angle);
+
+        group
+          .append("text")
+          .attr("x", x * (radius + 20))
+          .attr("y", y * (radius + 20))
+          .attr("text-anchor", "middle")
+          .attr("alignment-baseline", "middle")
+          .attr("fill", "#FFFFFF")
+          .style("font-size", "1.25rem")
+          .text(i === 0 ? 12 : i); // 12시 방향 표시
+
+        group
+          .append("line")
+          .attr("x1", 0)
+          .attr("y1", 0)
+          .attr("x2", x * radius)
+          .attr("y2", y * radius)
+          .attr("stroke", "#C5C5C5")
+          .attr("stroke-width", 1)
+          .attr("stroke-dasharray", "2.2");
+      }
+
+      // 툴팁 생성
+      const tooltip = d3
+        .select("body")
+        .append("div")
+        .style("position", "absolute")
+        .style("background", "#000000")
+        .style("color", "#FFFFFF")
+        .style("padding", "5px")
+        .style("border-radius", "5px")
+        .style("pointer-events", "none")
+        .style("visibility", "hidden")
+        .style("font-size", "15px")
+        .style("top", "0px")
+        .style("left", "0px");
+
+      // 데이터 tic 추가
+      usageCount.forEach((count, idx) => {
+        if (count > 0) {
+          const angle = (idx / numberOfTimeUnit) * ((2 * Math.PI) / 12) - Math.PI / 2;
+          const outerRadius = radius;
+          const innerRadius =
+            maxCount <= val
+              ? radius - (radius * count) / val
+              : radius - (radius * count) / maxCount;
+
+          const x1 = Math.cos(angle) * outerRadius;
+          const y1 = Math.sin(angle) * outerRadius;
+          const x2 = Math.cos(angle) * innerRadius;
+          const y2 = Math.sin(angle) * innerRadius;
+
+          group
+            .append("line")
+            .attr("x1", x1)
+            .attr("y1", y1)
+            .attr("x2", x1)
+            .attr("y2", y1)
+            .attr("stroke", label === "AM" ? "#FF4500" : "#3476D0")
+            .attr("stroke-width", 2)
+            .on("mouseover", function (event) {
+              tooltip
+                .style("visibility", "visible")
+                .text(
+                  `${label} ${String(Math.floor(idx / numberOfTimeUnit)).padStart(2, "0")}:${String(
+                    (idx % numberOfTimeUnit) * timeInterval
+                  ).padStart(2, "0")}, 사용 횟수: ${count}`
+                );
+            })
+            .on("mousemove", function (event) {
+              tooltip
+                .style("top", `${event.pageY - 10}px`)
+                .style("left", `${event.pageX + 10}px`);
+            })
+            .on("mouseout", function () {
+              tooltip.style("visibility", "hidden");
+            })            
+            .transition()
+            .duration(1000)
+            .attr("x2", x2)
+            .attr("y2", y2);
+        }
+      });
+
+      // 범례 추가
+      const legend = d3
+        .select(svgRef.current)
+        .append("g")
+        .attr("transform", `translate(${centerX}, ${centerY})`); // 그래프 중앙에 배치
+
+      legend
+        .append("rect")
+        .attr("x", -60) // 중앙 기준으로 왼쪽으로 이동
+        .attr("y", radius + 10) // 그래프 아래쪽에 배치
+        .attr("width", 20)
+        .attr("height", 12)
+        .attr("fill", "#FF4500");
+
+      legend
+        .append("text")
+        .attr("x", -30) // 중앙 기준으로 약간 오른쪽으로 이동
+        .attr("y", radius + 22) // 그래프 아래쪽에 배치
+        .text("오전")
+        .style("font-size", "18px")
+        .attr("fill", "#FFFFFF");
+
+      legend
+        .append("rect")
+        .attr("x", 20) // 중앙 기준으로 오른쪽으로 이동
+        .attr("y", radius + 10) // 그래프 아래쪽에 배치
+        .attr("width", 20)
+        .attr("height", 12)
+        .attr("fill", "#3476D0");
+
+      legend
+        .append("text")
+        .attr("x", 50) // 중앙 기준으로 약간 오른쪽으로 이동
+        .attr("y", radius + 22) // 그래프 아래쪽에 배치
+        .text("오후")
+        .style("font-size", "18px")
+        .attr("fill", "#FFFFFF");
+
+      return tooltip;
+    };
+
+    const amTooltip = drawChart(amUsageCount, -radius - 0.075 * vw, "AM"); // AM 데이터
+    const pmTooltip = drawChart(pmUsageCount, radius + 0.075 * vw, "PM");  // PM 데이터
 
     return () => {
       d3.select(svgRef.current).selectAll("*").remove();
-      tooltip.remove();
+      amTooltip.remove();
+      pmTooltip.remove();
     };
   }, [startTimeList]);
 
-  return <svg ref={svgRef} className="text-base font-bold" />;
+  return (
+    <div ref={containerRef} className="w-full h-full overflow-visible">
+      <svg ref={svgRef} />
+    </div>
+  );
 };
 
 CircleChart.propTypes = {
