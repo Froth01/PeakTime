@@ -8,6 +8,9 @@ import { AiFillHome, AiFillSetting } from "react-icons/ai";
 import { Dropdown, Tooltip } from "flowbite-react";
 import { useState } from "react";
 import { useUserStore } from "../../stores/UserStore";
+import Swal from "sweetalert2"; // 모달 라이브러리
+import "../../styles/daily-report-custom-swal.css";
+import usersApi from "../../api/usersApi";
 
 function Toolbar() {
   const navigate = useNavigate();
@@ -17,6 +20,50 @@ function Toolbar() {
   const [isHomeHovered, setIsHomeHovered] = useState(false);
   const [isSettingHovered, setIsSettingHovered] = useState(false);
   const [activeSetting, setActiveSetting] = useState(false);
+
+  // 회원정보 관리 페이지 접근 권한 검사 모달창 띄우기
+  const checkAccessModal = async () => {
+    const { value: getPassword } = await Swal.fire({
+      title: '비밀번호를 입력해주세요.',
+      customClass: {
+        popup: 'custom-swal-popup',
+      },
+      input: 'password',
+      inputAttributes: {
+        style: 'color: black;', // input 텍스트 색상
+      },
+    });
+
+    // 이후 처리되는 내용
+    if (getPassword) {
+      checkAccess(getPassword);
+    }
+  }
+
+  // 회원정보 관리 페이지 접근 권한 검사 API 호출
+  const checkAccess = async (getPassword) => {
+    const checkAccessData = {
+      password: getPassword,
+    };
+    try {
+      await usersApi.post("/settings", checkAccessData);
+      // 성공하면 이어서 진행
+      handleMenu("/usersetting");
+    } catch (error) {
+      // 실패하면 여기로 진입
+      console.error(error);
+      Swal.fire({
+        title: "다시 시도해주세요.",
+        customClass: {
+          popup: 'custom-swal-popup',
+        },
+        text: '비밀번호가 일치하지 않습니다.',
+        icon: "error",
+        confirmButtonColor: "#03C777",
+        confirmButtonText: "확인",
+      });
+    }
+  }
 
   //이동 함수
   const handleMenu = (type) => {
@@ -131,7 +178,7 @@ function Toolbar() {
           content={
             <div className="flex flex-col">
               <button
-                onClick={() => handleMenu("/usersetting")}
+                onClick={checkAccessModal}
                 className="text-left"
               >
                 유저정보수정
@@ -146,9 +193,7 @@ function Toolbar() {
           className="whitespace-nowrap font-bold"
         >
           <button
-            onClick={() => {
-              handleMenu("/usersetting");
-            }}
+            onClick={checkAccessModal}
             className="text-white text-5xl"
           >
             <AiFillSetting
