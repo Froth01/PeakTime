@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, dialog, session } from "electron";
+import { app, BrowserWindow, ipcMain, session } from "electron";
 import path from "path";
 import url from "url";
 import WebSocket, { WebSocketServer } from "ws";
@@ -17,6 +17,7 @@ dotenv.config();
 const store = new Store();
 
 const __dirname = path.resolve();
+
 
 function createWindow() {
   // 일렉트론 크기
@@ -56,6 +57,17 @@ function createWindow() {
    * */
   win.loadURL(startUrl);
 }
+
+// 일렉트론 종료
+app.on('before-quit', (event) => {
+  // 소켓 종료
+
+  wss.close();
+  endWatcher();
+
+  event.preventDefault();
+  app.exit(0);
+});
 
 let wss;
 
