@@ -14,13 +14,18 @@ import { IoIosArrowDown } from "react-icons/io";
 function AddChild() {
   const { groupList, setGroupList, setContent } = useGroupStore();
   const [groupId, setGroupId] = useState("");
+  // 서브 계정 아이디 관련
   const [childLoginId, setChildLoginId] = useState("");
+  const [idFormatIsOK, setIdFormatIsOK] = useState(false);
+  const [isDuplicate, setIsDuplicate] = useState(false); // false, "duplicated", "checked, "needToCheck"
+  // 비밀번호 관련
   const [childPassword, setChildPassword] = useState("");
   const [childConfirmPassword, setChildConfirmPassword] = useState("");
+  const [childPasswordFormatIsOk, setChildPasswordFormatIsOk] = useState(false);
+  // 닉네임 관련
   const [childNickname, setChildNickname] = useState("");
-
+  
   const [passwordCheck, setPasswordCheck] = useState(true);
-  const [isDuplicate, setIsDuplicate] = useState(false); // false, "duplicated", "checked, "needToCheck"
 
   // 드롭다운 관련
   const [isOpen, setIsOpen] = useState(false);
@@ -38,6 +43,12 @@ function AddChild() {
   };
 
   const duplicatedMessage = () => {
+    if(!idFormatIsOK) return (
+      <div className="text-[#f40000] absolute top-[65%]">
+      * 5자 이상 15자 이하  * 영문, 숫자 사용 가능
+    </div>
+    )
+
     switch (isDuplicate) {
       case "duplicated":
         return (
@@ -61,6 +72,17 @@ function AddChild() {
         return;
     }
   };
+
+  // 아이디 형식 확인
+  useEffect(() => {
+    const idRegex = /^[a-zA-Z0-9]{5,15}$/;
+    if(idRegex.test(childLoginId)){
+      setIdFormatIsOK(true);
+    } else{
+      setIdFormatIsOK(false);
+    }
+    setIsDuplicate("needToCheck");
+  }, [childLoginId])
 
   // 아이디 중복 확인
   const handleCheckId = () => {
@@ -117,16 +139,73 @@ function AddChild() {
       });
   };
 
+  // 비밀번호 형식 확인
   useEffect(() => {
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-\[\]{};':"\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_+\-\[\]{};':"\\|,.<>\/?]{8,}$/;
+    if (passwordRegex.test(childPassword)) {
+      setChildPasswordFormatIsOk(true);
+    } else {
+      setChildPasswordFormatIsOk(false);
+    }
+
+    if(!childPasswordFormatIsOk) return;
     setPasswordCheck(childPassword === childConfirmPassword);
-  }, [childPassword, childConfirmPassword]);
+  }, [childPassword, childConfirmPassword, childPasswordFormatIsOk]);
+
+  // 비밀번호 확인 후 메시지
+  const passwordMessage = () => {
+    if (!childPasswordFormatIsOk) {
+      return (
+        <div className="text-[#f40000] absolute top-[105%]">
+          * 최소 8자 이상  * 영문 대문자, 영문 소문자, 숫자, 특수문자를 모두 포함
+        </div>
+      );
+    }
+  
+    if (childPasswordFormatIsOk && passwordCheck) {
+      return (
+        <div className="text-[#03C777] absolute top-[105%]">
+          사용 가능한 비밀번호입니다.
+        </div>
+      );
+    }
+  
+    if (childPasswordFormatIsOk && !passwordCheck) {
+      return (
+        <div className="text-[#f40000] absolute top-[105%]">
+          입력한 비밀번호가 일치하지 않습니다.
+        </div>
+      );
+    }
+  
+    return null;
+  };
+
+  // 닉네임 확인 후 메시지
+  const nicknameMessage = () => {
+    const nicknameRegex = /^[가-힣a-zA-Z0-9]{2,15}$/;
+    
+    if(nicknameRegex.test(childNickname)){
+      return (
+        <div className="text-[#03C777] absolute top-[105%]">
+          사용 가능한 닉네임입니다.
+        </div>
+      );
+    }
+  
+    return (
+      <div className="text-[#f40000] absolute top-[105%]">
+        * 2자 이상 15자 이하  * 한글, 영문, 숫자 사용 가능
+      </div>
+    );
+  };
 
   return (
     <div className="absolute left-[43vw] w-[54vw] h-[84vh] my-[3vh] bg-[#333333] bg-opacity-70 rounded-lg p-5 flex flex-col items-center justify-between">
       <h2 className="text-white text-[30px] font-bold">계정 생성</h2>
       <div className="flex justify-between w-[70%]">
         <div className="flex justify-around gap-3 text-start w-full">
-          <div className="flex flex-col gap-3 w-[40%]">
+          <div className="flex flex-col gap-3 w-[40%] relative">
             <label htmlFor="childNickname" className="text-white font-bold">
               닉네임
             </label>
@@ -138,6 +217,7 @@ function AddChild() {
               onChange={(e) => setChildNickname(e.target.value)}
               className="h-[60%] rounded-lg focus:ring-4 focus:ring-[#66aadf] focus:outline-none ps-3"
             />
+            {nicknameMessage()}
           </div>
           <div className="flex flex-col gap-3 w-[40%]">
             <label htmlFor="groupId" className="text-white font-bold">
@@ -210,7 +290,8 @@ function AddChild() {
             {isDuplicate !== "checked" && (
               <button
                 onClick={() => handleCheckId()}
-                className="absolute font-bold text-white top-[90%] bg-[#4d90d8] rounded-xl px-5 py-2 hover:bg-[#3476d0] focus:ring-4 focus:ring-[#4d90d8]"
+                className="absolute font-bold text-white top-[105%] bg-[#4d90d8] rounded-xl px-5 py-2 hover:bg-[#3476d0] focus:ring-4 focus:ring-[#4d90d8]"
+                disabled={!idFormatIsOK}
               >
                 아이디 중복 확인
               </button>
@@ -239,11 +320,7 @@ function AddChild() {
                 onChange={(e) => setChildConfirmPassword(e.target.value)}
                 className="rounded-lg focus:ring-4 focus:ring-[#66aadf] focus:outline-none ps-3"
               />
-              {!passwordCheck && (
-                <div className="text-[#f40000] absolute top-[105%]">
-                  입력한 비밀번호가 일치하지 않습니다.
-                </div>
-              )}
+              {passwordMessage()}
             </div>
           </div>
         </div>

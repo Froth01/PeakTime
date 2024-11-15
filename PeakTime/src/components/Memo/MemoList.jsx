@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Swal from "sweetalert2";
 import memosApi from "../../api/memosApi";
 import dayjs from "dayjs";
@@ -10,42 +10,52 @@ import "../../styles/daily-report-custom-swal.css";
 function MemoList() {
   const {
     memoList,
+    page,
+    isLastPage,
     setMemoList,
-    memoListLimit,
     summaryCount,
     setSummaryCount,
     summaryCountLimit,
     setSelected,
+    resetAll,
   } = useMemoStore();
 
-  // 메모 리스트
   const [showDeleteButton, setShowDeleteButton] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
 
-  useEffect(() => {
-    fetchGetMemoList();
-  }, []);
+  const fetchGetMemoList = useCallback(async () => {
+    if (isLastPage || isFetching) return;
 
-  const fetchGetMemoList = async () => {
+    setIsFetching(true);
+
     try {
       // 메모 전체 조회 GET 요청을 보내기
-      const response = await memosApi.get(``);
+      const response = await memosApi.get(``, { params: { page } });
       console.log("memoListGetApi: ", response.data);
-      const memoList = response.data.data.memoList;
-      const summaryCount = response.data.data.summaryCount;
-      setMemoList([...memoList]); // 상태를 업데이트하여 UI에 반영
+
+      const data = response.data.data;
+      const addMemoList = data.memoList;
+      const summaryCount = data.summaryCount;
+      const isLastPage = data.isLastPage;
+
+      setMemoList(addMemoList, isLastPage); // 상태를 업데이트하여 UI에 반영
       setSummaryCount(summaryCount);
     } catch (error) {
       console.error("Error fetching memoList:", error);
       throw error;
+    } finally {
+      setIsFetching(false);
     }
-  };
+  }, [isLastPage, page, isFetching, setMemoList, setSummaryCount]);
 
   const deleteMemo = async (memoId) => {
     try {
       // 메모 삭제 delete 요청 보내기
-      const response = await memosApi.delete(`${memoId}`);
+      const response = await memosApi.delete(`/${memoId}`);
       console.log("memoDeleteApi: ", response.data);
-      handleDelete(memoId);
+
+      resetAll();
+      fetchGetMemoList();
     } catch (error) {
       console.error("error delete memo api", error);
     }
@@ -59,7 +69,8 @@ function MemoList() {
   // 메모 삭제
   const openDeleteWarn = (title, memoId) => {
     Swal.fire({
-      title: `${title}을 정말로 삭제하시겠습니까?`,
+      title: "메모 삭제",
+      text: `${title}을 정말로 삭제하시겠습니까?`,
       customClass: {
         popup: "custom-swal-popup",
       },
@@ -76,18 +87,40 @@ function MemoList() {
     });
   };
 
-  // 삭제버튼 클릭
-  const handleDelete = (memoId) => {
-    setMemoList(memoList.filter((one, _) => one.memoId != memoId));
-  };
+  // 무한 스크롤
+  const observerRef = useRef(null);
+
+  useEffect(() => {
+    fetchGetMemoList();
+  }, []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isLastPage) {
+          fetchGetMemoList();
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    const currentObserverRef = observerRef.current;
+    if (currentObserverRef) {
+      observer.observe(currentObserverRef);
+    }
+
+    return () => {
+      if (currentObserverRef) {
+        observer.unobserve(currentObserverRef);
+      }
+    };
+  }, [fetchGetMemoList, isLastPage]);
 
   return (
     <div className="absolute bg-[#333333] bg-opacity-70 left-[11vw] w-[29vw] h-[84vh] my-[3vh] rounded-lg flex flex-col justify-start items-center text-start p-5">
       <div className="flex flex-col">
         <div className="flex justify-between text-white mb-3">
-          <h2 className="text-[30px] font-bold">
-            메모({memoList?.length} / {memoListLimit})
-          </h2>
+          <h2 className="text-[30px] font-bold">메모</h2>
           <button
             className="text-white text-[30px]"
             onClick={() => setShowDeleteButton(!showDeleteButton)}
@@ -97,12 +130,12 @@ function MemoList() {
         </div>
 
         <div className="flex flex-col gap-5 bg-white text-[20px] w-[25vw] h-[70vh] overflow-y-auto rounded-lg p-5 custom-scrollbar mb-3">
-          {memoList.map((memo, index) => (
+          {memoList.map((memo, idx) => (
             <div
               className={`flex justify-between mx-2 pb-2 ${
-                index === memoList.length - 1 ? "" : "border-b"
+                idx === memoList.length - 1 ? "" : "border-b"
               }`}
-              key={index}
+              key={idx}
             >
               <button
                 className="w-[90%] flex flex-col"
@@ -123,6 +156,7 @@ function MemoList() {
               </div>
             </div>
           ))}
+          <div ref={observerRef} />
         </div>
 
         <div className="w-full text-white text-[25px] flex justify-end mb-3">

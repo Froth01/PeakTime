@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import authApi from "../api/authApi";
+import authApi from "../api/authApi"; 
 import Swal from "sweetalert2"; // 모달 라이브러리
 import "../styles/daily-report-custom-swal.css";
 

@@ -44,7 +44,9 @@ const CircleChart = ({ startTimeList }) => {
       .style("border-radius", "5px")
       .style("pointer-events", "none")
       .style("visibility", "hidden")
-      .style("font-size", "20px");
+      .style("font-size", "20px")
+      .style("top", "0px")
+      .style("left", "0px");
 
     // 항상 5개의 grid가 나타나도록 설정
     const numGrids = 5;
