@@ -16,7 +16,7 @@ export async function endHikingProcess(sumData, startedHikingId, accessToken) {
     "00" + day.toString()
   ).slice(-2)} ${("00" + hour.toString()).slice(-2)}:${(
     "00" + minute.toString()
-  ).slice(-2)}:${("00" + second.toString()).slice(-2)}`;
+  ).slice(-2)}:${("00" + (second + 1).toString()).slice(-2)}`;
 
   // 보낼 데이터 패키징
   const endHikingData = {
