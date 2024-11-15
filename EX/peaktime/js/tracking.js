@@ -147,36 +147,6 @@ function handleUrlChange(newUrl) {
     const shouldBlock = websiteList.some((urlPattern) =>
       fullUrl.includes(urlPattern)
     );
-    // console.log("Should block:", shouldBlock);
-
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs[0]) {
-        const tabId = tabs[0].id;
-
-        chrome.tabs.sendMessage(
-          tabId,
-          { action: "checkContentScript" },
-          (response) => {
-            if (chrome.runtime.lastError || !response) {
-              chrome.scripting.executeScript(
-                {
-                  target: { tabId },
-                  files: ["/js/contentScript.js"],
-                },
-                () => {
-                  if (shouldBlock) {
-                    chrome.tabs.sendMessage(tabId, { action: "shutdown" });
-                  }
-                }
-              );
-            } else if (shouldBlock) {
-              // 이미 contentScript가 로드된 상태에서만 shutdown 메시지 전송
-              chrome.tabs.sendMessage(tabId, { action: "shutdown" });
-            }
-          }
-        );
-      }
-    });
   });
 }
 
