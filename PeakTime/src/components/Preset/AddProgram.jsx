@@ -1,13 +1,11 @@
 import PropTypes from "prop-types";
 import { useState, useEffect } from "react";
-// import "flowbite/dist/flowbite.css";
-import { ToggleSwitch } from "flowbite-react";
 
 function AddProgram({ blockProgramArray, onAddProgram }) {
   const [isDuplicate, setIsDuplicate] = useState(false);
   const [isEmpty, setIsEmpty] = useState(false);
   const [isInvalidProcess, setIsInvalidProcess] = useState(false); // 프로세스로 넣기
-  const [isFileMode, setIsFileMode] = useState(false); // 입력 방식 토글 상태
+  const [isFileMode, setIsFileMode] = useState(true); // 입력 방식 토글 상태
   const [isExeName, setIsExeName] = useState(false); // 입력 방식 토글 상태
 
   const [newProgram, setNewProgram] = useState("");
@@ -58,15 +56,28 @@ function AddProgram({ blockProgramArray, onAddProgram }) {
     <div className="flex flex-col justify-center items-center">
       <div className="flex justify-around items-center gap-5 mb-10 w-full">
         <div className="flex flex-col justify-center w-[35%]">
-          <div className="flex justify-center">
-            <ToggleSwitch
-              checked={isFileMode}
-              onChange={() => setIsFileMode(!isFileMode)}
-            />
+          <div className="flex justify-center gap-2">
+            <button
+              className={`text-[18px] ${
+                isFileMode
+                  ? "bg-[#03c777] rounded-xl px-5 py-2 hover:bg-[#02a566] focus:ring-4 focus:ring-[#03c777] text-white font-bold"
+                  : "bg-[#7c7c7c] rounded-xl px-5 py-2 hover:bg-[#5c5c5c] focus:ring-4 focus:ring-[#c5c5c5] text-white font-bold"
+              }`}
+              onClick={() => setIsFileMode(true)}
+            >
+              파일 선택
+            </button>
+            <button
+              className={`px-4 py-2 text-[18px] font-bold rounded-lg ${
+                !isFileMode
+                  ? "bg-[#03c777] rounded-xl px-5 py-2 hover:bg-[#02a566] focus:ring-4 focus:ring-[#03c777] text-white font-bold"
+                  : "bg-[#7c7c7c] rounded-xl px-5 py-2 hover:bg-[#5c5c5c] focus:ring-4 focus:ring-[#c5c5c5] text-white font-bold"
+              }`}
+              onClick={() => setIsFileMode(false)}
+            >
+              직접 입력
+            </button>
           </div>
-          {/* <div className="text-sm text-white mt-2">
-            <span>{isFileMode ? "파일 선택" : "직접 입력"}</span>
-          </div> */}
         </div>
 
         <div className="w-[65%]">
