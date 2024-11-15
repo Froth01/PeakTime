@@ -66,16 +66,7 @@ function receivedSocketMessage(data) {
   if (data.action === "sendUrlList") {
     console.log("sendUrlList");
     // 데이터 저장
-    chrome.storage.local.set({ websiteList: data.websiteList }, () => {
-      // 1초 후 페이지 새로 고침
-      setTimeout(() => {
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-          if (tabs.length > 0) {
-            chrome.tabs.reload(tabs[0].id, { bypassCache: true });
-          }
-        });
-      }, 1000); // 1000ms = 1초
-    });
+    chrome.storage.local.set({ websiteList: data.websiteList });
   }
 }
 

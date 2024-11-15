@@ -22,7 +22,7 @@ chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     document.body.style.cursor = "not-allowed"; // 금지된 커서 모양 표시
 
     // 응답 메시지
-    // sendResponse({ message: "Block WebSite" });
+    sendResponse({ message: "Block WebSite" });
   }
   if (msg.action === "GET_SELECTED_TEXT") {
     //사용자가 드래그한 메시지 백그라운드로 보냄
