@@ -2,6 +2,9 @@ import { create } from "zustand";
 
 const initialState = {
   memoList: [],
+  page: 0,
+  isLastPage: false,
+
   summaryCount: 0,
   memoData: {
     title: "",
@@ -27,13 +30,26 @@ const initialState = {
 export const useMemoStore = create((set) => ({
   ...initialState,
 
-  memoListLimit: 10, // 메모 최대한도 수
   summaryCountLimit: 3, // 요약 최대한도 수
   inputTextLimit: 1000,
   keywordInputLimit: 10, // 키워드 하나당 최대 글자 길이
   keywordsLimit: 3, // 최대 키워드 input 수
 
-  setMemoList: (memoList) => set({ memoList: [...memoList] }),
+  setMemoList: (addMemoList, newIsLastPage) => {
+    const isLastPage = useMemoStore.getState().isLastPage;
+
+    if (isLastPage) return;
+
+    const list = useMemoStore.getState().memoList;
+    const pageNow = useMemoStore.getState().page;
+    const pageNew = !isLastPage ? pageNow + 1 : pageNow;
+
+    set({
+      memoList: [...list, ...addMemoList],
+      page: pageNew,
+      isLastPage: newIsLastPage,
+    });
+  },
   setSummaryCount: (count) => set({ summaryCount: count }),
   setMemoData: (memoData) => set({ memoData: memoData }),
   setSummaryData: (summaryData) => set({ summaryData: summaryData }),

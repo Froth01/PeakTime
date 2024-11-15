@@ -111,6 +111,9 @@ const StatisticsReport = () => {
         <div className="w-[48%] flex flex-col justify-center items-center">
           <div className="font-bold text-[30px] mb-[3vh]">시작 시간 분석</div>
           <CircleChart startTimeList={showStatistics.startTimeList} />
+          <div className="text-gray-400 text-[18px] px-3">
+            *시작 시간 분석은 성공한 하이킹에 대해서만 반영됩니다.
+          </div>
         </div>
         <div className="flex flex-col w-[52%] justify-around items-center pl-4 border-l">
           <div className="font-bold text-[30px] text-left">접속 통계 차트</div>
