@@ -23,7 +23,12 @@ public class SaveUrlPresetResponseDto {
     public static SaveUrlPresetResponseDto createSaveUrlPresetResponseDto(Preset preset) {
         return SaveUrlPresetResponseDto.builder()
                 .presetId(preset.getPresetId())
-                .blockWebsiteArray(preset.getBlockWebsiteArray())
+                .blockWebsiteArray(
+                        preset.getBlockWebsiteArray()
+                                .stream()
+                                .sorted()
+                                .toList()
+                )
                 .build();
     }
 }
