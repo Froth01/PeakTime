@@ -17,14 +17,14 @@ document.addEventListener("hikingStart", (event) => {
   const message = JSON.stringify({
     action: "start",
     websiteList: event.detail.selectedPreset.blockWebsiteArray,
-    role: "root",
+    role: event.detail.isRoot,
     presetId: event.detail.selectedPreset.presetId,
     hikingId: event.detail.startedHikingId,
   });
 
   window.electronAPI.sendWebSocketMessage(message);
   // 메인 프로세스에 메시지 저장 요청
-  window.electronAPI.sendStartMessage(message); 
+  window.electronAPI.sendStartMessage(message);
 
   // 차단 시스템 요청
   const data = {};
@@ -40,9 +40,8 @@ document.addEventListener("hikingStart", (event) => {
 
 //하이킹 종료
 document.addEventListener("hikingEnd", (event) => {
-
   window.electronAPI.sendStartMessage(null);
-  
+
   console.log("하이킹 끝");
   window.electronAPI.sendWebSocketMessage(
     JSON.stringify({
@@ -51,6 +50,15 @@ document.addEventListener("hikingEnd", (event) => {
   );
 
   window.electronAPI.endBlockProgram(event.detail.startedHikingId);
+});
+
+document.addEventListener("sendUrlList", (event) => {
+  // WebSocket 전송 데이터 생성 및 저장
+  const message = JSON.stringify({
+    action: "sendUrlList",
+    websiteList: event.detail.urlList,
+  });
+  window.electronAPI.sendWebSocketMessage(message);
 });
 
 let parsedMessage = null;
@@ -97,12 +105,10 @@ function handleParsedMessage(parsedMessage) {
   }
   if (parsedMessage.action === "saveMemo") {
     console.log("savememo renderer");
-    console.log(parsedMessage);
     window.electronAPI.sendSaveMemo(parsedMessage); // preload에서 electronAPi 설정한 곳으로 이동
   }
   if (parsedMessage.action === "addUrl") {
     console.log("addUrl renderer");
-    console.log(parsedMessage);
     window.electronAPI.sendAddUrl(parsedMessage); // preload에서 electronAPi 설정한 곳으로 이동
   }
 }

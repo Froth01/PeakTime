@@ -23,10 +23,16 @@ export function programProcess(data) {
 // 확인 함수
 export async function checkDone(event, hikingId, accessToken) {
   try {
-    if (isSiteDone && isProgramDone) {
-      const sumData = [...siteData, ...programData];
-      await endHikingProcess(sumData, hikingId, accessToken); // API 요청
-      event.reply("all-done", sumData);
+    if (isProgramDone && isProgramDone) {
+      if (siteData.length <= 0) {
+        const sumData = [...programData];
+        await endHikingProcess(sumData, hikingId, accessToken); // API 요청
+        event.reply("all-done", sumData);
+      } else {
+        const sumData = [...siteData, ...programData];
+        await endHikingProcess(sumData, hikingId, accessToken); // API 요청
+        event.reply("all-done", sumData);
+      }
     } else {
       console.log("data is not ready.");
     }

@@ -155,14 +155,9 @@ function PresetList({ onPresetClick, updateTrigger }) {
 
   return (
     <div className="absolute bg-[#333333] bg-opacity-70 left-[11vw] w-[29vw] h-[84vh] my-[3vh] rounded-lg flex flex-col justify-start items-center text-start p-5">
-      <div className="w-full mb-3 flex justify-between items-start">
-        <h2 className="self-start text-white font-bold text-[30px]">
-          차단 프리셋 목록
-        </h2>
-        <h2 className="text-white font-bold text-[30px]">
-          ({presetList.length} / 5)
-        </h2>
-      </div>
+      <h2 className="self-start text-white font-bold text-[30px] mb-3">
+        차단 프리셋 목록({presetList.length} / 5)
+      </h2>
 
       <div className="flex flex-col gap-5 bg-white text-[20px] w-[25vw] h-[70vh] overflow-y-auto rounded-lg p-5 font-bold">
         {presetList.map((preset, index) => (

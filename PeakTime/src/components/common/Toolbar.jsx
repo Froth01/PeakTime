@@ -17,6 +17,7 @@ function Toolbar() {
   const navigate = useNavigate();
   //유저정보
   const { user, userActions } = useUserStore();
+  const localUser = JSON.parse(localStorage.getItem("user")) || null;
   // 버튼 스타일 조건을 위한 변수
   const [isHomeHovered, setIsHomeHovered] = useState(false);
   const [isSettingHovered, setIsSettingHovered] = useState(false);
@@ -174,34 +175,38 @@ function Toolbar() {
             <MdStickyNote2 />
           </button>
         </Tooltip>
-        <Tooltip
-          content="차단 관리"
-          placement="right"
-          className="whitespace-nowrap font-bold"
-        >
-          <button
-            onClick={() => {
-              handleMenu("/preset");
-            }}
-            className="bg-gray-100 hover:bg-white active:bg-gray-200 w-[10vh] h-[10vh] rounded-full flex items-center justify-center text-4xl shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
-          >
-            <BiShieldQuarter />
-          </button>
-        </Tooltip>
-        <Tooltip
-          content="서브계정 관리"
-          placement="right"
-          className="whitespace-nowrap font-bold"
-        >
-          <button
-            onClick={() => {
-              handleMenu("/children");
-            }}
-            className="bg-gray-100 hover:bg-white active:bg-gray-200 w-[10vh] h-[10vh] rounded-full flex items-center justify-center text-4xl shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
-          >
-            <FaHandsHoldingChild />
-          </button>
-        </Tooltip>
+        {localUser && localUser.isRoot && (
+          <>
+            <Tooltip
+              content="차단 관리"
+              placement="right"
+              className="whitespace-nowrap font-bold"
+            >
+              <button
+                onClick={() => {
+                  handleMenu("/preset");
+                }}
+                className="bg-gray-100 hover:bg-white active:bg-gray-200 w-[10vh] h-[10vh] rounded-full flex items-center justify-center text-4xl shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
+              >
+                <BiShieldQuarter />
+              </button>
+            </Tooltip>
+            <Tooltip
+              content="서브계정 관리"
+              placement="right"
+              className="whitespace-nowrap font-bold"
+            >
+              <button
+                onClick={() => {
+                  handleMenu("/children");
+                }}
+                className="bg-gray-100 hover:bg-white active:bg-gray-200 w-[10vh] h-[10vh] rounded-full flex items-center justify-center text-4xl shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
+              >
+                <FaHandsHoldingChild />
+              </button>
+            </Tooltip>
+          </>
+        )}
       </div>
       <div className="flex flex-col h-[20%] justify-around">
         <Tooltip
@@ -230,13 +235,17 @@ function Toolbar() {
         <Tooltip
           content={
             <div className="flex flex-col">
-              <button
-                onClick={checkAccessModal}
-                className="text-left"
-              >
-                유저정보수정
-              </button>
-              <hr className="border-t my-1 border-gray-300" />
+              {localUser && localUser.isRoot && (
+                <>
+                  <button
+                    onClick={checkAccessModal}
+                    className="text-left"
+                  >
+                    유저정보수정
+                  </button>
+                  <hr className="border-t my-1 border-gray-300" />
+                </>
+              )}
               <button onClick={logoutModal} className="text-left">
                 로그아웃
               </button>
