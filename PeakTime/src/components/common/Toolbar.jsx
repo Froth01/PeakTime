@@ -11,6 +11,7 @@ import { useUserStore } from "../../stores/UserStore";
 import Swal from "sweetalert2"; // 모달 라이브러리
 import "../../styles/daily-report-custom-swal.css";
 import usersApi from "../../api/usersApi";
+import authApi from "../../api/authApi";
 
 function Toolbar() {
   const navigate = useNavigate();
@@ -70,8 +71,60 @@ function Toolbar() {
     navigate(type);
   };
 
-  //로그아웃 함수
-  const handleLogout = () => {
+  // 로그아웃 검사 모달창 띄우기
+  const logoutModal = async () => {
+    const { value: getRootUserPassword } = await Swal.fire({
+      title: '메인 계정의 비밀번호를 입력해주세요.',
+      customClass: {
+        popup: 'custom-swal-popup',
+      },
+      input: 'password',
+      inputAttributes: {
+        style: 'color: black;', // input 텍스트 색상
+      },
+    });
+
+    // 이후 처리되는 내용
+    if (getRootUserPassword) {
+      logout(getRootUserPassword);
+    }
+  }
+
+  // 로그아웃 API 호출
+  const logout = async (getRootUserPassword) => {
+    // 로그아웃은 auth이지만 유일하게 access Token이 필요
+    const logoutData = {
+      rootUserPassword: getRootUserPassword,
+    };
+    try {
+      const { user } = useUserStore.getState();
+      const accessToken = user.accessToken;
+      await authApi.post("/logout", logoutData, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+      // 성공하면 이어서 진행
+      browserLogout();
+    } catch (error) {
+      // 실패하면 여기로 진입
+      console.error(error);
+      Swal.fire({
+        title: "다시 시도해주세요.",
+        customClass: {
+          popup: 'custom-swal-popup',
+        },
+        text: '비밀번호가 일치하지 않습니다.',
+        icon: "error",
+        confirmButtonColor: "#03C777",
+        confirmButtonText: "확인",
+      });
+    }
+  }
+
+  // 브라우저 로그아웃
+  const browserLogout = () => {
     userActions.setUser(null);
     localStorage.removeItem("user");
   };
@@ -184,7 +237,7 @@ function Toolbar() {
                 유저정보수정
               </button>
               <hr className="border-t my-1 border-gray-300" />
-              <button onClick={handleLogout} className="text-left">
+              <button onClick={logoutModal} className="text-left">
                 로그아웃
               </button>
             </div>
