@@ -8,10 +8,12 @@ import ReactDOM from "react-dom/client";
 import { UPDATE_GROUP_ALERT_MESSAGE } from "../../utils/Child/UpdateGroupAlertMessage";
 import { IoIosArrowDown } from "react-icons/io";
 import "../../styles/daily-report-custom-swal.css";
+import "../../styles/custom-scrollbar.css";
 
 function UpdateGroup() {
-  const { groupId, presetList, setGroupList, setContent, getPresetById } = useGroupStore();
-  
+  const { groupId, presetList, setGroupList, setContent, getPresetById } =
+    useGroupStore();
+
   const [groupTitle, setGroupTitle] = useState(null);
   const [groupInfo, setGroupInfo] = useState(null);
 
@@ -93,8 +95,7 @@ function UpdateGroup() {
         .catch(() => {
           Swal.fire(UPDATE_GROUP_ALERT_MESSAGE.failToDeleteTimer);
         });
-      }
-    );
+    });
   };
 
   // 그룹 타이머 추가 모달
@@ -171,10 +172,12 @@ function UpdateGroup() {
         .delete(`/${groupId}`)
         .then((result) => {
           // 삭제 완료 모달 띄운 후 그룹 목록 수정하고 페이지 닫기
-          Swal.fire(UPDATE_GROUP_ALERT_MESSAGE.succcessToDeleteGroup).then(() => {
-            setGroupList(result.data.data.groupList);
-            setContent(null);
-          });
+          Swal.fire(UPDATE_GROUP_ALERT_MESSAGE.succcessToDeleteGroup).then(
+            () => {
+              setGroupList(result.data.data.groupList);
+              setContent(null);
+            }
+          );
         })
         .catch(() => {
           Swal.fire(UPDATE_GROUP_ALERT_MESSAGE.failToDeleteGroup);
@@ -189,38 +192,44 @@ function UpdateGroup() {
       return false;
     }
 
-    Swal.fire(UPDATE_GROUP_ALERT_MESSAGE.warningForUpdateGroupInfo).then((res) => {
-      if (!res.isConfirmed) return false;
+    Swal.fire(UPDATE_GROUP_ALERT_MESSAGE.warningForUpdateGroupInfo).then(
+      (res) => {
+        if (!res.isConfirmed) return false;
 
-      groupsApi
-        .put(`/${groupId}`, {
-          title: groupInfo.title,
-          presetId: groupInfo.presetId,
-        })
-        .then((result) => {
-          Swal.fire(UPDATE_GROUP_ALERT_MESSAGE.successToUpdateGroup).then(() => {
-            setGroupTitle(groupInfo.title);
-            setGroupList(result.data.data.groupList);
+        groupsApi
+          .put(`/${groupId}`, {
+            title: groupInfo.title,
+            presetId: groupInfo.presetId,
+          })
+          .then((result) => {
+            Swal.fire(UPDATE_GROUP_ALERT_MESSAGE.successToUpdateGroup).then(
+              () => {
+                setGroupTitle(groupInfo.title);
+                setGroupList(result.data.data.groupList);
+              }
+            );
+          })
+          .catch((err) => {
+            err.status == 422
+              ? Swal.fire(UPDATE_GROUP_ALERT_MESSAGE.duplicateGroupTitleError)
+              : Swal.fire(UPDATE_GROUP_ALERT_MESSAGE.failToUpdateGroup);
           });
-        })
-        .catch((err) => {
-          err.status == 422
-            ? Swal.fire(UPDATE_GROUP_ALERT_MESSAGE.duplicateGroupTitleError)
-            : Swal.fire(UPDATE_GROUP_ALERT_MESSAGE.failToUpdateGroup);
-        });
-    });
+      }
+    );
   };
 
   return (
     <div className="absolute left-[43vw] w-[54vw] h-[84vh] my-[3vh] bg-[#333333] bg-opacity-70 rounded-lg p-5 flex flex-col items-center justify-between">
       {/* title */}
-      <h2 className="text-white text-[30px] font-bold w-full pb-3 border-b">{groupTitle}</h2>
+      <h2 className="text-white text-[30px] font-bold w-full pb-3 border-b">
+        {groupTitle}
+      </h2>
 
       {/* title, presets */}
       <div className="flex justify-between w-[70%]">
         {/* title */}
         <div className="flex flex-col gap-3 text-start w-[40%]">
-          <label className="text-white font-bold">그룹명</label>
+          <label className="text-white font-bold text-[22px]">그룹명</label>
           <input
             id="title"
             name="title"
@@ -232,7 +241,7 @@ function UpdateGroup() {
 
         {/* presets */}
         <div className="flex flex-col gap-3 text-start w-[40%]">
-          <label className="text-white font-bold">프리셋</label>
+          <label className="text-white font-bold text-[22px]">프리셋</label>
           <div
             tabIndex={0}
             className={`relative h-[60%] rounded-lg bg-white border border-gray-300 px-3 py-2 cursor-pointer ${
@@ -278,7 +287,7 @@ function UpdateGroup() {
 
       {/* timers */}
       <div className="w-[85%] h-[50%] text-start">
-        <div className="w-full h-[90%] rounded-xl border-4 border-[#66aadf] p-5">
+        <div className="w-full h-[90%] rounded-xl border-4 border-[#66aadf] p-5 overflow-y-auto custom-scrollbar">
           {groupInfo?.timerList.map((timer) => (
             <div
               key={timer.timerId}
@@ -299,13 +308,16 @@ function UpdateGroup() {
             </div>
           )) || ""}
         </div>
-        <div className="self-start mt-3">
+        <div className="mt-3 flex justify-between">
           <button
             onClick={() => openTimeSetModal()}
             className="text-white font-bold text-[20px] ps-3"
           >
             +시간 추가
           </button>
+          <div className="text-gray-400 text-[18px] px-3">
+            * 타이머는 설정된 요일과 시각에 매주 반복 실행됩니다.
+          </div>
         </div>
       </div>
 
