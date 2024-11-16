@@ -73,11 +73,7 @@ const StatisticsReport = () => {
             data={showStatistics.totalSuccessCount}
             unit={"회"}
           />
-          <DataFormat
-            title={"성공률"}
-            data={rateToSuccess}
-            unit={"%"}
-          />
+          <DataFormat title={"성공률"} data={rateToSuccess} unit={"%"} />
           <DataFormat
             title={"하이킹 회당 평균 시간"}
             data={avgHikingTime}
@@ -107,8 +103,8 @@ const StatisticsReport = () => {
           <div className="flex w-full grid grid-cols-3 items-center">
             <div />
             <div className="font-bold text-[30px]">시작 시간 분포 차트</div>
-            <div className="text-gray-400 text-[18px]">
-              *차트는 성공한 하이킹 결과만 반영됩니다.
+            <div className="text-gray-400 text-[18px] whitespace-nowrap">
+              *이 차트는 성공한 하이킹 결과만 반영합니다.
             </div>
           </div>
 
@@ -137,7 +133,6 @@ const StatisticsReport = () => {
               />
             </div>
           </div>
-
         </div>
       </div>
     </div>
