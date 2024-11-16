@@ -188,11 +188,6 @@ function UserSettingPage() {
         </div>
         <div id="changePageButton" className="flex gap-5 w-[70%]">
           <button
-            onClick={() => handleChangeBtn("/passwordchange")}
-            className="bg-[#66aadf] rounded-xl px-5 py-2 hover:bg-[#4d90d8] focus:ring-4 focus:ring-[#66aadf] font-bold text-white">
-            비밀번호 변경
-          </button>
-          <button
             onClick={() => handleChangeBtn("/emailchange")}
             className="bg-[#66aadf] rounded-xl px-5 py-2 hover:bg-[#4d90d8] focus:ring-4 focus:ring-[#66aadf] font-bold text-white">
             이메일 변경
