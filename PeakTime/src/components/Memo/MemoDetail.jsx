@@ -1,5 +1,4 @@
 import Swal from "sweetalert2";
-import MemoSummary from "./MemoSummary"; // 메모 요약
 import memosApi from "../../api/memosApi";
 import summariesApi from "../../api/summariesApi";
 import { useEffect, useState } from "react";
@@ -12,14 +11,11 @@ function MemoDetail() {
   const {
     memoData,
     setMemoData,
-    setSummaryData,
-    resetSummaryData,
     selectedMemo,
+    setSelectedMemo,
     summaryCount,
     setSummaryCount,
     summaryCountLimit,
-    isSummary,
-    setIsSummary,
     inputText,
     setInputText,
     inputTextLimit,
@@ -29,7 +25,6 @@ function MemoDetail() {
     resetKeyWords,
     keywordInput,
     setKeywordInput,
-    isLoading,
     setIsLoading,
     keywordInputLimit,
     keywordsLimit,
@@ -100,7 +95,6 @@ function MemoDetail() {
       // 요약하기 내용, 키워드 삭제하고 요약 내용 띄우기
       setInputText("");
       setKeywords([]);
-      setIsSummary(true);
     } catch (error) {
       Swal.fire({
         title: "요약 실패",
@@ -153,7 +147,8 @@ function MemoDetail() {
     console.log("카운트gpt ", summaryCount);
     if (summaryCount >= summaryCountLimit) {
       Swal.fire({
-        title: `요약은 하루 최대 ${summaryCountLimit}번이 가능합니다.`,
+        title: "요약 횟수 제한",
+        text: `요약은 하루 최대 ${summaryCountLimit}번이 가능합니다.`,
         customClass: {
           popup: "custom-swal-popup",
         },
@@ -165,7 +160,8 @@ function MemoDetail() {
     // 2. 입력된 내용이 비어 있으면 알림 표시
     if (inputText.trim().length === 0) {
       Swal.fire({
-        title: "요약 내용이 비어있습니다.",
+        title: "입력 내용 확인",
+        text: "요약 내용이 비어있습니다.",
         customClass: {
           popup: "custom-swal-popup",
         },
@@ -302,131 +298,129 @@ function MemoDetail() {
   };
 
   return (
-    <div className="absolute left-[43vw] w-[54vw] h-[84vh] my-[3vh] bg-[#333333] bg-opacity-70 rounded-lg p-5 flex flex-col items-center justify-between">
-      <h2 className="w-full text-white text-[30px] font-bold pb-3 border-b mb-5">
-        {memoData.title}
-      </h2>
+    <div className="absolute left-[42.5vw] my-[3vh] gap-x-[2vw] flex">
+      <>
+        {selectedMemo && (
+          <div className="w-[28vw] h-[84vh] bg-[#333333] bg-opacity-70 rounded-lg p-5 flex flex-col items-center justify-between">
+            <h2 className="w-full text-white text-[30px] font-bold pb-3 border-b mb-5">
+              {memoData.title}
+            </h2>
 
-      <div className="flex h-full w-full gap-x-5 px-3">
-        <div className="flex flex-col justify-between h-full w-[60%]">
-          <h2 className="text-white text-[20px] font-bold mb-3">기록된 메모</h2>
-          <div className="h-full flex flex-col justify-between">
-            <div
-              style={{ whiteSpace: "pre-line" }}
-              className="min-h-[60vh] max-h-[60vh] text-left overflow-y-scroll p-3 bg-white custom-scrollbar mb-5"
-              onMouseUp={(event) => {
-                event.stopPropagation(); // 이벤트 전파 막기
-                handleSelection();
-              }}
-            >
-              {memoData.content}
-            </div>
-
-            <div className="flex justify-end gap-x-5">
-              {!isSummary && (
-                <button
-                  onClick={() => copyButton()}
-                  className="bg-[#03c777] rounded-xl px-5 py-2 hover:bg-[#02a566] focus:ring-4 focus:ring-[#03c777] text-white font-bold"
-                >
-                  복사하기
-                </button>
-              )}
-              <button
-                onClick={() => setIsSummary(!isSummary)}
-                className="bg-[#66aadf] rounded-xl px-5 py-2 hover:bg-[#4d90d8] focus:ring-4 focus:ring-[#66aadf] font-bold text-white"
-              >
-                {isSummary ? "질문입력" : "요약보기"}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col justify-between w-[40%] h-full">
-          {!isSummary ? (
-            <>
-              <h2 className="text-white text-[20px] font-bold mb-3">
-                요약하기
-              </h2>
+            <div className="flex flex-col justify-between h-full w-full gap-x-5 px-3">
               <div className="h-full flex flex-col justify-between">
-                <div className="flex flex-col justify-between h-[90%] mb-5">
-                  <div className="flex flex-col justify-between h-full">
-                    <textarea
-                      type="text"
-                      value={inputText}
-                      onChange={handleInputChange}
-                      placeholder="요약하고 싶은 내용을 작성하세요. 메모에서 드래그한 내용을 붙여넣기가 가능합니다."
-                      className="h-[92%] rounded-xl p-2 w-full custom-scrollbar"
-                    />
-                    <div className="text-[#C5C5C5] text-start text-[15px] my-2">
-                      현재 입력 글자 수: {inputText.length} / {inputTextLimit}
-                    </div>
-                  </div>
-                  {/* 추가 키워드 입력 필드 */}
-                  <div className="pt-3 border-t">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={keywordInput}
-                        onChange={handleKeywordInputChange}
-                        placeholder="추가 키워드를 입력하세요"
-                        className="border border-gray-300 p-2 w-full rounded-xl"
-                      />
-                      {/* 키워드 추가 버튼 (아이콘 형식) */}
-                      <button
-                        onClick={() => addKeyword()}
-                        className="bg-[#66aadf] rounded-xl px-5 py-2 hover:bg-[#4d90d8] focus:ring-4 focus:ring-[#66aadf] font-bold text-white"
-                        aria-label="키워드 추가"
-                      >
-                        +
-                      </button>
-                    </div>
-                    {/* 추가된 키워드 리스트 표시 */}
-                    <div className="mt-2">
-                      <h3 className="text-[#C5C5C5] text-start text-[15px] mb-1">
-                        추가된 키워드({keywords.length} / {keywordsLimit}):
-                      </h3>
-                      <div className="flex flex-wrap grid grid-cols-2 gap-2">
-                        {keywords.map((keyword, index) => (
-                          <span
-                            key={index}
-                            className="flex justify-between items-center bg-[#66aadf] rounded-xl hover:bg-[#4d90d8] focus:ring-4 focus:ring-[#66aadf] font-bold text-white px-2 py-1 mx-1 cursor-pointer"
-                            onClick={() => removeKeyword(keyword)}
-                          >
-                            {keyword}
-                            <TiDelete />
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+                <div
+                  style={{ whiteSpace: "pre-line" }}
+                  className="min-h-[65vh] max-h-[65vh] text-left overflow-y-scroll p-3 bg-white custom-scrollbar mb-5"
+                  onMouseUp={(event) => {
+                    event.stopPropagation(); // 이벤트 전파 막기
+                    handleSelection();
+                  }}
+                >
+                  {memoData.content}
                 </div>
 
-                <div className="w-full flex justify-center gap-x-3">
+                <div className="flex justify-end gap-x-5">
                   <button
+                    onClick={() => copyButton()}
                     className="bg-[#03c777] rounded-xl px-5 py-2 hover:bg-[#02a566] focus:ring-4 focus:ring-[#03c777] text-white font-bold"
-                    onClick={() => openSummaryModal(memoData.title, keywords)}
                   >
-                    요약하기
+                    복사하기
                   </button>
                   <button
                     className="text-white font-bold px-5 py-2 rounded-xl bg-[#7C7C7C] hover:bg-[#5C5C5C]"
-                    onClick={() => {
-                      resetInputText();
-                      resetKeyWords();
-                    }}
+                    onClick={() => setSelectedMemo(null)}
                   >
-                    내용삭제
+                    닫기
                   </button>
                 </div>
               </div>
-            </>
-          ) : (
-            <>
-              <MemoSummary />
-            </>
-          )}
+            </div>
+          </div>
+        )}
+      </>
+
+      <>
+        <div className="ml-[0.5vw] w-[24vw] h-[84vh] bg-[#333333] bg-opacity-70 rounded-lg p-5 flex flex-col items-center justify-between">
+          <div className="flex flex-col justify-between w-full h-full">
+            <h2 className="text-white text-[30px] font-bold pb-3 border-b mb-5">
+              요약 프롬프트 작성 도구
+            </h2>
+
+            <div className="h-full flex flex-col justify-between">
+              <div className="flex flex-col justify-between h-[90%] mb-5">
+                <div className="flex flex-col justify-between h-full">
+                  <textarea
+                    type="text"
+                    value={inputText}
+                    onChange={handleInputChange}
+                    placeholder="메모에서 요약하고 싶은 내용을 작성하세요. 메모에서 드래그한 내용을 붙여넣기가 가능합니다."
+                    className="h-[92%] rounded-xl p-2 w-full custom-scrollbar"
+                  />
+                  <div className="text-[#C5C5C5] text-start text-[15px] my-2">
+                    현재 입력 글자 수: {inputText.length} / {inputTextLimit}
+                  </div>
+                </div>
+                {/* 추가 키워드 입력 필드 */}
+                <div className="pt-3 border-t">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={keywordInput}
+                      onChange={handleKeywordInputChange}
+                      placeholder="추가 키워드를 입력하세요"
+                      className="border border-gray-300 p-2 w-full rounded-xl"
+                    />
+                    {/* 키워드 추가 버튼 (아이콘 형식) */}
+                    <button
+                      onClick={() => addKeyword()}
+                      className="bg-[#66aadf] rounded-xl px-5 py-2 hover:bg-[#4d90d8] focus:ring-4 focus:ring-[#66aadf] font-bold text-white"
+                      aria-label="키워드 추가"
+                    >
+                      +
+                    </button>
+                  </div>
+                  {/* 추가된 키워드 리스트 표시 */}
+                  <div className="mt-2">
+                    <h3 className="text-[#C5C5C5] text-start text-[15px] mb-1">
+                      추가된 키워드({keywords.length} / {keywordsLimit}):
+                    </h3>
+                    <div className="flex flex-wrap grid grid-cols-2 gap-2">
+                      {keywords.map((keyword, index) => (
+                        <span
+                          key={index}
+                          className="flex justify-between items-center bg-[#66aadf] rounded-xl hover:bg-[#4d90d8] focus:ring-4 focus:ring-[#66aadf] font-bold text-white px-2 py-1 mx-1 cursor-pointer"
+                          onClick={() => removeKeyword(keyword)}
+                        >
+                          {keyword}
+                          <TiDelete />
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="w-full flex justify-center gap-x-3">
+                <button
+                  className="bg-[#03c777] rounded-xl px-5 py-2 hover:bg-[#02a566] focus:ring-4 focus:ring-[#03c777] text-white font-bold"
+                  onClick={() => openSummaryModal(memoData.title, keywords)}
+                >
+                  요약하기
+                </button>
+                <button
+                  className="text-white font-bold px-5 py-2 rounded-xl bg-[#7C7C7C] hover:bg-[#5C5C5C]"
+                  onClick={() => {
+                    resetInputText();
+                    resetKeyWords();
+                  }}
+                >
+                  내용삭제
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </>
     </div>
   );
 }
