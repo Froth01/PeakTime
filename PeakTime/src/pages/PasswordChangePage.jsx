@@ -29,7 +29,7 @@ function PasswordChangePage() {
         html: "비밀번호가 성공적으로 변경되었습니다.<br>메인 페이지로 되돌아갑니다.",
         icon: "success",
         confirmButtonColor: "#03C777",
-        didClose: () => navigate(-1),
+        didClose: () => navigate("/"),
       });
     } catch (error) {
       // 실패하면 여기로 진입
