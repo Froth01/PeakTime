@@ -37,8 +37,8 @@ if (!gotTheLock) {
     // Menu.setApplicationMenu(null); 메뉴바 삭제
 
     win = new BrowserWindow({
-      width: 1366,
-      height: 768,
+      width: 1920,
+      height: 1080,
       webPreferences: {
         preload: path.join(
           __dirname,
