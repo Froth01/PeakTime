@@ -107,4 +107,23 @@ public class ChildController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ResultDto.res(HttpStatus.OK.value(), "자식 계정 수정에 성공하였습니다."));
     }
+
+    @Operation(summary = "자식 계정 비밀번호 초기화", description = "루트 유저가 자식 계정의 비밀번호 초기화")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "자식 계정 비밀번호 초기화에 성공하였습니다.",
+                    content = {@Content(schema = @Schema(implementation = ResultDto.class))}),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 계정입니다.",
+                    content = {@Content(schema = @Schema(implementation = ResultDto.class))}),
+            @ApiResponse(responseCode = "500", description = "자식 계정 비밀번호 초기화에 실패하였습니다.",
+                    content = {@Content(schema = @Schema(implementation = ResultDto.class))})
+    })
+    @CommonSwaggerResponse.CommonResponses
+    @PutMapping("/{child-id}/init-password")
+    public ResponseEntity<?> initChildPassword(@PathVariable("child-id") Long childId){
+
+        childService.initChildPassword(childId);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ResultDto.res(HttpStatus.OK.value(), "자식 계정 비밀번호 초기화에 성공하였습니다."));
+    }
 }

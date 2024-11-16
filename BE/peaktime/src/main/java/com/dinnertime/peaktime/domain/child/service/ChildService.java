@@ -30,6 +30,9 @@ public class ChildService {
     private final UserGroupRepository userGroupRepository;
     private final GroupRepository groupRepository;
 
+    // 초기화 비밀번호 설정
+    private static final String initPassword = "000000";
+
     @Transactional
     public void createChild(CreateChildRequestDto requestDto){
 
@@ -154,6 +157,19 @@ public class ChildService {
         String encodedPassword = passwordEncoder.encode(requestDto.getChildPassword());
 
         // 5. 수정 후 저장
+        childUser.updatePassword(encodedPassword);
+        userRepository.save(childUser);
+    }
+
+    @Transactional
+    public void initChildPassword(Long childId){
+        // 1. 자식 계정 조회
+        User childUser = this.getChildUser(childId);
+
+        // 2. 초기화 비밀번호 설정
+        String encodedPassword = passwordEncoder.encode(initPassword);
+
+        // 3. 저장
         childUser.updatePassword(encodedPassword);
         userRepository.save(childUser);
     }
