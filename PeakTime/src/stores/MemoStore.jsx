@@ -25,7 +25,6 @@ const initialState = {
 
   // 요약 입력 등
   summaryCount: 0,
-  isSummary: false,
 
   inputText: "", // input box text
   keywords: [],
@@ -81,7 +80,6 @@ export const useMemoStore = create((set) => ({
   setSelectedMemo: (selectedMemo) => set({ selectedMemo: selectedMemo }),
   setSelectedSummary: (selectedSummary) =>
     set({ selectedSummary: selectedSummary }),
-  setIsSummary: (isSummary) => set({ isSummary: isSummary }),
 
   setInputText: (text) => set({ inputText: text }),
   setKeywords: (keywords) => set({ keywords: [...keywords] }),
