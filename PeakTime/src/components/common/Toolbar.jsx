@@ -92,6 +92,7 @@ function Toolbar() {
       confirmButtonColor: "#03C777",
       confirmButtonText: "확인",
       inputAttributes: {
+        placeholder: "password",
         style: "color: black;", // input 텍스트 색상
       },
     });
@@ -156,6 +157,7 @@ function Toolbar() {
       confirmButtonColor: "#03C777",
       confirmButtonText: "확인",
       inputAttributes: {
+        placeholder: "password",
         style: "color: black;", // input 텍스트 색상
       },
     });
