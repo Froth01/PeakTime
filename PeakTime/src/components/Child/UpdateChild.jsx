@@ -31,9 +31,6 @@ function UpdateChild() {
     getGroupById,
   } = useGroupStore();
 
-  // 비밀번호 변경 상태 변수
-  const [passwordChange, setPasswordChange] = useState(false);
-
   // groupList에서 child 찾아 변수로 지정
   const [child, setChild] = useState(null);
 
@@ -109,6 +106,33 @@ function UpdateChild() {
       default:
         return null;
     }
+  };
+
+  const handleinitassword = () => {
+    childrenApi
+      .put(`/${childId}/init-password`)
+      .then(() => {
+        Swal.fire({
+          title: "비밀번호 초기화 성공",
+          text: `초기화 비밀번호는 000000 입니다.`,
+          icon: "success",
+          confirmButtonText: "확인",
+          confirmButtonColor: "#03C777",
+          customClass: {
+            popup: "custom-swal-popup",
+          }
+        });
+      })
+      .catch(() => Swal.fire({
+        title: "비밀번호 초기화 실패",
+        text: "비밀번호 초기화을 실패했습니다. 잠시 후 다시 시도해주세요.",
+        icon: "error",
+        confirmButtonText: "확인",
+        confirmButtonColor: "#03C777",
+        customClass: {
+          popup: "custom-swal-popup",
+        }
+      }));
   };
 
   return (
@@ -197,17 +221,11 @@ function UpdateChild() {
       </div>
       <div className="flex gap-3 justify-between w-[70%] relative">
         <button
-          onClick={() => setPasswordChange(true)}
+          onClick={handleinitassword}
           className="bg-[#66aadf] rounded-xl px-5 py-2 hover:bg-[#4d90d8] focus:ring-4 focus:ring-[#66aadf] font-bold"
         >
-          비밀번호변경
+          비밀번호 초기화
         </button>
-        {passwordChange && (
-          <ChangePassword
-            childId={childId}
-            setPasswordChange={setPasswordChange}
-          />
-        )}
       </div>
       <div className="w-full flex justify-end gap-5">
         <button
