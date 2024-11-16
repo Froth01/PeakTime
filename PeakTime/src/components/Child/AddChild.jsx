@@ -19,13 +19,10 @@ function AddChild() {
   const [idFormatIsOK, setIdFormatIsOK] = useState(false);
   const [isDuplicate, setIsDuplicate] = useState(false); // false, "duplicated", "checked, "needToCheck"
   // 비밀번호 관련
-  const [childPassword, setChildPassword] = useState("");
-  const [childConfirmPassword, setChildConfirmPassword] = useState("");
-  const [childPasswordFormatIsOk, setChildPasswordFormatIsOk] = useState(false);
+
   // 닉네임 관련
   const [childNickname, setChildNickname] = useState("");
-  
-  const [passwordCheck, setPasswordCheck] = useState(true);
+
 
   // 드롭다운 관련
   const [isOpen, setIsOpen] = useState(false);
@@ -34,17 +31,14 @@ function AddChild() {
   const resetAllInputs = () => {
     setGroupId("");
     setChildLoginId("");
-    setChildPassword("");
-    setChildConfirmPassword("");
     setChildNickname("");
-    setPasswordCheck(true);
     setIsDuplicate(false);
     setSelectedOption(null);
   };
 
   const duplicatedMessage = () => {
     if(!idFormatIsOK) return (
-      <div className="text-[#f40000] absolute top-[65%]">
+      <div className="text-[#f40000] top-[65%]">
       * 5자 이상 15자 이하  * 영문, 숫자 사용 가능
     </div>
     )
@@ -52,19 +46,19 @@ function AddChild() {
     switch (isDuplicate) {
       case "duplicated":
         return (
-          <div className="text-[#f40000] absolute top-[65%]">
+          <div className="text-[#f40000] top-[65%]">
             입력한 아이디는 이미 존재합니다.
           </div>
         );
       case "checked":
         return (
-          <div className="text-[#03c777] absolute top-[65%]">
+          <div className="text-[#03c777] top-[65%]">
             사용 가능한 아이디입니다.
           </div>
         );
       case "needToCheck":
         return (
-          <div className="text-[#f40000] absolute top-[65%]">
+          <div className="text-[#f40000] top-[65%]">
             아이디 중복 확인이 필요합니다.
           </div>
         );
@@ -109,8 +103,6 @@ function AddChild() {
       isDuplicate !== "checked" ||
       !groupId ||
       !childLoginId ||
-      !childPassword ||
-      !childConfirmPassword ||
       !childNickname
     ) {
       Swal.fire(errorBeforeConfirm);
@@ -121,8 +113,6 @@ function AddChild() {
       .post("", {
         groupId,
         childLoginId,
-        childPassword,
-        childConfirmPassword,
         childNickname,
       })
       .then(() => {
@@ -139,62 +129,20 @@ function AddChild() {
       });
   };
 
-  // 비밀번호 형식 확인
-  useEffect(() => {
-    const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-\[\]{};':"\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_+\-\[\]{};':"\\|,.<>\/?]{8,}$/;
-    if (passwordRegex.test(childPassword)) {
-      setChildPasswordFormatIsOk(true);
-    } else {
-      setChildPasswordFormatIsOk(false);
-    }
-
-    if(!childPasswordFormatIsOk) return;
-    setPasswordCheck(childPassword === childConfirmPassword);
-  }, [childPassword, childConfirmPassword, childPasswordFormatIsOk]);
-
-  // 비밀번호 확인 후 메시지
-  const passwordMessage = () => {
-    if (!childPasswordFormatIsOk) {
-      return (
-        <div className="text-[#f40000] absolute top-[105%]">
-          * 최소 8자 이상  * 영문 대문자, 영문 소문자, 숫자, 특수문자를 모두 포함
-        </div>
-      );
-    }
-  
-    if (childPasswordFormatIsOk && passwordCheck) {
-      return (
-        <div className="text-[#03C777] absolute top-[105%]">
-          사용 가능한 비밀번호입니다.
-        </div>
-      );
-    }
-  
-    if (childPasswordFormatIsOk && !passwordCheck) {
-      return (
-        <div className="text-[#f40000] absolute top-[105%]">
-          입력한 비밀번호가 일치하지 않습니다.
-        </div>
-      );
-    }
-  
-    return null;
-  };
-
   // 닉네임 확인 후 메시지
   const nicknameMessage = () => {
     const nicknameRegex = /^[가-힣a-zA-Z0-9]{2,15}$/;
     
     if(nicknameRegex.test(childNickname)){
       return (
-        <div className="text-[#03C777] absolute top-[105%]">
+        <div className="text-[#03C777] top-[105%]">
           사용 가능한 닉네임입니다.
         </div>
       );
     }
   
     return (
-      <div className="text-[#f40000] absolute top-[105%]">
+      <div className="text-[#f40000] top-[105%]">
         * 2자 이상 15자 이하  * 한글, 영문, 숫자 사용 가능
       </div>
     );
@@ -203,7 +151,7 @@ function AddChild() {
   return (
     <div className="absolute left-[43vw] w-[54vw] h-[84vh] my-[3vh] bg-[#333333] bg-opacity-70 rounded-lg p-5 flex flex-col items-center justify-between">
       <h2 className="text-white text-[30px] font-bold">계정 생성</h2>
-      <div className="flex justify-between w-[70%]">
+      <div className="flex justify-between w-[70%] border">
         <div className="flex justify-around gap-3 text-start w-full">
           <div className="flex flex-col gap-3 w-[40%] relative">
             <label htmlFor="childNickname" className="text-white font-bold">
@@ -215,7 +163,7 @@ function AddChild() {
               placeholder="닉네임"
               value={childNickname}
               onChange={(e) => setChildNickname(e.target.value)}
-              className="h-[60%] rounded-lg focus:ring-4 focus:ring-[#66aadf] focus:outline-none ps-3"
+              className="h-[60%] rounded-lg focus:ring-4 focus:ring-[#66aadf] focus:outline-none px-3 py-2"
             />
             {nicknameMessage()}
           </div>
@@ -266,10 +214,15 @@ function AddChild() {
                 </ul>
               )}
             </div>
+            {groupId == "" ? (
+              <div className="text-[#f40000] top-[105%]">
+              * 소속 그룹을 선택해주세요
+              </div>
+            ) : null }
           </div>
         </div>
       </div>
-      <div className="flex justify-between w-[70%]">
+      <div className="flex justify-between w-[70%] border">
         <div className="flex justify-around gap-3 text-start w-full">
           <div className="flex flex-col gap-3 w-[40%] relative">
             <label htmlFor="childLoginId" className="text-white font-bold">
@@ -284,7 +237,8 @@ function AddChild() {
                 setChildLoginId(e.target.value);
                 setIsDuplicate("needToCheck");
               }}
-              className="h-[32%] rounded-lg focus:ring-4 focus:ring-[#66aadf] focus:outline-none ps-3"
+              className="h-[60%] rounded-lg focus:ring-4 focus:ring-[#66aadf] focus:outline-none px-3 py-2"
+              
             />
             {duplicatedMessage()}
             {isDuplicate !== "checked" && (
@@ -302,25 +256,10 @@ function AddChild() {
               <label htmlFor="childPassword" className="text-white font-bold">
                 비밀번호
               </label>
-              <input
-                id="childPassword"
-                name="childPassword"
-                placeholder="비밀번호"
-                type="password"
-                value={childPassword}
-                onChange={(e) => setChildPassword(e.target.value)}
-                className="rounded-lg focus:ring-4 focus:ring-[#66aadf] focus:outline-none ps-3"
-              />
-              <input
-                id="childConfirmPassword"
-                name="childConfirmPassword"
-                placeholder="비밀번호 확인"
-                type="password"
-                value={childConfirmPassword}
-                onChange={(e) => setChildConfirmPassword(e.target.value)}
-                className="rounded-lg focus:ring-4 focus:ring-[#66aadf] focus:outline-none ps-3"
-              />
-              {passwordMessage()}
+            </div>
+            <div className="text-[#FFFFFF] top-[105%]">
+              * 비밀번호는 000000 입니다.
+              * 서브 계정에서 비밀번호를 변경할 수 있습니다.
             </div>
           </div>
         </div>
