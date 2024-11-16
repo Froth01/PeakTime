@@ -135,6 +135,13 @@ public class PresetService {
         Preset preset = presetRepository.findByPresetId(presetId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PRESET_NOT_FOUND));
 
+        boolean isExist = preset.getBlockWebsiteArray().stream()
+                .anyMatch(website -> website.equals(requestDto.getUrl()));
+
+        if(isExist) {
+            throw new CustomException(ErrorCode.DUPLICATED_URL);
+        }
+
         preset.addWebsitePreset(requestDto);
 
         presetRepository.save(preset);
