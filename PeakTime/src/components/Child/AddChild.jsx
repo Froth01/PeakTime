@@ -23,7 +23,6 @@ function AddChild() {
   // 닉네임 관련
   const [childNickname, setChildNickname] = useState("");
 
-
   // 드롭다운 관련
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -37,11 +36,15 @@ function AddChild() {
   };
 
   const duplicatedMessage = () => {
-    if(!idFormatIsOK) return (
-      <div className="text-[#f40000] top-[65%]">
-      * 5자 이상 15자 이하  * 영문, 숫자 사용 가능
-    </div>
-    )
+    if (!idFormatIsOK)
+      return (
+        <div
+          className="text-[#f40000] top-[65%]"
+          style={{ whiteSpace: "pre-line" }}
+        >
+          {`* 5자 이상 15자 이하\n* 영문, 숫자 사용 가능`}
+        </div>
+      );
 
     switch (isDuplicate) {
       case "duplicated":
@@ -70,13 +73,13 @@ function AddChild() {
   // 아이디 형식 확인
   useEffect(() => {
     const idRegex = /^[a-zA-Z0-9]{5,15}$/;
-    if(idRegex.test(childLoginId)){
+    if (idRegex.test(childLoginId)) {
       setIdFormatIsOK(true);
-    } else{
+    } else {
       setIdFormatIsOK(false);
     }
     setIsDuplicate("needToCheck");
-  }, [childLoginId])
+  }, [childLoginId]);
 
   // 아이디 중복 확인
   const handleCheckId = () => {
@@ -132,18 +135,21 @@ function AddChild() {
   // 닉네임 확인 후 메시지
   const nicknameMessage = () => {
     const nicknameRegex = /^[가-힣a-zA-Z0-9]{2,15}$/;
-    
-    if(nicknameRegex.test(childNickname)){
+
+    if (nicknameRegex.test(childNickname)) {
       return (
         <div className="text-[#03C777] top-[105%]">
           사용 가능한 닉네임입니다.
         </div>
       );
     }
-  
+
     return (
-      <div className="text-[#f40000] top-[105%]">
-        * 2자 이상 15자 이하  * 한글, 영문, 숫자 사용 가능
+      <div
+        className="text-[#f40000] top-[105%]"
+        style={{ whiteSpace: "pre-line" }}
+      >
+        {`* 2자 이상 15자 이하 \n* 한글, 영문, 숫자 사용 가능`}
       </div>
     );
   };
@@ -151,80 +157,82 @@ function AddChild() {
   return (
     <div className="absolute left-[43vw] w-[54vw] h-[84vh] my-[3vh] bg-[#333333] bg-opacity-70 rounded-lg p-5 flex flex-col items-center justify-between">
       <h2 className="text-white text-[30px] font-bold">계정 생성</h2>
-      <div className="flex justify-between w-[70%] border">
-        <div className="flex justify-around gap-3 text-start w-full">
-          <div className="flex flex-col gap-3 w-[40%] relative">
-            <label htmlFor="childNickname" className="text-white font-bold">
-              닉네임
-            </label>
-            <input
-              id="childNickname"
-              name="childNickname"
-              placeholder="닉네임"
-              value={childNickname}
-              onChange={(e) => setChildNickname(e.target.value)}
-              className="h-[60%] rounded-lg focus:ring-4 focus:ring-[#66aadf] focus:outline-none px-3 py-2"
-            />
-            {nicknameMessage()}
-          </div>
-          <div className="flex flex-col gap-3 w-[40%]">
-            <label htmlFor="groupId" className="text-white font-bold">
-              소속 그룹
-            </label>
+
+      {/* 닉네임, 소속 그룹 */}
+      <div className="flex justify-around w-[70%] h-[10vh] text-left">
+        <div className="flex flex-col gap-3 w-[40%]">
+          <label htmlFor="childNickname" className="text-white font-bold">
+            닉네임
+          </label>
+          <input
+            id="childNickname"
+            name="childNickname"
+            placeholder="닉네임"
+            value={childNickname}
+            onChange={(e) => setChildNickname(e.target.value)}
+            className="rounded-lg focus:ring-4 focus:ring-[#66aadf] focus:outline-none px-3 py-2"
+          />
+          {nicknameMessage()}
+        </div>
+        <div className="flex flex-col gap-3 w-[40%]">
+          <label htmlFor="groupId" className="text-white font-bold">
+            소속 그룹
+          </label>
+          <div
+            tabIndex={0}
+            onChange={(e) => setGroupId(e.target.value)}
+            className={`relative rounded-lg bg-white border border-gray-300 px-3 py-2 cursor-pointer ${
+              isOpen ? "focus:ring-4 focus:ring-[#66aadf]" : ""
+            }`}
+          >
             <div
-              tabIndex={0}
-              onChange={(e) => setGroupId(e.target.value)}
-              className={`relative h-[60%] rounded-lg bg-white border border-gray-300 px-3 py-2 cursor-pointer ${
-                isOpen ? "focus:ring-4 focus:ring-[#66aadf]" : ""
-              }`}
+              onClick={() => setIsOpen(!isOpen)}
+              className="flex justify-between items-center"
             >
-              <div
-                onClick={() => setIsOpen(!isOpen)}
-                className="flex justify-between items-center"
-              >
-                <p>
-                  {selectedOption
-                    ? selectedOption.groupTitle
-                    : "그룹을 선택하세요."}
-                </p>
-                <IoIosArrowDown />
-              </div>
-              {isOpen && (
-                <ul
-                  className="absolute left-0 right-0 mt-3 bg-white border
-                border-gray-300 rounded-lg shadow-lg z-50"
-                >
-                  {groupList.map((group, index) => (
-                    <div key={group.groupId}>
-                      <li
-                        onClick={() => {
-                          setGroupId(group.groupId);
-                          setSelectedOption(group);
-                          setIsOpen(false);
-                        }}
-                        className="px-3 py-2 hover:bg-[#66aadf] cursor-pointer rounded-lg hover:font-bold"
-                      >
-                        {`${group.groupTitle} (${group.childList.length} / 30)`}
-                      </li>
-                      {index < groupList.length - 1 && (
-                        <hr className="border-gray-200" />
-                      )}
-                    </div>
-                  ))}
-                </ul>
-              )}
+              <p>
+                {selectedOption
+                  ? selectedOption.groupTitle
+                  : "그룹을 선택하세요."}
+              </p>
+              <IoIosArrowDown />
             </div>
-            {groupId == "" ? (
-              <div className="text-[#f40000] top-[105%]">
-              * 소속 그룹을 선택해주세요
-              </div>
-            ) : null }
+            {isOpen && (
+              <ul
+                className="absolute left-0 right-0 mt-3 bg-white border
+                border-gray-300 rounded-lg shadow-lg z-50"
+              >
+                {groupList.map((group, index) => (
+                  <div key={group.groupId}>
+                    <li
+                      onClick={() => {
+                        setGroupId(group.groupId);
+                        setSelectedOption(group);
+                        setIsOpen(false);
+                      }}
+                      className="px-3 py-2 hover:bg-[#66aadf] cursor-pointer rounded-lg hover:font-bold"
+                    >
+                      {`${group.groupTitle} (${group.childList.length} / 30)`}
+                    </li>
+                    {index < groupList.length - 1 && (
+                      <hr className="border-gray-200" />
+                    )}
+                  </div>
+                ))}
+              </ul>
+            )}
           </div>
+          {groupId == "" ? (
+            <div className="text-[#f40000] top-[105%]">
+              * 소속 그룹을 선택해주세요
+            </div>
+          ) : null}
         </div>
       </div>
-      <div className="flex justify-between w-[70%] border">
+
+      {/* 아이디 */}
+      <div className="flex flex-col justify-between w-[70%]">
         <div className="flex justify-around gap-3 text-start w-full">
-          <div className="flex flex-col gap-3 w-[40%] relative">
+          <div className="flex flex-col gap-3 w-[40%]">
             <label htmlFor="childLoginId" className="text-white font-bold">
               아이디
             </label>
@@ -237,32 +245,42 @@ function AddChild() {
                 setChildLoginId(e.target.value);
                 setIsDuplicate("needToCheck");
               }}
-              className="h-[60%] rounded-lg focus:ring-4 focus:ring-[#66aadf] focus:outline-none px-3 py-2"
-              
+              className="rounded-lg focus:ring-4 focus:ring-[#66aadf] focus:outline-none px-3 py-2"
             />
             {duplicatedMessage()}
-            {isDuplicate !== "checked" && (
+          </div>
+          <div
+            className="gap-3 w-[40%] text-[#FFFFFF] text-[#7C7C7C] text-[18px] font-bold flex justify-center items-center"
+            style={{ whiteSpace: "pre-line" }}
+          >
+            <>
+              {`* 서브 계정 생성 시 초기 비밀번호는 000000 입니다,\n\n* 서브 계정 로그인 후 비밀번호를 변경할 수 있습니다.`}
+            </>
+          </div>
+        </div>
+
+        <div className="w-full flex justify-around">
+          <div className="w-[40%] flex">
+            {isDuplicate !== "checked" ? (
               <button
                 onClick={() => handleCheckId()}
-                className="absolute font-bold text-white top-[105%] bg-[#4d90d8] rounded-xl px-5 py-2 hover:bg-[#3476d0] focus:ring-4 focus:ring-[#4d90d8]"
+                className="font-bold text-white bg-[#4d90d8] rounded-xl px-5 py-2 mt-3 hover:bg-[#3476d0] focus:ring-4 focus:ring-[#4d90d8]"
                 disabled={!idFormatIsOK}
+              >
+                아이디 중복 확인
+              </button>
+            ) : (
+              <button
+                className="font-bold text-white bg-transparent rounded-xl px-5 py-2 mt-3 invisible"
+                disabled
               >
                 아이디 중복 확인
               </button>
             )}
           </div>
-          <div className="flex flex-col gap-3 w-[40%]">
-            <div className="flex flex-col gap-3 relative">
-              <label htmlFor="childPassword" className="text-white font-bold">
-                비밀번호
-              </label>
-            </div>
-            <div className="text-[#FFFFFF] top-[105%]">
-              * 비밀번호는 000000 입니다.
-              * 서브 계정에서 비밀번호를 변경할 수 있습니다.
-            </div>
-          </div>
+          <div className="w-[40%]" />
         </div>
+        <div />
       </div>
 
       <div className="w-full flex justify-end gap-5">
