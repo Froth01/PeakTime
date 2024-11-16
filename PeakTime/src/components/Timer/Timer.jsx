@@ -562,7 +562,7 @@ function Timer() {
         .timer {
           background: ${
             isRunning
-              ? "-webkit-linear-gradient(left, #333333 50%, #f40000 50%)"
+              ? "-webkit-linear-gradient(left, #333333 50%, #d10000 50%)"
               : "#eee"
           };
           border-radius: 100%;
@@ -583,7 +583,7 @@ function Timer() {
           width: 50%;
           background: ${
             isRunning
-              ? `${remainTime >= totalTime / 2 ? "#f40000" : "#333333"}`
+              ? `${remainTime >= totalTime / 2 ? "#d10000" : "#333333"}`
               : "#eee"
           };
           transform-origin: 50% 50%;
@@ -623,6 +623,8 @@ function Timer() {
           height: 15px;
           border-radius: 100%;
           transform: translate(-50%, -50%);
+          background: radial-gradient(circle, #c5c5c5 0%, #86c8e3 10%, #263439 100%);
+          box-shadow: 0px 0px 15px 3px #7FBFDA;
         }
         input[type="number"]::-webkit-outer-spin-button,
         input[type="number"]::-webkit-inner-spin-button {
@@ -638,7 +640,7 @@ function Timer() {
         {isSmall && (
           <div
             className={`me-4 text-5xl font-bold text-${
-              isRunning ? "[#f40000]" : "white"
+              isRunning ? "[#d10000]" : "white"
             }`}
           >
             {isRunning
@@ -648,7 +650,11 @@ function Timer() {
                 ).slice(-2)}`}
           </div>
         )}
-        <div className="flex flex-col items-center text-center">
+        <div
+          className={`flex flex-col items-end text-${
+            isSmall ? "end" : "center"
+          }`}
+        >
           <button
             onClick={handleSmall}
             className="rounded-full bg-[#66aadf] w-[5vh] h-[5vh] flex justify-center items-center text-2xl text-white shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
@@ -656,7 +662,7 @@ function Timer() {
             <MdAccessTimeFilled />
           </button>
           <p className="text-white font-bold mt-2">
-            {isSmall ? "시작하기" : "축소하기"}
+            {isSmall ? "타이머 표시" : "축소하기"}
           </p>
         </div>
       </div>
