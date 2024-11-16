@@ -34,7 +34,7 @@ if (!gotTheLock) {
 
   function createWindow() {
     // 일렉트론 크기
-    Menu.setApplicationMenu(null);
+    // Menu.setApplicationMenu(null); 메뉴바 삭제
 
     win = new BrowserWindow({
       width: 1366,
@@ -51,7 +51,7 @@ if (!gotTheLock) {
         nodeIntegration: false, // 보안 상 비활성화
         sandbox: true,
         enableRemoteModule: false,
-        devTools: false,
+        // devTools: false, 개발자 도구 막기
       },
     });
 
