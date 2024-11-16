@@ -5,19 +5,25 @@ import { MdStickyNote2 } from "react-icons/md";
 import { BiShieldQuarter } from "react-icons/bi";
 import { FaHandsHoldingChild } from "react-icons/fa6";
 import { AiFillHome, AiFillSetting } from "react-icons/ai";
-import { Dropdown, Tooltip } from "flowbite-react";
-import { useState } from "react";
+import { Tooltip } from "flowbite-react";
+import { useEffect, useState } from "react";
 import { useUserStore } from "../../stores/UserStore";
 import Swal from "sweetalert2"; // 모달 라이브러리
 import "../../styles/daily-report-custom-swal.css";
 import usersApi from "../../api/usersApi";
 import authApi from "../../api/authApi";
+import { useRunningStore } from "../../stores/RunningStore";
 
 function Toolbar() {
   const navigate = useNavigate();
   //유저정보
   const { user, userActions } = useUserStore();
   const localUser = JSON.parse(localStorage.getItem("user")) || null;
+  // 하이킹 진행중 정보
+  const { running, runningActions } = useRunningStore();
+  useEffect(() => {
+    console.log("Running state changed:", running);
+  }, [running]);
   // 버튼 스타일 조건을 위한 변수
   const [isHomeHovered, setIsHomeHovered] = useState(false);
   const [isSettingHovered, setIsSettingHovered] = useState(false);
@@ -69,7 +75,20 @@ function Toolbar() {
 
   //이동 함수
   const handleMenu = (type) => {
-    navigate(type);
+    if (type === "/preset" && running) {
+      Swal.fire({
+        title: "하이킹 중 접근 불가",
+        customClass: {
+          popup: "custom-swal-popup",
+        },
+        text: "하이킹 중에는 차단 관리에 접근할 수 없습니다.",
+        icon: "error",
+        confirmButtonColor: "#03C777",
+        confirmButtonText: "확인",
+      });
+    } else {
+      navigate(type);
+    }
   };
 
   // 로그아웃 검사 모달창 띄우기
@@ -134,13 +153,13 @@ function Toolbar() {
   // 비밀번호 변경 모달창 띄우기
   const changePasswordModal = async () => {
     const { value: getPassword } = await Swal.fire({
-      title: '비밀번호를 입력해주세요.',
+      title: "비밀번호를 입력해주세요.",
       customClass: {
-        popup: 'custom-swal-popup',
+        popup: "custom-swal-popup",
       },
-      input: 'password',
+      input: "password",
       inputAttributes: {
-        style: 'color: black;', // input 텍스트 색상
+        style: "color: black;", // input 텍스트 색상
       },
     });
 
@@ -148,7 +167,7 @@ function Toolbar() {
     if (getPassword) {
       checkPassword(getPassword);
     }
-  }
+  };
 
   // 비밀번호 검증 API 호출
   const checkPassword = async (getPassword) => {
@@ -165,15 +184,15 @@ function Toolbar() {
       Swal.fire({
         title: "다시 시도해주세요.",
         customClass: {
-          popup: 'custom-swal-popup',
+          popup: "custom-swal-popup",
         },
-        text: '비밀번호가 일치하지 않습니다.',
+        text: "비밀번호가 일치하지 않습니다.",
         icon: "error",
         confirmButtonColor: "#03C777",
         confirmButtonText: "확인",
       });
     }
-  }
+  };
 
   return (
     <div className="bg-[#66aadf] w-[8vw] h-[100vh] absolute left-0 z-[2] flex flex-col items-center justify-between">
@@ -241,7 +260,7 @@ function Toolbar() {
                   onClick={() => {
                     handleMenu("/preset");
                   }}
-                  className="bg-gray-100 hover:bg-white active:bg-gray-200 w-[10vh] h-[10vh] rounded-full flex items-start pt-6 justify-center text-4xl shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
+                  className="bg-gray-100 hover:bg-white active:bg-gray-200 w-[10vh] h-[10vh] rounded-full flex items-start pt-6 justify-center text-4xl shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200 "
                 >
                   <BiShieldQuarter />
                 </button>

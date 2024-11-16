@@ -1,6 +1,9 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("electronAPI", {
+  onWebSocketConnect: (callback) =>
+    ipcRenderer.on("websocket-on", (event, data) => callback(data.type)),
+  openLink: (url) => ipcRenderer.send("open-link", url),
   getBackUrl: () => ipcRenderer.invoke("getBackUrl"),
   sendWebSocketMessage: (message) =>
     ipcRenderer.send("websocket-message", message),
@@ -12,7 +15,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
   sendBackUrl: (url) => ipcRenderer.send("sendBackUrl", url),
   // 하이킹 종료시 정보 주고받기
   sendHikingInfo: (data) => {
-    console.log("sendHikingInfo :", data);
     ipcRenderer.send("hikingInfo", data);
   },
   // 프로그램 차단 시작

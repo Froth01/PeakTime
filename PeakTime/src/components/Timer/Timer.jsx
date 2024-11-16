@@ -4,11 +4,15 @@ import hikingsApi from "../../api/hikingsApi.js";
 import memosApi from "../../api/memosApi.js";
 import presetsApi from "../../api/presetsApi.js";
 import { IoIosArrowDown } from "react-icons/io";
+import { AiOutlineDisconnect } from "react-icons/ai";
+import { FaCheck } from "react-icons/fa";
 import { useUserStore } from "../../stores/UserStore.js";
 import { EventSourcePolyfill } from "event-source-polyfill";
 import { useBackgroundStore } from "../../stores/BackgroundStore.jsx";
 import { MdAccessTimeFilled } from "react-icons/md";
 import "../../styles/daily-report-custom-swal.css";
+import { useRunningStore } from "../../stores/RunningStore.jsx";
+import { useNavigate } from "react-router-dom";
 
 function Timer() {
   const { bg, bgActions } = useBackgroundStore();
@@ -16,6 +20,7 @@ function Timer() {
   const [totalTime, setTotalTime] = useState(0); // 타이머 시간 (분 단위)
   const [remainTime, setRemainTime] = useState(null); // 남은 시간 (초 단위)
   const [isRunning, setIsRunning] = useState(false); // 타이머 시작 상태
+  const { running, runningActions } = useRunningStore(); // 상태 정보 스토어
   const [isSelf, setIsSelf] = useState(true);
   const workerRef = useRef(null);
   const [startedHikingId, setStartedHikingId] = useState(null); // 시작한 hikingId 정보
@@ -36,6 +41,14 @@ function Timer() {
     hikingIdRef.current = startedHikingId;
   }, [startedHikingId]);
 
+  // 웹소켓 연결상태
+  const [isConnected, setIsConnected] = useState(false);
+  const isConnectedRef = useRef(isConnected);
+
+  useEffect(() => {
+    isConnectedRef.current = isConnected;
+  }, [isConnected]);
+
   // 드롭다운 관련
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -47,6 +60,8 @@ function Timer() {
   const [messages, setMessages] = useState(null);
   const { user } = useUserStore();
   const localUser = JSON.parse(localStorage.getItem("user")) || null;
+
+  const navigate = useNavigate();
 
   //현재 시간
   let [now, setNow] = useState(new Date());
@@ -70,6 +85,7 @@ function Timer() {
   // 타이머 시작
   const startTimer = (duration) => {
     setIsRunning(true);
+    runningActions.setRunning(true);
     workerRef.current.postMessage({ type: "start", duration });
   };
 
@@ -83,7 +99,7 @@ function Timer() {
     // 시간 정수화
     const time = parseInt(inputTime, 10);
     // 입력 시간 유효성 검사
-    if (isNaN(time) || time <= 0) {
+    if (isNaN(time) || time <= 29) {
       Swal.fire({
         title: "올바른 시간을 입력하세요.",
         customClass: {
@@ -188,6 +204,7 @@ function Timer() {
           const startBtn = document.getElementById("start");
           startBtn.dispatchEvent(hikingStart);
           startTimer(time * 60);
+          navigate("/");
         } catch (err) {
           console.error("API 요청 중 오류 발생:", err);
           Swal.fire({
@@ -272,6 +289,43 @@ function Timer() {
     if (user && messages) {
       if (!user.isRoot) {
         const startHiking = async () => {
+          if (isRunning) {
+            bgActions.setBackground("loft");
+            try {
+              if (isRunningRef.current) {
+                setRemainTime(0);
+                console.log("자동종료 로직 작동");
+                // 종료 커스텀 이벤트 발생시키기
+                const hikingEnd = new CustomEvent("hikingEnd", {
+                  bubbles: true,
+                  detail: { startedHikingId: hikingIdRef.current },
+                });
+                const endBtn = document.getElementById("mini");
+                if (endBtn) {
+                  endBtn.dispatchEvent(hikingEnd);
+                }
+                // 상태 업데이트
+                setIsRunning(false);
+                runningActions.setRunning(false);
+              }
+            } catch (err) {
+              console.error("API 요청 중 오류 발생:", err);
+
+              // SweetAlert를 사용하여 오류 메시지 표시
+              Swal.fire({
+                title: "하이킹을 종료하는 데 실패했습니다.",
+                customClass: {
+                  popup: "custom-swal-popup",
+                },
+                text: `오류 내용: ${
+                  err.response?.data?.message || err.message
+                }`,
+                icon: "error",
+                confirmButtonColor: "#03c777",
+                confirmButtonText: "확인",
+              });
+            }
+          }
           try {
             // 시작 시간 포맷 생성
             const now = new Date();
@@ -321,6 +375,7 @@ function Timer() {
             const startBtn = document.getElementById("start");
             startBtn?.dispatchEvent(hikingStart);
             startTimer(messages.attentionTime * 60);
+            navigate("/");
           } catch (err) {
             console.error("API 요청 중 오류 발생:", err);
 
@@ -427,14 +482,10 @@ function Timer() {
     workerRef.current.onmessage = (e) => {
       if (e.data.type === "step") {
         setRemainTime((prev) => prev - 1);
-        console.log(
-          "isRunning : ",
-          remainTimeRef.current,
-          isRunningRef.current
-        );
       } else if (e.data.type === "end") {
         try {
-          console.log("message end isRunning :", isRunningRef.current);
+          bgActions.setBackground("loft");
+
           if (isRunningRef.current) {
             setRemainTime(0);
             console.log("자동종료 로직 작동");
@@ -449,6 +500,7 @@ function Timer() {
             }
             // 상태 업데이트
             setIsRunning(false);
+            runningActions.setRunning(false);
           }
         } catch (err) {
           console.error("API 요청 중 오류 발생:", err);
@@ -474,6 +526,17 @@ function Timer() {
     window.electronAPI.onSaveMemo(handleExtensionMemoMessage);
 
     window.electronAPI.onAddUrl(handleExtensionUrlMessage);
+
+    window.electronAPI.onWebSocketConnect((type) => {
+      console.log(type);
+      if (type === "connect") {
+        console.log("WebSocket Connect!!!", isConnectedRef.current);
+        setIsConnected(true);
+      } else if (type === "disconnect") {
+        console.log("WebSocket Disconnect!!!", isConnectedRef.current);
+        setIsConnected(false);
+      }
+    });
 
     presetsApi
       .get("")
@@ -505,7 +568,6 @@ function Timer() {
         try {
           console.log("취소 로직 작동");
           if (isRunning) {
-            console.log("종료할때 isRunning판단 : ", isRunning);
             // 종료 커스텀 이벤트 발생시키기
             const hikingEnd = new CustomEvent("hikingEnd", {
               bubbles: true,
@@ -518,6 +580,7 @@ function Timer() {
             pauseTimer(); // 분 단위로 받은 시간을 초로 변환
             setRemainTime(null);
             setIsRunning(false);
+            runningActions.setRunning(false);
           }
         } catch (err) {
           console.error("API 요청 중 오류 발생:", err);
@@ -701,10 +764,10 @@ function Timer() {
                 type="number"
                 value={inputTime}
                 onChange={(e) => setInputTime(e.target.value)}
-                className="w-[60%] hover:border-[#66AADF] rounded-xl"
+                className="w-[60%] hover:border-[#66AADF] rounded-xl text-lg"
                 placeholder="하이킹 시간을 입력해주세요"
               />
-              <label htmlFor="hikingStart" className="text-sm text-white">
+              <label htmlFor="hikingStart" className="text-md text-white">
                 *분 단위로 입력해주세요.<br></br>최소 30분부터 240분까지
                 가능합니다.
               </label>
@@ -756,8 +819,26 @@ function Timer() {
                   </label>
                 </>
               )}
+              <div className="flex w-full mt-3">
+                <div
+                  className={`flex justify-center items-center w-[4vh] h-[4vh] ms-5 rounded-full font-bold text-white text-2xl bg-${
+                    isConnected ? "[#03c777]" : "[#f40000]"
+                  }`}
+                >
+                  {isConnected ? <FaCheck /> : <AiOutlineDisconnect />}
+                </div>
+                <div
+                  className={`flex items-center justify-center text-${
+                    isConnected ? "[#03c777]" : "[#f40000]"
+                  } text-xl ms-3 font-bold`}
+                >
+                  {isConnected
+                    ? "확장프로그램과 연결된 상태입니다!"
+                    : "확장프로그램과 연결이 필요합니다!"}
+                </div>
+              </div>
               <button
-                className="w-[10vw] h-[6vh] mt-[10%] rounded-xl text-white bg-[#03c777]"
+                className="w-[10vw] h-[6vh] mt-5 rounded-xl text-white text-xl  font-bold bg-[#03c777]"
                 onClick={handleStart}
                 id="start"
               >

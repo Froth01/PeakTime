@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, session } from "electron";
+import { app, BrowserWindow, ipcMain, session, shell } from "electron";
 import path from "path";
 import url from "url";
 import WebSocket, { WebSocketServer } from "ws";
@@ -17,11 +17,11 @@ dotenv.config();
 const store = new Store();
 
 const __dirname = path.resolve();
-
+let mainWindow;
 
 function createWindow() {
   // 일렉트론 크기
-  const win = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1366,
     height: 768,
     webPreferences: {
@@ -55,11 +55,11 @@ function createWindow() {
   /*
    * startUrl에 배정되는 url을 맨 위에서 생성한 BrowserWindow에서 실행시킵니다.
    * */
-  win.loadURL(startUrl);
+  mainWindow.loadURL(startUrl);
 }
 
 // 일렉트론 종료
-app.on('before-quit', (event) => {
+app.on("before-quit", (event) => {
   // 소켓 종료
 
   wss.close();
@@ -74,14 +74,11 @@ let wss;
 // 웹소켓 메세지 주고받기
 ipcMain.on("websocket-message", (event, action) => {
   if (wss && wss.clients) {
-    let count = 0;
     wss.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
         client.send(action);
-        count += 1;
       }
     });
-    console.log(count);
   }
 });
 
@@ -114,7 +111,12 @@ app.whenReady().then(() => {
   // WebSocket 연결 처리
   wss.on("connection", (ws) => {
     console.log("New client connected");
-
+    if (mainWindow) {
+      console.log("mainwindow ok");
+      mainWindow.webContents.send("websocket-on", { type: "connect" });
+    } else {
+      console.error("mainWindow가 정의되지 않았습니다.");
+    }
     // 새 클라이언트에게 저장된 메시지 전송
     if (lastWebSocketMessage) {
       ws.send(lastWebSocketMessage);
@@ -131,6 +133,11 @@ app.whenReady().then(() => {
     // 클라이언트 연결 종료
     ws.on("close", () => {
       console.log("Client disconnected");
+      if (mainWindow) {
+        mainWindow.webContents.send("websocket-on", { type: "disconnect" });
+      } else {
+        console.error("mainWindow가 정의되지 않았습니다.");
+      }
     });
 
     // 에러 처리
@@ -142,6 +149,11 @@ app.whenReady().then(() => {
   wss.on("error", (err) => {
     console.error("WebSocket server error:", err);
   });
+});
+
+// 링크 열기
+ipcMain.on("open-link", (event, url) => {
+  shell.openExternal(url); // 메인 프로세스에서 링크 열기
 });
 
 // 하이킹 정보 받기

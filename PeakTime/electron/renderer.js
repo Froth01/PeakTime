@@ -1,3 +1,13 @@
+// 익스텐션 설치 url 클릭
+document.addEventListener("extensionUrl", (event) => {
+  console.log("link click event : ", event.detail);
+  if (event.detail.url) {
+    console.log(window.electronAPI);
+    console.log(event.detail.url);
+    window.electronAPI.openLink(event.detail.url);
+  }
+});
+
 //하이킹 시작
 
 document.addEventListener("hikingStart", (event) => {
