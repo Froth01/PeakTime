@@ -8,6 +8,7 @@ import ReactDOM from "react-dom/client";
 import { UPDATE_GROUP_ALERT_MESSAGE } from "../../utils/Child/UpdateGroupAlertMessage";
 import { IoIosArrowDown } from "react-icons/io";
 import "../../styles/daily-report-custom-swal.css";
+import "../../styles/custom-scrollbar.css";
 
 function UpdateGroup() {
   const { groupId, presetList, setGroupList, setContent, getPresetById } =
@@ -286,7 +287,7 @@ function UpdateGroup() {
 
       {/* timers */}
       <div className="w-[85%] h-[50%] text-start">
-        <div className="w-full h-[90%] rounded-xl border-4 border-[#66aadf] p-5">
+        <div className="w-full h-[90%] rounded-xl border-4 border-[#66aadf] p-5 overflow-y-auto custom-scrollbar">
           {groupInfo?.timerList.map((timer) => (
             <div
               key={timer.timerId}
