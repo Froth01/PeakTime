@@ -38,7 +38,7 @@ const HorizontalBarChart = ({ listArray, ylabel }) => {
           datasets: [
             {
               label: "사용 시간 (분)",
-              data: dataArray.map((item) => item.usingTime / 60),
+              data: dataArray.map((item) => (item.usingTime / 60).toFixed(1)),
               backgroundColor: colors.slice(0, dataArray.length),
               borderColor: colors.slice(0, dataArray.length),
               borderWidth: 1,
