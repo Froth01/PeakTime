@@ -5,6 +5,7 @@ import com.dinnertime.peaktime.domain.child.service.dto.request.CreateChildReque
 import com.dinnertime.peaktime.domain.child.service.dto.request.UpdateChildRequestDto;
 import com.dinnertime.peaktime.domain.group.entity.Group;
 import com.dinnertime.peaktime.domain.group.repository.GroupRepository;
+import com.dinnertime.peaktime.domain.statistic.entity.Statistic;
 import com.dinnertime.peaktime.domain.statistic.repository.StatisticRepository;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
