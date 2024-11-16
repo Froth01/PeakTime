@@ -129,9 +129,22 @@ public class AuthService {
         } catch (IOException e) {
             throw new CustomException(ErrorCode.FILE_NOT_FOUND);
         }
-        // 9. Create Default Preset
-        Preset preset = Preset.createDefaultPreset(blockWebsiteList, user);
-        // 10. Save Preset
+        // 9. Create Block Program Array For Default Preset
+        List<String> blockProgramList;
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("DistractionsPrograms.txt")) {
+            if (inputStream == null) {
+                throw new CustomException(ErrorCode.FILE_NOT_FOUND);
+            }
+            blockProgramList = new BufferedReader(new InputStreamReader(inputStream))
+                    .lines()
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new CustomException(ErrorCode.FILE_NOT_FOUND);
+        }
+
+        // 10. Create Default Preset
+        Preset preset = Preset.createDefaultPreset(blockWebsiteList, blockProgramList, user);
+        // 11. Save Preset
         presetRepository.save(preset);
     }
 
