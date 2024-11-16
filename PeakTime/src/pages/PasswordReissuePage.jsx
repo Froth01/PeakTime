@@ -22,25 +22,25 @@ function PasswordReissuePage() {
     const resetPasswordData = {
       userLoginId: inputId,
       email: inputEmail,
-    }
+    };
     try {
       await authApi.put("/reset-password", resetPasswordData);
       // 성공하면 이어서 진행
       Swal.fire({
-        title: "임시 비밀번호가 발급되었습니다.",
+        title: "임시 비밀번호 발급",
         customClass: {
-          popup: 'custom-swal-popup',
+          popup: "custom-swal-popup",
         },
-        text: "이어서 로그인을 진행해주세요.",
+        html: "임시 비밀번호가 발급되었습니다.<br>이어서 로그인을 진행해주세요.",
         icon: "success",
         confirmButtonColor: "#03C777",
         didClose: () => navigate(-1),
       });
     } catch (error) {
       Swal.fire({
-        title: "다시 시도해주세요.",
+        title: "임시 비밀번호 발급 실패",
         customClass: {
-          popup: 'custom-swal-popup',
+          popup: "custom-swal-popup",
         },
         text: `${error.response.data.message}`,
         icon: "error",
@@ -48,7 +48,7 @@ function PasswordReissuePage() {
         confirmButtonText: "확인",
       });
     }
-  }
+  };
 
   return (
     <div className="h-[100vh] flex justify-center items-center">
@@ -56,7 +56,8 @@ function PasswordReissuePage() {
         <h1 className="text-[30px] font-bold">비밀번호 재발급</h1>
         <div
           id="main-content"
-          className="flex flex-col h-[70%] w-full items-center justify-evenly">
+          className="flex flex-col h-[70%] w-full items-center justify-evenly"
+        >
           <div>서브 유저는 비밀번호 재발급이 불가능합니다.</div>
           <div className="relative z-0 mb-5 group text-start w-[45%]">
             <input
@@ -97,7 +98,8 @@ function PasswordReissuePage() {
             </div>
             <button
               className="bg-[#66aadf] rounded-xl px-5 py-2 hover:bg-[#4d90d8] focus:ring-4 focus:ring-[#66aadf] mb-5 ms-0"
-              onClick={resetPassword}>
+              onClick={resetPassword}
+            >
               비밀번호 발급
             </button>
           </div>
