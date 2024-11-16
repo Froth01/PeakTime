@@ -13,8 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemoDetailResponseDto {
 
-    // 메모 상세, 해당하는 요약 정보 넣기
-
+    // 메모 상세 정보 넣기
     private Long memoId;
     private String title;
     private LocalDateTime memoCreateAt;
