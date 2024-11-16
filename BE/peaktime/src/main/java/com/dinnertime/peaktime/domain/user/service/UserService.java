@@ -4,10 +4,7 @@ import com.dinnertime.peaktime.domain.group.entity.Group;
 import com.dinnertime.peaktime.domain.group.repository.GroupRepository;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
-import com.dinnertime.peaktime.domain.user.service.dto.request.AllowSettingsRequest;
-import com.dinnertime.peaktime.domain.user.service.dto.request.UpdateEmailRequest;
-import com.dinnertime.peaktime.domain.user.service.dto.request.UpdateNicknameRequest;
-import com.dinnertime.peaktime.domain.user.service.dto.request.UpdatePasswordRequest;
+import com.dinnertime.peaktime.domain.user.service.dto.request.*;
 import com.dinnertime.peaktime.domain.user.service.dto.response.GetProfileResponse;
 import com.dinnertime.peaktime.domain.usergroup.entity.UserGroup;
 import com.dinnertime.peaktime.domain.usergroup.repository.UserGroupRepository;
@@ -130,6 +127,18 @@ public class UserService {
         userRepository.save(user);
         // 9. Redis에서 emailAuthentication prefix 데이터 삭제
         redisService.removeEmailAuthentication(lowerEmail);
+    }
+
+    // 비밀번호 검증
+    @Transactional(readOnly = true)
+    public void checkPassword(CheckPasswordRequest checkPasswordRequest, UserPrincipal userPrincipal) {
+        // 1. 유저 정보 불러오기
+        User user = userRepository.findByUserId((userPrincipal.getUserId()))
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        // 2. 비밀번호가 일치하는지 확인하기
+        if(!passwordEncoder.matches(checkPasswordRequest.getPassword(), user.getPassword())) {
+            throw new CustomException(ErrorCode.INVALID_ROOT_PASSWORD);
+        }
     }
 
     // 회원정보 관리 페이지 접근 권한 검사

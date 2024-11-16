@@ -1,10 +1,7 @@
 package com.dinnertime.peaktime.domain.user.controller;
 
 import com.dinnertime.peaktime.domain.user.service.UserService;
-import com.dinnertime.peaktime.domain.user.service.dto.request.AllowSettingsRequest;
-import com.dinnertime.peaktime.domain.user.service.dto.request.UpdateEmailRequest;
-import com.dinnertime.peaktime.domain.user.service.dto.request.UpdateNicknameRequest;
-import com.dinnertime.peaktime.domain.user.service.dto.request.UpdatePasswordRequest;
+import com.dinnertime.peaktime.domain.user.service.dto.request.*;
 import com.dinnertime.peaktime.domain.user.service.dto.response.GetProfileResponse;
 import com.dinnertime.peaktime.global.auth.service.dto.security.UserPrincipal;
 import com.dinnertime.peaktime.global.util.CommonSwaggerResponse;
@@ -152,6 +149,32 @@ public class UserController {
                 .status(HttpStatus.OK)
                 .body(ResultDto.res(HttpStatus.OK.value(),
                         "이메일 변경 요청에 성공하였습니다."));
+    }
+
+    // 비밀번호 검증
+    @Operation(summary = "비밀번호 검증", description = "비밀번호 검증하기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "비밀번호가 검증되었습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 형식의 요청입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않은 유저입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "409", description = "비밀번호가 일치하지 않습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "500", description = "비밀번호 검증 요청에 실패하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+    })
+    @CommonSwaggerResponse.CommonResponses
+    @PostMapping("/password")
+    public ResponseEntity<?> checkPassword(@RequestBody @Valid CheckPasswordRequest checkPasswordRequest, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        userService.checkPassword(checkPasswordRequest, userPrincipal);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResultDto.res(HttpStatus.OK.value(),
+                        "비밀번호가 검증되었습니다."));
     }
 
     // 회원정보 관리 페이지 접근 권한 검사
