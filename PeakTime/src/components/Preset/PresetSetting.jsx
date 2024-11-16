@@ -222,7 +222,7 @@ function PresetSetting({ onCancel, setUpdateTrigger }) {
           <div className="h-[40vh] overflow-y-scroll border border-white p-3 custom-scrollbar">
             {blockWebsiteArray.map((site, idx) => (
               <li key={idx} className="flex items-center text-[20px] gap-3">
-                <span>{site}</span>
+                <div className="text-left truncate w-full">{site}</div>
                 <button
                   className="text-[20px]"
                   onClick={() => handleDeleteSite(idx)}
@@ -246,7 +246,7 @@ function PresetSetting({ onCancel, setUpdateTrigger }) {
           <div className="h-[40vh] overflow-y-scroll border border-white p-3 custom-scrollbar">
             {blockProgramArray.map((program, idx) => (
               <li key={idx} className="flex items-center text-[20px] gap-3">
-                <span>{program}</span>
+                <span className="text-left truncate w-full">{program}</span>
                 <button
                   className="text-[20px]"
                   onClick={() => handleDeleteProgram(idx)}
