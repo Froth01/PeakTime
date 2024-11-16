@@ -52,7 +52,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.GET, "/presets").hasAnyAuthority("root","child")
                         .requestMatchers(HttpMethod.GET, "/schedules").hasAuthority("child")
-                        .requestMatchers("/auth/logout","/hikings/**","/summaries/**", "/memos/**").hasAnyAuthority("root", "child")
+                        .requestMatchers("/auth/logout","/hikings/**","/summaries/**", "/memos/**", "/users/password").hasAnyAuthority("root", "child")
                         .requestMatchers("/users/**", "/children/**", "/groups/**", "/presets/**", "/timers/**").hasAuthority("root")
                         .anyRequest().denyAll())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
