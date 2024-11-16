@@ -91,13 +91,13 @@ public class RedisService {
     }
 
     public Integer getGPTcount(Long userId) {
-        String key = "gpt_usage_count: " + userId;
+        String key = "gpt_usage_count:" + userId;
         Integer count = (Integer) redisTemplate.opsForValue().get(key);
         return count;
     }
 
     public void setGPTIncrement(Long userId) {
-        String key = "gpt_usage_count: " + userId;
+        String key = "gpt_usage_count:" + userId;
         // 초기 설정 or 개수 증가
         redisTemplate.opsForValue().increment(key);
         if (getGPTcount(userId) == 1) { // 맨 처음 생성 시 expire 설정
