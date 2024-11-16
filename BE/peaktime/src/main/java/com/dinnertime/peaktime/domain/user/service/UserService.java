@@ -157,4 +157,9 @@ public class UserService {
         return userRepository.findByEmail(lowerEmail).isPresent();
     }
 
+    @Transactional(readOnly = true)
+    public User getUser(Long userId) {
+        return userRepository.findByUserId(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    }
+
 }
