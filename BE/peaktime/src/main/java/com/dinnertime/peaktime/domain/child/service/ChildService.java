@@ -33,6 +33,9 @@ public class ChildService {
     private final GroupRepository groupRepository;
     private final StatisticRepository statisticRepository;
 
+    // 초기화 비밀번호 설정
+    private static final String initPassword = "000000";
+
     @Transactional
     public void createChild(CreateChildRequestDto requestDto){
 
@@ -58,33 +61,23 @@ public class ChildService {
             throw new CustomException(ErrorCode.DUPLICATED_USER_LOGIN_ID);
         };
 
-        // 5. 비밀번호 형식 확인
-        if(!AuthUtil.checkFormatValidationPassword(requestDto.getChildPassword())){
-           throw new CustomException(ErrorCode.INVALID_PASSWORD_FORMAT);
-        }
-
-        // 6. 비밀번호, 비밀번호 확인 일치 확인
-        if(!requestDto.getChildPassword().equals(requestDto.getChildConfirmPassword())){
-            throw new CustomException(ErrorCode.NOT_EQUAL_PASSWORD);
-        }
-
-        // 7. 닉네임 형식 확인
+        // 5. 닉네임 형식 확인
         if(!AuthUtil.checkFormatValidationNickname(requestDto.getChildNickname())){
             throw new CustomException(ErrorCode.INVALID_NICKNAME_FORMAT);
         }
 
-        // 8. 비밀번호 암호화
-        String encodedPassword = passwordEncoder.encode(requestDto.getChildPassword());
+        // 6. 비밀번호 암호화
+        String encodedPassword = passwordEncoder.encode(initPassword);
 
-        // 9. 유저 테이블 저장
+        // 7. 유저 테이블 저장
         User user = User.createChildUser(requestDto.getChildLoginId(), encodedPassword, requestDto.getChildNickname());
         userRepository.save(user);
 
-        //9-1. 통계 테이블 저장
+        //8. 통계 테이블 저장
         Statistic statistic = Statistic.createFirstStatistic(user);
         statisticRepository.save(statistic);
 
-        // 10. 유저 그룹 테이블 저장
+        // 9. 유저 그룹 테이블 저장
         UserGroup userGroup = UserGroup.createUserGroup(user, group);
         userGroupRepository.save(userGroup);
     }
@@ -161,6 +154,19 @@ public class ChildService {
         String encodedPassword = passwordEncoder.encode(requestDto.getChildPassword());
 
         // 5. 수정 후 저장
+        childUser.updatePassword(encodedPassword);
+        userRepository.save(childUser);
+    }
+
+    @Transactional
+    public void initChildPassword(Long childId){
+        // 1. 자식 계정 조회
+        User childUser = this.getChildUser(childId);
+
+        // 2. 초기화 비밀번호 설정
+        String encodedPassword = passwordEncoder.encode(initPassword);
+
+        // 3. 저장
         childUser.updatePassword(encodedPassword);
         userRepository.save(childUser);
     }

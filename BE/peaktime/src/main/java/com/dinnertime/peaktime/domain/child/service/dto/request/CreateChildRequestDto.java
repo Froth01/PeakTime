@@ -21,14 +21,6 @@ public class CreateChildRequestDto {
     private String childLoginId;
 
     @NotBlank
-    @Length(min = 8, message = "최소 8자 이상의 패스워드를 입력해주세요.")
-    private String childPassword;
-
-    @NotBlank
-    @Length(min = 8, message = "최소 8자 이상의 패스워드를 입력해주세요.")
-    private String childConfirmPassword;
-
-    @NotBlank
     @Length(min = 2, max = 15, message = "2자 이상 15자 이하의 닉네임을 입력주세요.")
     private String childNickname;
 }
