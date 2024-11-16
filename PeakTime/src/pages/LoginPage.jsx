@@ -24,7 +24,7 @@ function LoginPage() {
       };
       try {
         const loginResponse = await authApi.post("/login", loginData, {
-          withCredentials: true
+          withCredentials: true,
         });
         // 성공하면 이어서 진행
         userActions.setUser(loginResponse.data.data);
@@ -33,9 +33,9 @@ function LoginPage() {
       } catch (error) {
         // 에러 코드가 발생하면 여기로 진입
         Swal.fire({
-          title: "다시 시도해주세요.",
+          title: "로그인 오류",
           customClass: {
-            popup: 'custom-swal-popup',
+            popup: "custom-swal-popup",
           },
           text: `${error.response.data.message}`,
           icon: "error",
@@ -45,9 +45,9 @@ function LoginPage() {
       }
     } else {
       Swal.fire({
-        title: "다시 시도해주세요.",
+        title: "입력 오류",
         customClass: {
-          popup: 'custom-swal-popup',
+          popup: "custom-swal-popup",
         },
         text: "아이디와 비밀번호를 입력해 주세요.",
         icon: "error",

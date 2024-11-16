@@ -219,7 +219,7 @@ function PresetSetting({ onCancel, setUpdateTrigger }) {
       <div className="grid gap-5 grid-cols-2 w-full">
         <div>
           <h3 className="text-[20px] font-bold mb-4">사이트 차단 목록</h3>
-          <div className="h-[40vh] overflow-y-scroll border border-white p-3 custom-scrollbar">
+          <div className="h-[40vh] overflow-y-scroll border-2 border-[#66aadf] p-3 custom-scrollbar">
             {blockWebsiteArray.map((site, idx) => (
               <li key={idx} className="flex items-center text-[20px] gap-3">
                 <div className="text-left truncate w-full">{site}</div>
@@ -243,7 +243,7 @@ function PresetSetting({ onCancel, setUpdateTrigger }) {
         </div>
         <div>
           <h3 className="text-[20px] font-bold mb-4">프로그램 차단 목록</h3>
-          <div className="h-[40vh] overflow-y-scroll border border-white p-3 custom-scrollbar">
+          <div className="h-[40vh] overflow-y-scroll border-2 border-[#66aadf] p-3 custom-scrollbar">
             {blockProgramArray.map((program, idx) => (
               <li key={idx} className="flex items-center text-[20px] gap-3">
                 <span className="text-left truncate w-full">{program}</span>
