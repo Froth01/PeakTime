@@ -31,7 +31,7 @@ public class Timer {
     private LocalDateTime startTime;
 
     @Column(name = "attention_time", nullable = false)
-    @Min(30)
+//    @Min(30)
     @Max(240)
     private int attentionTime;
 
