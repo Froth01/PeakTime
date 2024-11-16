@@ -26,7 +26,7 @@ function PasswordChangePage() {
         customClass: {
           popup: 'custom-swal-popup',
         },
-        text: "개인 설정 페이지로 되돌아갑니다.",
+        text: "메인 페이지로 되돌아갑니다.",
         icon: "success",
         confirmButtonColor: "#03C777",
         didClose: () => navigate(-1),

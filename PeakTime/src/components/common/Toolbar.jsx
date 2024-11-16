@@ -128,7 +128,52 @@ function Toolbar() {
   const browserLogout = () => {
     userActions.setUser(null);
     localStorage.removeItem("user");
+    window.location.href = "/login";
   };
+
+  // 비밀번호 변경 모달창 띄우기
+  const changePasswordModal = async () => {
+    const { value: getPassword } = await Swal.fire({
+      title: '비밀번호를 입력해주세요.',
+      customClass: {
+        popup: 'custom-swal-popup',
+      },
+      input: 'password',
+      inputAttributes: {
+        style: 'color: black;', // input 텍스트 색상
+      },
+    });
+
+    // 이후 처리되는 내용
+    if (getPassword) {
+      checkPassword(getPassword);
+    }
+  }
+
+  // 비밀번호 검증 API 호출
+  const checkPassword = async (getPassword) => {
+    const checkPasswordData = {
+      password: getPassword,
+    };
+    try {
+      await usersApi.post("/password", checkPasswordData);
+      // 성공하면 이어서 진행
+      handleMenu("/passwordchange");
+    } catch (error) {
+      // 실패하면 여기로 진입
+      console.error(error);
+      Swal.fire({
+        title: "다시 시도해주세요.",
+        customClass: {
+          popup: 'custom-swal-popup',
+        },
+        text: '비밀번호가 일치하지 않습니다.',
+        icon: "error",
+        confirmButtonColor: "#03C777",
+        confirmButtonText: "확인",
+      });
+    }
+  }
 
   return (
     <div className="bg-[#66aadf] w-[8vw] h-[100vh] absolute left-0 z-[2] flex flex-col items-center justify-between">
@@ -246,6 +291,10 @@ function Toolbar() {
                   <hr className="border-t my-1 border-gray-300" />
                 </>
               )}
+              <button onClick={changePasswordModal} className="text-left">
+                비밀번호 변경
+              </button>
+              <hr className="border-t my-1 border-gray-300" />
               <button onClick={logoutModal} className="text-left">
                 로그아웃
               </button>
