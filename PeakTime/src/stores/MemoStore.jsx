@@ -5,6 +5,8 @@ const initialState = {
   page: 0,
   isLastPage: false,
 
+  summaryList: [],
+
   summaryCount: 0,
   memoData: {
     title: "",
@@ -17,7 +19,8 @@ const initialState = {
     updatedAt: "",
   },
 
-  selected: null,
+  selectedMemo: null,
+  selectedSummary: null,
   isSummary: false,
 
   inputText: "", // input box text
@@ -50,11 +53,28 @@ export const useMemoStore = create((set) => ({
       isLastPage: newIsLastPage,
     });
   },
+  setSummaryList: (addSummaryList, newIsLastPage) => {
+    const isLastPage = useMemoStore.getState().isLastPage;
+
+    if (isLastPage) return;
+
+    const list = useMemoStore.getState().summaryList;
+    const pageNow = useMemoStore.getState().page;
+    const pageNew = !isLastPage ? pageNow + 1 : pageNow;
+
+    set({
+      summaryList: [...list, ...addSummaryList],
+      page: pageNew,
+      isLastPage: newIsLastPage,
+    });
+  },
   setSummaryCount: (count) => set({ summaryCount: count }),
   setMemoData: (memoData) => set({ memoData: memoData }),
   setSummaryData: (summaryData) => set({ summaryData: summaryData }),
 
-  setSelected: (selected) => set({ selected: selected }),
+  setSelectedMemo: (selectedMemo) => set({ selectedMemo: selectedMemo }),
+  setSelectedSummary: (selectedSummary) =>
+    set({ selectedSummary: selectedSummary }),
   setIsSummary: (isSummary) => set({ isSummary: isSummary }),
 
   setInputText: (text) => set({ inputText: text }),
@@ -63,6 +83,7 @@ export const useMemoStore = create((set) => ({
 
   setIsLoading: (bool) => set({ isLoading: bool }),
 
+  resetPage: () => set({ page: initialState.page }),
   resetInputText: () => set({ inputText: initialState.inputText }),
   resetKeyWords: () => set({ keywords: initialState.keywords }),
   resetSummaryData: () => set({ summaryData: initialState.summaryData }),

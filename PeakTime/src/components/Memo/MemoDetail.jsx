@@ -14,7 +14,7 @@ function MemoDetail() {
     setMemoData,
     setSummaryData,
     resetSummaryData,
-    selected,
+    selectedMemo,
     summaryCount,
     setSummaryCount,
     summaryCountLimit,
@@ -37,30 +37,18 @@ function MemoDetail() {
 
   const [selectedText, setSelectedText] = useState(""); // 드래그 텍스트 저장
 
-  // 특정 메모 및 요약 상세 정보 보기
+  // 특정 메모 정보 보기
   const readDetailMemoGet = async () => {
     try {
-      // 메모, 요약 상세정보 get api
-      const response = await memosApi.get(`/${selected}`);
+      // 메모 상세정보 get api
+      const response = await memosApi.get(`/${selectedMemo}`);
       console.log("get detail memo api: ", response.data);
 
       setMemoData({
-        title: response.data.data.memoDetail.title,
-        content: response.data.data.memoDetail.memoContent,
-        createdAt: response.data.data.memoDetail.createdAt,
+        title: response.data.data.title,
+        content: response.data.data.memoContent,
+        createdAt: response.data.data.memoCreateAt,
       });
-
-      if (response.data.data.summaryDetail !== null) {
-        setSummaryData({
-          summaryId: response.data.data.summaryDetail.summaryId,
-          content: response.data.data.summaryDetail.summaryContent,
-          updatedAt: response.data.data.summaryDetail.summaryUpdateAt,
-        });
-        setIsSummary(true);
-      } else {
-        resetSummaryData();
-        setIsSummary(false);
-      }
     } catch (error) {
       console.error("Error get detail memo api", error);
       Swal.fire({
@@ -80,16 +68,16 @@ function MemoDetail() {
   // MemoList에서 클릭 시 메모 상세조회 실행
   useEffect(() => {
     readDetailMemoGet();
-  }, [selected]);
+  }, [selectedMemo]);
 
-  const summaryGPTPost = async (selected, keywords) => {
+  const summaryGPTPost = async (keywords) => {
     setIsLoading(true);
 
     try {
       // 요약 요청 post api
       const requestData = {
+        title: "아무 타이틀", // 요약 타이틀 추가하기
         content: inputText, // 요약에 작성한 content
-        memoId: selected, // 해당 memoId
         keywords: keywords, // 추가 키워드(최대 3개)
       };
       const response = await summariesApi.post(``, requestData);
@@ -107,7 +95,7 @@ function MemoDetail() {
         confirmButtonText: "확인",
       });
       // 요청 성공 후 최신 데이터를 다시 가져오기
-      await readDetailMemoGet(selected);
+      await readDetailMemoGet(selectedMemo);
 
       // 요약하기 내용, 키워드 삭제하고 요약 내용 띄우기
       setInputText("");
@@ -187,7 +175,7 @@ function MemoDetail() {
       return;
     }
     // 모든 조건이 통과되면 summaryGPTPost 함수 호출
-    summaryGPTPost(selected, keywords);
+    summaryGPTPost(keywords);
   };
 
   // 복사하기
