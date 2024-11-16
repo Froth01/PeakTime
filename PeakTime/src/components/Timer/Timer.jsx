@@ -18,9 +18,23 @@ function Timer() {
   const [isRunning, setIsRunning] = useState(false); // 타이머 시작 상태
   const [isSelf, setIsSelf] = useState(true);
   const workerRef = useRef(null);
-
   const [startedHikingId, setStartedHikingId] = useState(null); // 시작한 hikingId 정보
   const [presetList, setPresetList] = useState(null); // 프리셋 리스트
+  const remainTimeRef = useRef(remainTime);
+  const isRunningRef = useRef(isRunning);
+  const hikingIdRef = useRef(startedHikingId);
+
+  useEffect(() => {
+    remainTimeRef.current = remainTime;
+  }, [remainTime]);
+
+  useEffect(() => {
+    isRunningRef.current = isRunning;
+  }, [isRunning]);
+
+  useEffect(() => {
+    hikingIdRef.current = startedHikingId;
+  }, [startedHikingId]);
 
   // 드롭다운 관련
   const [isOpen, setIsOpen] = useState(false);
@@ -350,14 +364,6 @@ function Timer() {
     }
   }, [messages]);
 
-  // 요청해서 아이디 받으면
-  useEffect(() => {
-    if (startedHikingId !== null) {
-      console.log("시작한 하이킹 아이디:", startedHikingId);
-      // 차단 프로세스 시작
-    }
-  }, [startedHikingId]);
-
   const handleExtensionMemoMessage = async (data) => {
     // 익스텍션에서 받은 메모 저장
     console.log("handleExtensionMemoMessage: ", data);
@@ -420,23 +426,27 @@ function Timer() {
     workerRef.current = new Worker(new URL("./worker.js", import.meta.url));
     workerRef.current.onmessage = (e) => {
       if (e.data.type === "step") {
-        console.log("react step!");
         setRemainTime((prev) => prev - 1);
+        console.log(
+          "isRunning : ",
+          remainTimeRef.current,
+          isRunningRef.current
+        );
       } else if (e.data.type === "end") {
         try {
-          if (isRunning) {
+          console.log("message end isRunning :", isRunningRef.current);
+          if (isRunningRef.current) {
             setRemainTime(0);
             console.log("자동종료 로직 작동");
             // 종료 커스텀 이벤트 발생시키기
             const hikingEnd = new CustomEvent("hikingEnd", {
               bubbles: true,
-              detail: { startedHikingId },
+              detail: { startedHikingId: hikingIdRef.current },
             });
             const endBtn = document.getElementById("mini");
             if (endBtn) {
               endBtn.dispatchEvent(hikingEnd);
             }
-            pauseTimer();
             // 상태 업데이트
             setIsRunning(false);
           }
@@ -552,7 +562,7 @@ function Timer() {
         .timer {
           background: ${
             isRunning
-              ? "-webkit-linear-gradient(left, #333333 50%, #f40000 50%)"
+              ? "-webkit-linear-gradient(left, #333333 50%, #d10000 50%)"
               : "#eee"
           };
           border-radius: 100%;
@@ -573,7 +583,7 @@ function Timer() {
           width: 50%;
           background: ${
             isRunning
-              ? `${remainTime >= totalTime / 2 ? "#f40000" : "#333333"}`
+              ? `${remainTime >= totalTime / 2 ? "#d10000" : "#333333"}`
               : "#eee"
           };
           transform-origin: 50% 50%;
@@ -613,6 +623,8 @@ function Timer() {
           height: 15px;
           border-radius: 100%;
           transform: translate(-50%, -50%);
+          background: radial-gradient(circle, #c5c5c5 0%, #86c8e3 10%, #263439 100%);
+          box-shadow: 0px 0px 15px 3px #7FBFDA;
         }
         input[type="number"]::-webkit-outer-spin-button,
         input[type="number"]::-webkit-inner-spin-button {
@@ -628,7 +640,7 @@ function Timer() {
         {isSmall && (
           <div
             className={`me-4 text-5xl font-bold text-${
-              isRunning ? "[#f40000]" : "white"
+              isRunning ? "[#d10000]" : "white"
             }`}
           >
             {isRunning
@@ -638,12 +650,21 @@ function Timer() {
                 ).slice(-2)}`}
           </div>
         )}
-        <button
-          onClick={handleSmall}
-          className="rounded-full bg-[#66aadf] w-[5vh] h-[5vh] flex justify-center items-center text-2xl text-white shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
+        <div
+          className={`flex flex-col items-end text-${
+            isSmall ? "end" : "center"
+          }`}
         >
-          <MdAccessTimeFilled />
-        </button>
+          <button
+            onClick={handleSmall}
+            className="rounded-full bg-[#66aadf] w-[5vh] h-[5vh] flex justify-center items-center text-2xl text-white shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
+          >
+            <MdAccessTimeFilled />
+          </button>
+          <p className="text-white font-bold mt-2">
+            {isSmall ? "타이머 표시" : "축소하기"}
+          </p>
+        </div>
       </div>
       <div
         id="timer"

@@ -26,13 +26,13 @@ function Toolbar() {
   // 회원정보 관리 페이지 접근 권한 검사 모달창 띄우기
   const checkAccessModal = async () => {
     const { value: getPassword } = await Swal.fire({
-      title: '비밀번호를 입력해주세요.',
+      title: "비밀번호를 입력해주세요.",
       customClass: {
-        popup: 'custom-swal-popup',
+        popup: "custom-swal-popup",
       },
-      input: 'password',
+      input: "password",
       inputAttributes: {
-        style: 'color: black;', // input 텍스트 색상
+        style: "color: black;", // input 텍스트 색상
       },
     });
 
@@ -40,7 +40,7 @@ function Toolbar() {
     if (getPassword) {
       checkAccess(getPassword);
     }
-  }
+  };
 
   // 회원정보 관리 페이지 접근 권한 검사 API 호출
   const checkAccess = async (getPassword) => {
@@ -57,15 +57,15 @@ function Toolbar() {
       Swal.fire({
         title: "다시 시도해주세요.",
         customClass: {
-          popup: 'custom-swal-popup',
+          popup: "custom-swal-popup",
         },
-        text: '비밀번호가 일치하지 않습니다.',
+        text: "비밀번호가 일치하지 않습니다.",
         icon: "error",
         confirmButtonColor: "#03C777",
         confirmButtonText: "확인",
       });
     }
-  }
+  };
 
   //이동 함수
   const handleMenu = (type) => {
@@ -75,13 +75,13 @@ function Toolbar() {
   // 로그아웃 검사 모달창 띄우기
   const logoutModal = async () => {
     const { value: getRootUserPassword } = await Swal.fire({
-      title: '메인 계정의 비밀번호를 입력해주세요.',
+      title: "메인 계정의 비밀번호를 입력해주세요.",
       customClass: {
-        popup: 'custom-swal-popup',
+        popup: "custom-swal-popup",
       },
-      input: 'password',
+      input: "password",
       inputAttributes: {
-        style: 'color: black;', // input 텍스트 색상
+        style: "color: black;", // input 텍스트 색상
       },
     });
 
@@ -89,7 +89,7 @@ function Toolbar() {
     if (getRootUserPassword) {
       logout(getRootUserPassword);
     }
-  }
+  };
 
   // 로그아웃 API 호출
   const logout = async (getRootUserPassword) => {
@@ -102,9 +102,9 @@ function Toolbar() {
       const accessToken = user.accessToken;
       await authApi.post("/logout", logoutData, {
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`
-        }
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
       // 성공하면 이어서 진행
       browserLogout();
@@ -114,15 +114,15 @@ function Toolbar() {
       Swal.fire({
         title: "다시 시도해주세요.",
         customClass: {
-          popup: 'custom-swal-popup',
+          popup: "custom-swal-popup",
         },
-        text: '비밀번호가 일치하지 않습니다.',
+        text: "비밀번호가 일치하지 않습니다.",
         icon: "error",
         confirmButtonColor: "#03C777",
         confirmButtonText: "확인",
       });
     }
-  }
+  };
 
   // 브라우저 로그아웃
   const browserLogout = () => {
@@ -181,74 +181,93 @@ function Toolbar() {
         <Tooltip
           content="하이킹 내역"
           placement="right"
-          className="whitespace-nowrap font-bold"
+          className="whitespace-nowrap font-bold text-2xl"
         >
-          <button
-            onClick={() => {
-              handleMenu("/report");
-            }}
-            className="bg-gray-100 hover:bg-white active:bg-gray-200 w-[10vh] h-[10vh] rounded-full flex items-center justify-center text-4xl shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
-          >
-            <FaHiking />
-          </button>
+          <div className="relative flex justify-center">
+            <button
+              onClick={() => {
+                handleMenu("/report");
+              }}
+              className="bg-gray-100 hover:bg-white active:bg-gray-200 w-[10vh] h-[10vh] rounded-full flex items-start pt-6 justify-center text-4xl shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
+            >
+              <FaHiking />
+            </button>
+            <p className="absolute top-[65%] text-sm font-bold">하이킹 내역</p>
+          </div>
         </Tooltip>
         <Tooltip
           content="전체 통계"
           placement="right"
-          className="whitespace-nowrap font-bold"
+          className="whitespace-nowrap font-bold text-2xl"
         >
-          <button
-            onClick={() => {
-              handleMenu("/statistic");
-            }}
-            className="bg-gray-100 hover:bg-white active:bg-gray-200 w-[10vh] h-[10vh] rounded-full flex items-center justify-center text-4xl shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
-          >
-            <HiOutlinePresentationChartLine />
-          </button>
+          <div className="relative flex justify-center">
+            <button
+              onClick={() => {
+                handleMenu("/statistic");
+              }}
+              className="bg-gray-100 hover:bg-white active:bg-gray-200 w-[10vh] h-[10vh] rounded-full flex items-start pt-6 justify-center text-4xl shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
+            >
+              <HiOutlinePresentationChartLine />
+            </button>
+            <p className="absolute top-[65%] text-sm font-bold">전체 통계</p>
+          </div>
         </Tooltip>
         <Tooltip
           content="메모"
           placement="right"
-          className="whitespace-nowrap font-bold"
+          className="whitespace-nowrap font-bold text-2xl"
         >
-          <button
-            onClick={() => {
-              handleMenu("/memo");
-            }}
-            className="bg-gray-100 hover:bg-white active:bg-gray-200 w-[10vh] h-[10vh] rounded-full flex items-center justify-center text-4xl shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
-          >
-            <MdStickyNote2 />
-          </button>
+          <div className="relative flex justify-center">
+            <button
+              onClick={() => {
+                handleMenu("/memo");
+              }}
+              className="bg-gray-100 hover:bg-white active:bg-gray-200 w-[10vh] h-[10vh] rounded-full flex items-start pt-6 justify-center text-4xl shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
+            >
+              <MdStickyNote2 />
+            </button>
+            <p className="absolute top-[65%] text-sm font-bold">메모</p>
+          </div>
         </Tooltip>
         {localUser && localUser.isRoot && (
           <>
             <Tooltip
               content="차단 관리"
               placement="right"
-              className="whitespace-nowrap font-bold"
+              className="whitespace-nowrap font-bold text-2xl"
             >
-              <button
-                onClick={() => {
-                  handleMenu("/preset");
-                }}
-                className="bg-gray-100 hover:bg-white active:bg-gray-200 w-[10vh] h-[10vh] rounded-full flex items-center justify-center text-4xl shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
-              >
-                <BiShieldQuarter />
-              </button>
+              <div className="relative flex justify-center">
+                <button
+                  onClick={() => {
+                    handleMenu("/preset");
+                  }}
+                  className="bg-gray-100 hover:bg-white active:bg-gray-200 w-[10vh] h-[10vh] rounded-full flex items-start pt-6 justify-center text-4xl shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
+                >
+                  <BiShieldQuarter />
+                </button>
+                <p className="absolute top-[65%] text-sm font-bold">
+                  차단 관리
+                </p>
+              </div>
             </Tooltip>
             <Tooltip
               content="서브계정 관리"
               placement="right"
-              className="whitespace-nowrap font-bold"
+              className="whitespace-nowrap font-bold text-2xl"
             >
-              <button
-                onClick={() => {
-                  handleMenu("/children");
-                }}
-                className="bg-gray-100 hover:bg-white active:bg-gray-200 w-[10vh] h-[10vh] rounded-full flex items-center justify-center text-4xl shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
-              >
-                <FaHandsHoldingChild />
-              </button>
+              <div className="relative flex justify-center">
+                <button
+                  onClick={() => {
+                    handleMenu("/children");
+                  }}
+                  className="bg-gray-100 hover:bg-white active:bg-gray-200 w-[10vh] h-[10vh] rounded-full flex items-start pt-6 justify-center text-4xl shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
+                >
+                  <FaHandsHoldingChild />
+                </button>
+                <p className="absolute top-[65%] text-sm font-bold">
+                  서브계정 관리
+                </p>
+              </div>
             </Tooltip>
           </>
         )}
@@ -257,7 +276,7 @@ function Toolbar() {
         <Tooltip
           content="홈"
           placement="right"
-          className="whitespace-nowrap font-bold"
+          className="whitespace-nowrap font-bold text-2xl"
         >
           <button
             onClick={() => {
@@ -282,10 +301,7 @@ function Toolbar() {
             <div className="flex flex-col">
               {localUser && localUser.isRoot && (
                 <>
-                  <button
-                    onClick={checkAccessModal}
-                    className="text-left"
-                  >
+                  <button onClick={checkAccessModal} className="text-left">
                     유저정보수정
                   </button>
                   <hr className="border-t my-1 border-gray-300" />
@@ -301,11 +317,9 @@ function Toolbar() {
             </div>
           }
           placement="right"
-          className="whitespace-nowrap font-bold"
+          className="whitespace-nowrap font-bold text-2xl"
         >
-          <button
-            className="text-white text-5xl"
-          >
+          <button className="text-white text-5xl">
             <AiFillSetting
               style={{
                 filter: isSettingHovered
