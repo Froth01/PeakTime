@@ -1,4 +1,12 @@
-import { app, BrowserWindow, ipcMain, session, Tray, Menu } from "electron";
+import {
+  app,
+  BrowserWindow,
+  ipcMain,
+  session,
+  shell,
+  Tray,
+  Menu,
+} from "electron";
 import path from "path";
 import url from "url";
 import WebSocket, { WebSocketServer } from "ws";
@@ -165,7 +173,12 @@ if (!gotTheLock) {
     // WebSocket 연결 처리
     wss.on("connection", (ws) => {
       console.log("New client connected");
-
+      if (win) {
+        console.log("mainwindow ok");
+        win.webContents.send("websocket-on", { type: "connect" });
+      } else {
+        console.error("mainWindow가 정의되지 않았습니다.");
+      }
       // 새 클라이언트에게 저장된 메시지 전송
       if (lastWebSocketMessage) {
         ws.send(lastWebSocketMessage);
@@ -182,6 +195,11 @@ if (!gotTheLock) {
       // 클라이언트 연결 종료
       ws.on("close", () => {
         console.log("Client disconnected");
+        if (mainWindow) {
+          mainWindow.webContents.send("websocket-on", { type: "disconnect" });
+        } else {
+          console.error("mainWindow가 정의되지 않았습니다.");
+        }
       });
 
       // 에러 처리
@@ -190,96 +208,93 @@ if (!gotTheLock) {
       });
     });
 
-    wss.on("error", (err) => {
-      console.error("WebSocket server error:", err);
+    // 메시지 이벤트 처리
+    ipcMain.on("websocket-message", (event, action) => {
+      if (wss && wss.clients) {
+        let count = 0;
+        wss.clients.forEach((client) => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(action);
+            count += 1;
+          }
+        });
+        console.log(count);
+      }
     });
-  });
 
-  // 메시지 이벤트 처리
-  ipcMain.on("websocket-message", (event, action) => {
-    if (wss && wss.clients) {
-      let count = 0;
-      wss.clients.forEach((client) => {
-        if (client.readyState === WebSocket.OPEN) {
-          client.send(action);
-          count += 1;
-        }
-      });
-      console.log(count);
-    }
-  });
+    // 링크 열기
+    ipcMain.on("open-link", (event, url) => {
+      shell.openExternal(url); // 메인 프로세스에서 링크 열기
+    });
 
-  ipcMain.on("set-start-hiking", (event, message) => {
-    lastWebSocketMessage = message;
-  });
+    // 하이킹 정보 받기
+    ipcMain.on("hikingInfo", async (event, data) => {
+      try {
+        console.log("hikingInfo Main on");
+        const accessToken = await store.get("accessToken");
+        console.log("store accessToken : ", accessToken);
 
-  // 하이킹 정보 받기
-  ipcMain.on("hikingInfo", async (event, data) => {
-    try {
-      console.log("hikingInfo Main on");
-      const accessToken = await store.get("accessToken");
-      console.log("store accessToken : ", accessToken);
+        const response = data.urlList;
+        await siteProcess(response); // 비동기 처리 완료 기다리
+        console.log("siteProcess :", response);
+        checkDone(event, data.hikingId, accessToken);
+      } catch (error) {
+        console.error("hikingInfo error :", error);
+      }
+    });
 
-      const response = data.urlList;
-      await siteProcess(response); // 비동기 처리 완료 기다리
-      console.log("siteProcess :", response);
-      checkDone(event, data.hikingId, accessToken);
-    } catch (error) {
-      console.error("hikingInfo error :", error);
-    }
-  });
+    // 차단 프로그램 시작
+    ipcMain.on("start-block-program", (event, data) => {
+      startWatcher(data);
+      resetProcess();
+    });
 
-  // 차단 프로그램 시작
-  ipcMain.on("start-block-program", (event, data) => {
-    startWatcher(data);
-    resetProcess();
-  });
+    // .env에서 로드된 환경 변수 반환
+    ipcMain.handle("getBackUrl", async (event) => {
+      const url = await store.get("url");
+      return url;
+    });
 
-  // .env에서 로드된 환경 변수 반환
-  ipcMain.handle("getBackUrl", async (event) => {
-    const url = await store.get("url");
-    return url;
-  });
+    //토큰 받기
+    ipcMain.on("sendAccessToken", (event, token) => {
+      console.log("Received access token:", token);
+      store.set("accessToken", token);
+    });
 
-  //토큰 받기
-  ipcMain.on("sendAccessToken", (event, token) => {
-    console.log("Received access token:", token);
-    store.set("accessToken", token);
-  });
+    //url 받기
+    ipcMain.on("sendBackUrl", (event, url) => {
+      console.log("Received back url:", url);
+      store.set("url", url);
+    });
 
-  //url 받기
-  ipcMain.on("sendBackUrl", (event, url) => {
-    console.log("Received back url:", url);
-    store.set("url", url);
-  });
+    // 메모저장 신호받기
+    ipcMain.on("save-memo", (event, data) => {
+      console.log("this is save-memo in main:", data);
 
-  // 메모저장 신호받기
-  ipcMain.on("save-memo", (event, data) => {
-    console.log("this is save-memo in main:", data);
+      // 메모 정보를 렌더러로 응답으로 보내기
+      event.reply("save-memo-response", data);
+    });
 
-    // 메모 정보를 렌더러로 응답으로 보내기
-    event.reply("save-memo-response", data);
-  });
+    // 프리셋 url 추가하기
+    ipcMain.on("add-url", (event, data) => {
+      console.log("this is add-url in main:", data);
+      // 추가한 url 정보를 렌더러로 응답으로 보내기
+      event.reply("add-url-response", data);
+    });
 
-  // 프리셋 url 추가하기
-  ipcMain.on("add-url", (event, data) => {
-    console.log("this is add-url in main:", data);
-    // 추가한 url 정보를 렌더러로 응답으로 보내기
-    event.reply("add-url-response", data);
-  });
-
-  // 차단 프로그램 종료
-  ipcMain.on("end-block-program", async (event, data) => {
-    try {
-      console.log("program end Main on");
-      const accessToken = await store.get("accessToken");
-      console.log("store accessToken : ", accessToken);
-      const response = endWatcher();
-      await programProcess(response); // 비동기 처리 완료 기다리기
-      console.log("programProcess :", response);
-      checkDone(event, data, accessToken);
-    } catch (error) {
-      console.error("program error:", error);
-    }
+    // 차단 프로그램 종료
+    ipcMain.on("end-block-program", async (event, data) => {
+      try {
+        console.log("program end Main on");
+        const accessToken = await store.get("accessToken");
+        console.log("store accessToken : ", accessToken);
+        const response = endWatcher();
+        await programProcess(response); // 비동기 처리 완료 기다리기
+        console.log("programProcess :", response);
+        checkDone(event, data, accessToken);
+      } catch (error) {
+        console.error("program error:", error);
+      }
+    });
   });
 }
