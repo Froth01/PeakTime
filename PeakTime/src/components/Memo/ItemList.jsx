@@ -250,10 +250,10 @@ function ItemList() {
             <>
               {summaryList.map((summary, idx) => (
                 <div
+                  key={summary.summaryId}
                   className={`flex justify-between mx-2 pb-2 ${
                     idx === summaryList.length - 1 ? "" : "border-b"
                   }`}
-                  key={idx}
                 >
                   <button
                     className="w-[90%] flex flex-col"

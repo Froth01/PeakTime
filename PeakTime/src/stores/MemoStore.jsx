@@ -26,7 +26,8 @@ const initialState = {
   // 요약 입력 등
   summaryCount: 0,
 
-  inputText: "", // input box text
+  inputTitle: "", // prompt title
+  inputText: "", // prompt text
   keywords: [],
   keywordInput: "",
 
@@ -48,30 +49,22 @@ export const useMemoStore = create((set) => ({
 
     if (isLastPage) return;
 
-    const list = useMemoStore.getState().memoList;
-    const pageNow = useMemoStore.getState().page;
-    const pageNew = !isLastPage ? pageNow + 1 : pageNow;
-
-    set({
-      memoList: [...list, ...addMemoList],
-      memoPage: pageNew,
+    set((state) => ({
+      memoList: [...state.memoList, ...addMemoList],
+      memoPage: !isLastPage ? state.memoPage + 1 : state.memoPage,
       isMemoLastPage: newIsLastPage,
-    });
+    }));
   },
   setSummaryList: (addSummaryList, newIsLastPage) => {
     const isLastPage = useMemoStore.getState().isSummaryLastPage;
 
     if (isLastPage) return;
 
-    const list = useMemoStore.getState().summaryList;
-    const pageNow = useMemoStore.getState().page;
-    const pageNew = !isLastPage ? pageNow + 1 : pageNow;
-
-    set({
-      summaryList: [...list, ...addSummaryList],
-      summaryPage: pageNew,
+    set((state) => ({
+      summaryList: [...state.summaryList, ...addSummaryList],
+      summaryPage: !isLastPage ? state.summaryPage + 1 : state.summaryPage,
       isSummaryLastPage: newIsLastPage,
-    });
+    }));
   },
   setSummaryCount: (count) => set({ summaryCount: count }),
   setMemoData: (memoData) => set({ memoData: memoData }),
@@ -81,6 +74,7 @@ export const useMemoStore = create((set) => ({
   setSelectedSummary: (selectedSummary) =>
     set({ selectedSummary: selectedSummary }),
 
+  setInputTitle: (text) => set({ inputTitle: text }),
   setInputText: (text) => set({ inputText: text }),
   setKeywords: (keywords) => set({ keywords: [...keywords] }),
   setKeywordInput: (keyword) => set({ keywordInput: keyword }),
@@ -88,21 +82,23 @@ export const useMemoStore = create((set) => ({
   setIsLoading: (bool) => set({ isLoading: bool }),
 
   resetMemoContent: () =>
-    set({
+    set((state) => ({
+      ...state,
       memoList: initialState.memoList,
       memoData: initialState.memoData,
       selectedMemo: initialState.selectedMemo,
       memoPage: initialState.memoPage,
       isMemoLastPage: initialState.isMemoLastPage,
-    }),
-  resetSummaryContent: () =>
-    set({
+    })),
+  resetSummaryContent: () => 
+    set((state) => ({
+      ...state,
       summaryList: initialState.summaryList,
       summaryData: initialState.summaryData,
       selectedSummary: initialState.selectedSummary,
       summaryPage: initialState.summaryPage,
       isSummaryLastPage: initialState.isSummaryLastPage,
-    }),
+    })),
   resetInputText: () => set({ inputText: initialState.inputText }),
   resetKeyWords: () => set({ keywords: initialState.keywords }),
   resetSummaryData: () => set({ summaryData: initialState.summaryData }),

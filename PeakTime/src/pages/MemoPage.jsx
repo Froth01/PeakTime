@@ -1,8 +1,9 @@
 import Title from "../components/common/Title";
 import { useMemoStore } from "../stores/MemoStore";
 import { useEffect } from "react";
-import ItemList from "../components/Memo/ItemList"; // 메모 리스트
-import MemoDetail from "../components/Memo/MemoDetail"; // 메모 디테일
+import ItemList from "../components/Memo/ItemList";
+import MemoDetailPrompt from "../components/Memo/MemoDetailPrompt";
+import MemoDetail from "../components/Memo/MemoDetail";
 import SummaryDetail from "../components/Memo/SummaryDetail";
 import LoadingOverlay from "../components/Memo/LoadingOverlay";
 
@@ -22,6 +23,7 @@ function MemoPage() {
 
       <div className="h-[90vh] top-[10vh]">
         <ItemList />
+        {activeTab === "memo" && <MemoDetailPrompt />}
         {activeTab === "memo" && selectedMemo && <MemoDetail />}
         {activeTab === "summary" && selectedSummary && <SummaryDetail />}
       </div>
