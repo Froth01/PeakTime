@@ -89,6 +89,7 @@ if (!gotTheLock) {
 
   function createTray() {
     tray = new Tray(path.join(__dirname, "/public/Logo/logo-16x16.png")); // 트레이 아이콘 경로 설정
+    // tray = new Tray(path.join(__dirname, "../Logo/logo-16x16.png")); // 빌드 환경에서 트레이 아이콘 경로 설정
     const contextMenu = Menu.buildFromTemplate([
       { label: "Show App", click: () => win.show() }, // 앱 보이기
       {
