@@ -3,9 +3,8 @@ package com.dinnertime.peaktime.domain.memo.service;
 import com.dinnertime.peaktime.domain.memo.entity.Memo;
 import com.dinnertime.peaktime.domain.memo.repository.MemoRepository;
 import com.dinnertime.peaktime.domain.memo.service.dto.request.SaveMemoRequestDto;
-import com.dinnertime.peaktime.domain.memo.service.dto.response.MemoSummaryResponseDto;
+import com.dinnertime.peaktime.domain.memo.service.dto.response.MemoDetailResponseDto;
 import com.dinnertime.peaktime.domain.memo.service.dto.response.MemoWrapperResponseDto;
-import com.dinnertime.peaktime.domain.summary.entity.Summary;
 import com.dinnertime.peaktime.domain.summary.repository.SummaryRepository;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
@@ -15,13 +14,10 @@ import com.dinnertime.peaktime.global.util.RedisService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -42,8 +38,6 @@ public class MemoService {
 
         Pageable pageable = PageRequest.of(page, 10);
 
-//        List<Memo> memos = memoRepository.findAllByUser_UserIdOrderByMemoIdAsc(userId);
-
         Page<Memo> memos = memoRepository.findAllByUser_UserId(userId, pageable);
 
         log.info(memos.toString());
@@ -63,16 +57,13 @@ public class MemoService {
         memoRepository.delete(memo);
     }
 
-    // 메모 및 요약 상세 조회
+    // 메모 상세 조회
     @Transactional(readOnly = true)
-    public MemoSummaryResponseDto getDetailedMemo(Long memoId) {
+    public MemoDetailResponseDto getDetailedMemo(Long memoId) {
         Memo memo = memoRepository.findByMemoId(memoId)
                 .orElseThrow(()-> new CustomException(ErrorCode.MEMO_NOT_FOUND));
 
-        // null일 수 있음
-        Summary summary = summaryRepository.findByMemo_MemoId(memoId);
-
-        return MemoSummaryResponseDto.createMemoSummaryResponse(memo, summary);
+        return MemoDetailResponseDto.createMemoDetailResponse(memo);
     }
 
     // ex에서 받은 메모 정보 저장
@@ -80,7 +71,6 @@ public class MemoService {
     public void createMemo(Long userId, SaveMemoRequestDto requestDto) {
 
         // userPrincipal.getUserId()
-        // userId = 1로 임의 설정
         User user = userRepository.findByUserIdAndIsDeleteFalse(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 

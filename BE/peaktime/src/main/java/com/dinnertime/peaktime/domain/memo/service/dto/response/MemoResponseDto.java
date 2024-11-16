@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 public class MemoResponseDto {
 
     // 메모 리스트 responseDto 작성
-
     private Long memoId;
     private String title;
     private LocalDateTime createdAt;
