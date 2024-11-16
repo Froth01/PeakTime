@@ -173,7 +173,7 @@ function PresetList({ onPresetClick, updateTrigger }) {
                 <div className="font-bold">{preset.title}</div>
                 <div className="text-[18px]" style={{ whiteSpace: "pre-line" }}>
                   {`└ 차단 관리되는 사이트: ${preset.blockWebsiteArray.length}개
-                  └차단 관리되는 프로그램: ${preset.blockProgramArray.length}개`}
+                  └ 차단 관리되는 프로그램: ${preset.blockProgramArray.length}개`}
                 </div>
               </div>
             </button>
