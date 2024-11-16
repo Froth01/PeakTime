@@ -135,7 +135,7 @@ public class HikingController {
     @Operation(summary = "하이킹 통계 내역 조회", description = "하이킹 통계 내역 조회하기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "하이킹 통계 내역을 조회하는데 성공했습니다.",
-                    content = @Content(schema= @Schema(implementation = HikingStatisticResponseDto.class))
+                    content = @Content(schema= @Schema(implementation = HikingStatisticWrapperResponseDto.class))
             ),
             @ApiResponse(responseCode = "500", description = "하이킹 통계 내역을 조회하는데 실패했습니다.",
                     content= @Content(schema= @Schema(implementation = ResultDto.class))
@@ -143,11 +143,9 @@ public class HikingController {
     })
     @CommonSwaggerResponse.CommonResponses
     @GetMapping(value = "/statistics")
-    public ResponseEntity<?> getHikingStatistics(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
-            @RequestParam(value = "user-id", required = false) Long childUserId) {
+    public ResponseEntity<?> getHikingStatistics(@AuthenticationPrincipal UserPrincipal userPrincipal) {
 
-        HikingStatisticResponseDto responseDto = hikingService.getHikingStatistic(userPrincipal.getUserId(),childUserId);
+        HikingStatisticResponseDto responseDto = hikingService.getHikingStatistic(userPrincipal.getUserId());
 
 //        log.info(responseDto.toString());
 

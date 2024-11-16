@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface GroupRepository extends JpaRepository<Group, Long> {
+public interface GroupRepository extends JpaRepository<Group, Long>, GroupRepositoryCustom {
     
     // 그룹 전체 조회
     // 삭제되지 않은 group만 전체 조회

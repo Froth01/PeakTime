@@ -9,7 +9,7 @@ public enum ErrorCode {
     INVALID_PRESET_TITLE_LENGTH("프리셋 타이틀이 6자를 초과하거나 2자 미만일 수 없습니다.",HttpStatus.BAD_REQUEST),
     USER_NOT_FOUND("존재하지 않은 유저입니다.", HttpStatus.NOT_FOUND),
     GROUP_NOT_FOUND("존재하지 않는 그룹입니다.", HttpStatus.BAD_REQUEST),
-    GROUP_NAME_ALREADY_EXISTS("중복된 그룹 이름입니다.", HttpStatus.UNPROCESSABLE_ENTITY),
+    GROUP_NAME_ALREADY_EXISTS("중복된 그룹 이름입니다.", HttpStatus.CONFLICT),
     FAILED_CREATE_GROUP("최대 5개의 그룹만 생성할 수 있습니다.", HttpStatus.UNPROCESSABLE_ENTITY),
     PRESET_NOT_FOUND("존재하지 않는 프리셋에 대한 작업입니다.", HttpStatus.NOT_FOUND),
     FAILED_DELETE_PRESET_IN_GROUP("그룹에서 사용하는 프리셋은 삭제할 수 없습니다.", HttpStatus.BAD_REQUEST),
@@ -40,7 +40,17 @@ public enum ErrorCode {
     INVALID_ROOT_PASSWORD("비밀번호가 일치하지 않습니다.", HttpStatus.CONFLICT),
     DUPLICATED_NICKNAME("현재와 동일한 닉네임입니다.", HttpStatus.CONFLICT),
     DUPLICATED_PASSWORD("현재와 동일한 비밀번호입니다.", HttpStatus.CONFLICT),
-    CHILD_USER_NOT_FOUND("자식 유저가 아니거나 찾을 수 없습니다.", HttpStatus.NOT_FOUND)
+    FAILED_SEND_EMAIL("이메일을 전송하는데 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    EMAIL_CODE_NOT_FOUND("인증시간이 만료되었거나 인증코드를 발급받지 않으셨습니다. 다시 시도해주세요.", HttpStatus.NOT_FOUND),
+    NOT_EQUAL_EMAIL_CODE("인증 코드가 일치하지 않습니다.", HttpStatus.CONFLICT),
+    INVALID_EMAIL_AUTHENTICATION("이메일이 인증되지 않았습니다.", HttpStatus.FORBIDDEN),
+    SAME_EMAIL("기존과 동일한 이메일입니다.", HttpStatus.CONFLICT),
+    USER_LOGIN_ID_NOT_FOUND("존재하지 않는 아이디입니다.", HttpStatus.NOT_FOUND),
+    NOT_ROOT("서브 계정은 비밀번호 재발급 기능을 이용할 수 없습니다.", HttpStatus.FORBIDDEN),
+    NOT_EQUAL_EMAIL("아이디에 해당하는 이메일 주소가 아닙니다.", HttpStatus.CONFLICT),
+    SETTINGS_FOR_ROOT("서브 계정은 회원정보 관리 페이지에 접근할 수 없습니다.", HttpStatus.FORBIDDEN),
+    CHILD_USER_NOT_FOUND("자식 유저가 아니거나 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    DUPLICATED_URL("이미 존재하는 url 입니다.", HttpStatus.BAD_REQUEST)
     ;
 
     private final String message;

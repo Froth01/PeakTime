@@ -71,7 +71,7 @@ public class SummaryController {
 
         summaryFacade.deleteSummary(summaryId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(),"프리셋 삭제에 성공했습니다."));
+        return ResponseEntity.status(HttpStatus.OK).body(ResultDto.res(HttpStatus.OK.value(),"요약 내용 삭제에 성공했습니다."));
     }
 
 }

@@ -1,5 +1,6 @@
 package com.dinnertime.peaktime.domain.hiking.service.dto.query;
 
+import com.dinnertime.peaktime.domain.statistic.entity.StatisticContent;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
@@ -24,8 +25,8 @@ public class HikingDetailQueryDto {
     private Integer blockedProgramCount;
 
     @Setter
-    private List<UsingInfo> visitedSiteList;
+    private List<StatisticContent> visitedSiteList;
 
     @Setter
-    private List<UsingInfo> visitedProgramList;
+    private List<StatisticContent> visitedProgramList;
 }

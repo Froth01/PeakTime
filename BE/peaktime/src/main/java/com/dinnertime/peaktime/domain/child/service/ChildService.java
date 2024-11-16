@@ -5,6 +5,7 @@ import com.dinnertime.peaktime.domain.child.service.dto.request.CreateChildReque
 import com.dinnertime.peaktime.domain.child.service.dto.request.UpdateChildRequestDto;
 import com.dinnertime.peaktime.domain.group.entity.Group;
 import com.dinnertime.peaktime.domain.group.repository.GroupRepository;
+import com.dinnertime.peaktime.domain.statistic.repository.StatisticRepository;
 import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.domain.user.repository.UserRepository;
 import com.dinnertime.peaktime.domain.user.service.UserService;
@@ -29,6 +30,7 @@ public class ChildService {
     private final UserRepository userRepository;
     private final UserGroupRepository userGroupRepository;
     private final GroupRepository groupRepository;
+    private final StatisticRepository statisticRepository;
 
     // 초기화 비밀번호 설정
     private static final String initPassword = "000000";
@@ -70,7 +72,11 @@ public class ChildService {
         User user = User.createChildUser(requestDto.getChildLoginId(), encodedPassword, requestDto.getChildNickname());
         userRepository.save(user);
 
-        // 8. 유저 그룹 테이블 저장
+        //8. 통계 테이블 저장
+        Statistic statistic = Statistic.createFirstStatistic(user);
+        statisticRepository.save(statistic);
+
+        // 9. 유저 그룹 테이블 저장
         UserGroup userGroup = UserGroup.createUserGroup(user, group);
         userGroupRepository.save(userGroup);
     }

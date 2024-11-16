@@ -1,9 +1,7 @@
 package com.dinnertime.peaktime.global.auth.controller;
 
+import com.dinnertime.peaktime.global.auth.service.dto.request.*;
 import com.dinnertime.peaktime.global.auth.service.AuthService;
-import com.dinnertime.peaktime.global.auth.service.dto.request.LoginRequest;
-import com.dinnertime.peaktime.global.auth.service.dto.request.LogoutRequest;
-import com.dinnertime.peaktime.global.auth.service.dto.request.SignupRequest;
 import com.dinnertime.peaktime.global.auth.service.dto.response.IsDuplicatedResponse;
 import com.dinnertime.peaktime.global.auth.service.dto.response.LoginResponse;
 import com.dinnertime.peaktime.global.auth.service.dto.response.ReissueResponse;
@@ -39,6 +37,8 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "회원가입에 성공하였습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "400", description = "잘못된 형식의 요청입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "403", description = "이메일이 인증되지 않았습니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
             @ApiResponse(responseCode = "409", description = "이미 존재하는 아이디입니다.",
                     content = @Content(schema = @Schema(implementation = ResultDto.class))),
@@ -159,6 +159,76 @@ public class AuthController {
                 .status(HttpStatus.OK)
                 .body(ResultDto.res(HttpStatus.OK.value(),
                         "로그아웃에 성공하였습니다."));
+    }
+
+    // 인증 코드 전송
+    @Operation(summary = "인증 코드 전송", description = "인증 코드 전송하기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "인증 코드 전송에 성공하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 형식의 요청입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "500", description = "이메일을 전송하는데 실패했습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+    })
+    @CommonSwaggerResponse.CommonResponses
+    @PostMapping("/code/send")
+    public ResponseEntity<?> sendCode(@RequestBody @Valid SendCodeRequest sendCodeRequest) {
+        authService.sendCode(sendCodeRequest);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResultDto.res(HttpStatus.OK.value(),
+                        "인증 코드 전송에 성공하였습니다."));
+    }
+
+    // 인증 코드 확인
+    @Operation(summary = "인증 코드 확인", description = "인증 코드 확인하기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "인증 코드 확인 요청에 성공하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 형식의 요청입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "404", description = "인증시간이 만료되었거나 인증코드를 발급받지 않으셨습니다. 다시 시도해주세요.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "409", description = "인증 코드가 일치하지 않습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "500", description = "인증 코드 확인 요청에 실패하였습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+    })
+    @CommonSwaggerResponse.CommonResponses
+    @PostMapping("/code/check")
+    public ResponseEntity<?> checkCode(@RequestBody @Valid CheckCodeRequest checkCodeRequest) {
+        authService.checkCode(checkCodeRequest);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResultDto.res(HttpStatus.OK.value(),
+                        "인증 코드 확인 요청에 성공하였습니다."));
+    }
+
+    // 비밀번호 재발급
+    @Operation(summary = "비밀번호 재발급", description = "비밀번호 재발급하기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "비밀번호가 재발급되었습니다. 이메일을 확인해주세요.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 형식의 요청입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "403", description = "서브 계정은 비밀번호 재발급 기능을 이용할 수 없습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 아이디입니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "409", description = "아이디에 해당하는 이메일 주소가 아닙니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class))),
+            @ApiResponse(responseCode = "500", description = "이메일을 전송하는데 실패했습니다.",
+                    content = @Content(schema = @Schema(implementation = ResultDto.class)))
+    })
+    @CommonSwaggerResponse.CommonResponses
+    @PutMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody @Valid ResetPasswordRequest resetPasswordRequest) {
+        authService.resetPassword(resetPasswordRequest);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResultDto.res(HttpStatus.OK.value(),
+                        "비밀번호가 재발급되었습니다. 이메일을 확인해주세요."));
     }
 
 }

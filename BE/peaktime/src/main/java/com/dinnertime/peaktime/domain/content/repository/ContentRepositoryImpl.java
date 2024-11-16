@@ -1,7 +1,7 @@
 package com.dinnertime.peaktime.domain.content.repository;
 
 import com.dinnertime.peaktime.domain.content.entity.QContent;
-import com.dinnertime.peaktime.domain.hiking.service.dto.query.UsingInfo;
+import com.dinnertime.peaktime.domain.statistic.entity.StatisticContent;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -18,14 +18,19 @@ public class ContentRepositoryImpl implements ContentRepositoryCustom {
 
     // "site"와 "program" 타입의 상위 5개 BlockInfo 리스트 가져오는 메서드
     @Override
-    public List<UsingInfo> getTopUsingInfoList(String type, Long hikingId) {
+    public List<StatisticContent> getTopUsingInfoList(String type, Long hikingId) {
         return queryFactory.select(Projections.fields(
-                        UsingInfo.class,
+                        StatisticContent.class,
                         content.usingTime.sum().as("usingTime"),
                         content.name.as("name")
                 ))
                 .from(content)
-                .where(content.hiking.hikingId.eq(hikingId).and(content.type.eq(type)))
+                .where(
+                        content.hiking.hikingId.eq(hikingId)
+                                .and(content.type.eq(type))
+                                .and(content.isBlocked.isFalse())
+                                .and(content.hiking.realEndTime.isNotNull())
+                )
                 .groupBy(content.name)
                 .orderBy(content.usingTime.sum().desc())
                 .limit(5)
@@ -33,15 +38,18 @@ public class ContentRepositoryImpl implements ContentRepositoryCustom {
     }
 
     @Override
-    public List<UsingInfo> getTopUsingInfoListByUserId(String type, Long userId) {
+    public List<StatisticContent> getTopUsingInfoListByUserId(String type, Long userId) {
         return queryFactory.select(Projections.fields(
-                        UsingInfo.class,
+                        StatisticContent.class,
                         content.usingTime.sum().as("usingTime"),
                         content.name.as("name")
                 ))
                 .from(content)
                 .where(content.hiking.user.userId.eq(userId)
-                        .and(content.type.eq(type)))
+                        .and(content.type.eq(type))
+                        .and(content.isBlocked.isFalse())
+                        .and(content.hiking.realEndTime.isNotNull())
+                )
                 .groupBy(content.name)
                 .orderBy(content.usingTime.sum().desc())
                 .limit(5)

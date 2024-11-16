@@ -11,14 +11,16 @@ import java.util.List;
 public class MemoWrapperResponseDto {
     private List<MemoResponseDto> memoList;
     private Integer summaryCount; // 하루 gpt 사용 횟수
+    private Boolean isLastPage;
 
     @Builder
-    private MemoWrapperResponseDto(List<MemoResponseDto> memoList, Integer summaryCount) {
+    private MemoWrapperResponseDto(List<MemoResponseDto> memoList, Integer summaryCount, Boolean isLastPage) {
         this.memoList = memoList;
         this.summaryCount = summaryCount;
+        this.isLastPage = isLastPage;
     }
 
-    public static MemoWrapperResponseDto createMemoWrapperResponseDto(List<Memo> memos, Integer count) {
+    public static MemoWrapperResponseDto createMemoWrapperResponseDto(List<Memo> memos, Integer count, Boolean isLastPage) {
         List<MemoResponseDto> responseDto = memos.stream()
                 .map(MemoResponseDto::createMemoResponseDto)
                 .toList();
@@ -26,6 +28,7 @@ public class MemoWrapperResponseDto {
         return MemoWrapperResponseDto.builder()
                 .memoList(responseDto)
                 .summaryCount(count)
+                .isLastPage(isLastPage)
                 .build();
     }
 
