@@ -31,9 +31,6 @@ function UpdateChild() {
     getGroupById,
   } = useGroupStore();
 
-  // 비밀번호 변경 상태 변수
-  const [passwordChange, setPasswordChange] = useState(false);
-
   // groupList에서 child 찾아 변수로 지정
   const [child, setChild] = useState(null);
 
@@ -111,6 +108,35 @@ function UpdateChild() {
     }
   };
 
+  const handleinitassword = () => {
+    childrenApi
+      .put(`/${childId}/init-password`)
+      .then(() => {
+        Swal.fire({
+          title: "비밀번호 초기화 성공",
+          text: `초기화 비밀번호는 000000 입니다.`,
+          icon: "success",
+          confirmButtonText: "확인",
+          confirmButtonColor: "#03C777",
+          customClass: {
+            popup: "custom-swal-popup",
+          },
+        });
+      })
+      .catch(() =>
+        Swal.fire({
+          title: "비밀번호 초기화 실패",
+          text: "비밀번호 초기화을 실패했습니다. 잠시 후 다시 시도해주세요.",
+          icon: "error",
+          confirmButtonText: "확인",
+          confirmButtonColor: "#03C777",
+          customClass: {
+            popup: "custom-swal-popup",
+          },
+        })
+      );
+  };
+
   return (
     <div className="absolute left-[43vw] w-[54vw] h-[84vh] my-[3vh] bg-[#333333] bg-opacity-70 rounded-lg p-5 flex flex-col items-center justify-between">
       <h2 className="w-full text-white text-[30px] font-bold pb-3 border-b">
@@ -119,7 +145,7 @@ function UpdateChild() {
 
       <div className="flex flex-col gap-3 justify-between w-[70%]">
         <div className="flex flex-col gap-3 text-start w-[40%]">
-          <label htmlFor="" className="text-white font-bold">
+          <label htmlFor="" className="text-white font-bold text-[22px]">
             아이디
           </label>
           <input
@@ -134,7 +160,7 @@ function UpdateChild() {
       <div className="flex flex-col gap-3 justify-between w-[70%]">
         <div className="flex justify-between w-full">
           <div className="flex flex-col gap-3 text-start w-[40%]">
-            <label htmlFor="" className="text-white font-bold">
+            <label htmlFor="" className="text-white font-bold text-[22px]">
               닉네임
             </label>
             <input
@@ -146,7 +172,10 @@ function UpdateChild() {
             />
           </div>
           <div className="flex flex-col gap-3 text-start w-[40%]">
-            <label htmlFor="groupId" className="text-white font-bold">
+            <label
+              htmlFor="groupId"
+              className="text-white font-bold text-[22px]"
+            >
               소속 그룹
             </label>
             <div
@@ -197,17 +226,11 @@ function UpdateChild() {
       </div>
       <div className="flex gap-3 justify-between w-[70%] relative">
         <button
-          onClick={() => setPasswordChange(true)}
+          onClick={handleinitassword}
           className="bg-[#66aadf] rounded-xl px-5 py-2 hover:bg-[#4d90d8] focus:ring-4 focus:ring-[#66aadf] font-bold"
         >
-          비밀번호변경
+          비밀번호 초기화
         </button>
-        {passwordChange && (
-          <ChangePassword
-            childId={childId}
-            setPasswordChange={setPasswordChange}
-          />
-        )}
       </div>
       <div className="w-full flex justify-end gap-5">
         <button

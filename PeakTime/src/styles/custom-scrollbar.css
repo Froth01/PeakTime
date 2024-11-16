@@ -6,6 +6,7 @@
 
 .custom-scrollbar::-webkit-scrollbar-track {
   background: #f1f1f1; /* 스크롤바 트랙 배경 */
+  border-radius: 10px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {

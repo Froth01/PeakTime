@@ -84,7 +84,8 @@
       "target": [
         "zip",
         "nsis"
-      ]
+      ],
+      "requestedExecutionLevel": "requireAdministrator"
     },
     "nsis": {
       "oneClick": false,

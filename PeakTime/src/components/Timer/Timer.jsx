@@ -551,6 +551,10 @@ function Timer() {
     };
   }, []);
 
+  useEffect(() => {
+    console.log("isRunning : " , isRunning)
+  }, [isRunning])
+
   // 포기 버튼 누르기
   const handleGiveup = () => {
     Swal.fire({

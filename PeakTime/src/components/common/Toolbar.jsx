@@ -32,12 +32,18 @@ function Toolbar() {
   // 회원정보 관리 페이지 접근 권한 검사 모달창 띄우기
   const checkAccessModal = async () => {
     const { value: getPassword } = await Swal.fire({
-      title: "비밀번호를 입력해주세요.",
+      title: "사용자 정보 확인",
+      html: "개인정보 수정을 위해 인증이 필요합니다.<br>비밀번호를 입력해주세요.",
       customClass: {
         popup: "custom-swal-popup",
+        input: "custom-swal-input",
       },
       input: "password",
+      confirmButtonColor: "#03C777",
+      confirmButtonText: "확인",
+      icon: "question",
       inputAttributes: {
+        placeholder: "password",
         style: "color: black;", // input 텍스트 색상
       },
     });
@@ -94,12 +100,18 @@ function Toolbar() {
   // 로그아웃 검사 모달창 띄우기
   const logoutModal = async () => {
     const { value: getRootUserPassword } = await Swal.fire({
-      title: "메인 계정의 비밀번호를 입력해주세요.",
+      title: "로그아웃",
+      html: "로그아웃을 위해 메인 계정의 비밀번호를 입력해주세요.",
       customClass: {
         popup: "custom-swal-popup",
+        input: "custom-swal-input",
       },
+      icon: "question",
       input: "password",
+      confirmButtonColor: "#03C777",
+      confirmButtonText: "확인",
       inputAttributes: {
+        placeholder: "password",
         style: "color: black;", // input 텍스트 색상
       },
     });
@@ -131,7 +143,7 @@ function Toolbar() {
       // 실패하면 여기로 진입
       console.error(error);
       Swal.fire({
-        title: "다시 시도해주세요.",
+        title: "비밀번호 불일치",
         customClass: {
           popup: "custom-swal-popup",
         },
@@ -153,12 +165,18 @@ function Toolbar() {
   // 비밀번호 변경 모달창 띄우기
   const changePasswordModal = async () => {
     const { value: getPassword } = await Swal.fire({
-      title: "비밀번호를 입력해주세요.",
+      title: "사용자 정보 확인",
+      html: "비밀번호 수정을 위해 인증이 필요합니다.<br>비밀번호를 입력해주세요.",
       customClass: {
         popup: "custom-swal-popup",
+        input: "custom-swal-input",
       },
+      icon: "question",
       input: "password",
+      confirmButtonColor: "#03C777",
+      confirmButtonText: "확인",
       inputAttributes: {
+        placeholder: "password",
         style: "color: black;", // input 텍스트 색상
       },
     });
@@ -182,7 +200,7 @@ function Toolbar() {
       // 실패하면 여기로 진입
       console.error(error);
       Swal.fire({
-        title: "다시 시도해주세요.",
+        title: "비밀번호 불일치",
         customClass: {
           popup: "custom-swal-popup",
         },
@@ -210,8 +228,10 @@ function Toolbar() {
               className="bg-gray-100 hover:bg-white active:bg-gray-200 w-[10vh] h-[10vh] rounded-full flex items-start pt-6 justify-center text-4xl shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
             >
               <FaHiking />
+              <p className="absolute top-[65%] text-sm font-bold">
+                하이킹 내역
+              </p>
             </button>
-            <p className="absolute top-[65%] text-sm font-bold">하이킹 내역</p>
           </div>
         </Tooltip>
         <Tooltip
@@ -227,8 +247,8 @@ function Toolbar() {
               className="bg-gray-100 hover:bg-white active:bg-gray-200 w-[10vh] h-[10vh] rounded-full flex items-start pt-6 justify-center text-4xl shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
             >
               <HiOutlinePresentationChartLine />
+              <p className="absolute top-[65%] text-sm font-bold">전체 통계</p>
             </button>
-            <p className="absolute top-[65%] text-sm font-bold">전체 통계</p>
           </div>
         </Tooltip>
         <Tooltip
@@ -244,8 +264,8 @@ function Toolbar() {
               className="bg-gray-100 hover:bg-white active:bg-gray-200 w-[10vh] h-[10vh] rounded-full flex items-start pt-6 justify-center text-4xl shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
             >
               <MdStickyNote2 />
+              <p className="absolute top-[65%] text-sm font-bold">메모</p>
             </button>
-            <p className="absolute top-[65%] text-sm font-bold">메모</p>
           </div>
         </Tooltip>
         {localUser && localUser.isRoot && (
@@ -263,10 +283,10 @@ function Toolbar() {
                   className="bg-gray-100 hover:bg-white active:bg-gray-200 w-[10vh] h-[10vh] rounded-full flex items-start pt-6 justify-center text-4xl shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200 "
                 >
                   <BiShieldQuarter />
+                  <p className="absolute top-[65%] text-sm font-bold">
+                    차단 관리
+                  </p>
                 </button>
-                <p className="absolute top-[65%] text-sm font-bold">
-                  차단 관리
-                </p>
               </div>
             </Tooltip>
             <Tooltip
@@ -282,10 +302,10 @@ function Toolbar() {
                   className="bg-gray-100 hover:bg-white active:bg-gray-200 w-[10vh] h-[10vh] rounded-full flex items-start pt-6 justify-center text-4xl shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
                 >
                   <FaHandsHoldingChild />
+                  <p className="absolute top-[65%] text-sm font-bold">
+                    서브계정 관리
+                  </p>
                 </button>
-                <p className="absolute top-[65%] text-sm font-bold">
-                  서브계정 관리
-                </p>
               </div>
             </Tooltip>
           </>
