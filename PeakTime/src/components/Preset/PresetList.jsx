@@ -7,6 +7,7 @@ import { FaTrashAlt } from "react-icons/fa";
 import AddPreset from "./AddPreset";
 import usePresetStore from "../../stores/PresetStore";
 import "../../styles/daily-report-custom-swal.css";
+import "../../styles/custom-scrollbar.css";
 
 function PresetList({ onPresetClick, updateTrigger }) {
   // 프리셋 리스트 api 요청 필요
@@ -159,7 +160,7 @@ function PresetList({ onPresetClick, updateTrigger }) {
         차단 프리셋 목록({presetList.length} / 5)
       </h2>
 
-      <div className="flex flex-col gap-5 bg-white text-[20px] w-[25vw] h-[70vh] overflow-y-auto rounded-lg p-5">
+      <div className="flex flex-col gap-5 bg-white text-[20px] w-[25vw] h-[70vh] overflow-y-auto rounded-lg custom-scrollbar p-5">
         {presetList.map((preset, index) => (
           <div
             className={`gap-5 flex justify-between pb-4 ${
