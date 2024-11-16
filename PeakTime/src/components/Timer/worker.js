@@ -30,7 +30,6 @@ const playTimer = (_duration) => {
     const now = Date.now();
     const diff = now - prev;
     const nextAt = 1000 - (diff - 1000); // 다음 실행까지의 시간 조정
-    console.log("worker step!");
     prev = now;
     postMessage({ type: "step" });
     setTimeout(step, nextAt); // 다음 step 호출
