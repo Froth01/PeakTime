@@ -5,12 +5,21 @@ import com.dinnertime.peaktime.domain.memo.repository.MemoRepository;
 import com.dinnertime.peaktime.domain.summary.entity.Summary;
 import com.dinnertime.peaktime.domain.summary.repository.SummaryRepository;
 import com.dinnertime.peaktime.domain.summary.service.dto.request.SaveSummaryRequestDto;
+import com.dinnertime.peaktime.domain.summary.service.dto.response.SummaryDetailResponseDto;
+import com.dinnertime.peaktime.domain.summary.service.dto.response.SummaryResponseDto;
+import com.dinnertime.peaktime.domain.summary.service.dto.response.SummaryWrapperResponseDto;
+import com.dinnertime.peaktime.domain.user.entity.User;
 import com.dinnertime.peaktime.global.exception.CustomException;
 import com.dinnertime.peaktime.global.exception.ErrorCode;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 @Slf4j
@@ -24,25 +33,10 @@ public class SummaryService {
 
     // 요약 정보 저장 및 업데이트
     @Transactional
-    public void createOrUpdateSummary(SaveSummaryRequestDto requestDto, String GPTContent) {
-
-        Memo memo = memoRepository.findByMemoId(requestDto.getMemoId())
-                .orElseThrow(() -> new CustomException(ErrorCode.MEMO_NOT_FOUND));
-
-        // insert, update를 별개로 처리해야 하므로 분기 처리 진행
-        // memo가 null인 경우엔 insert, 이미 존재하는 경우는 update로 진행하도록 설정
-
-        Summary summary = summaryRepository.findByMemo_MemoId(memo.getMemoId());
-
-        if(summary == null) {
-            // insert
-            Summary createdSummary = Summary.createSummary(GPTContent, memo);
-            summaryRepository.save(createdSummary);
-            return;
-        }
-        // update
-        summary.updateSummary(GPTContent);
-        summaryRepository.save(summary);
+    public void createSummary(SaveSummaryRequestDto requestDto, String GPTContent, User user) {
+        // insert
+        Summary createdSummary = Summary.createSummary(GPTContent, requestDto.getTitle(), user);
+        summaryRepository.save(createdSummary);
     }
 
 
@@ -55,4 +49,27 @@ public class SummaryService {
         summaryRepository.delete(summary);
     }
 
+    @Transactional(readOnly = true)
+    public SummaryWrapperResponseDto getSummaryList(Long userId, int page) {
+        
+        //10개씩 조회
+        Pageable pageable = PageRequest.of(page, 10);
+
+        Page<Summary> pageSummaryList = summaryRepository.findAllByUser_UserId(userId, pageable);
+
+        List<SummaryResponseDto> summaryList = pageSummaryList.stream()
+                .map(SummaryResponseDto::createSummaryResponseDto)
+                .toList();
+
+        return SummaryWrapperResponseDto.createMemoWrapperResponseDto(summaryList, pageSummaryList.isLast());
+    }
+
+    @Transactional(readOnly = true)
+    public SummaryDetailResponseDto getSummaryDetail(Long summaryId) {
+        Summary summary = summaryRepository.findBySummaryId(summaryId).orElseThrow(
+                () -> new CustomException(ErrorCode.SUMMARY_NOT_FOUND)
+        );
+
+        return SummaryDetailResponseDto.createSummaryDetailResponse(summary);
+    }
 }

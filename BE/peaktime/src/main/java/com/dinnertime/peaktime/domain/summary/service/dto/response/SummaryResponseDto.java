@@ -10,29 +10,25 @@ import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SummaryDetailResponseDto {
-
+public class SummaryResponseDto {
+    // 요약 리스트 responseDto 작성
     private Long summaryId;
     private String title;
-    private String content;
     private LocalDateTime createdAt;
 
-    // 요약 정보가 담긴 responseDto 작성
     @Builder
-    private SummaryDetailResponseDto(Long summaryId, String content, LocalDateTime createdAt, String title) {
+    private SummaryResponseDto(Long summaryId, String title, LocalDateTime createdAt) {
         this.summaryId = summaryId;
-        this.content = content;
-        this.createdAt = createdAt;
         this.title = title;
+        this.createdAt = createdAt;
     }
 
-    public static SummaryDetailResponseDto createSummaryDetailResponse(Summary summary) {
-        return SummaryDetailResponseDto.builder()
+    // 메모리스트 (내용 제외) responseDto 작성
+    public static SummaryResponseDto createSummaryResponseDto(Summary summary) {
+        return SummaryResponseDto.builder()
                 .summaryId(summary.getSummaryId())
-                .content(summary.getContent())
-                .createdAt(summary.getCreatedAt())
                 .title(summary.getTitle())
+                .createdAt(summary.getCreatedAt())
                 .build();
     }
-
 }
