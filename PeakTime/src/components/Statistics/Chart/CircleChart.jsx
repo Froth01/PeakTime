@@ -10,7 +10,7 @@ const CircleChart = ({ startTimeList }) => {
   const numberOfTimeUnit = 60 / timeInterval; // 한 시간당 단위 수
   const val = 5; // 기준값
 
-  useEffect(() => {
+  const renderChart = () => {
     const container = containerRef.current;
     const { width: containerWidth, height: containerHeight } = container.getBoundingClientRect();
 
@@ -41,6 +41,21 @@ const CircleChart = ({ startTimeList }) => {
     const centerX = vw / 2;
     const centerY = vh / 2;
     const radius = Math.min(centerX, centerY) * 0.7;
+
+    const tooltip = d3
+      .select("body")
+      .append("div")
+      .attr("class", "tooltip")
+      .style("position", "absolute")
+      .style("background", "#000000")
+      .style("color", "#FFFFFF")
+      .style("padding", "5px")
+      .style("border-radius", "5px")
+      .style("pointer-events", "none")
+      .style("visibility", "hidden")
+      .style("font-size", "15px")
+      .style("top", 0)
+      .style("left", 0);
 
     const drawChart = (usageCount, offsetX, label) => {
       const group = svg
@@ -74,7 +89,7 @@ const CircleChart = ({ startTimeList }) => {
           .attr("alignment-baseline", "middle")
           .attr("fill", "#FFFFFF")
           .style("font-size", "1.25rem")
-          .text(i === 0 ? 12 : i); // 12시 방향 표시
+          .text(i === 0 ? 12 : i);
 
         group
           .append("line")
@@ -86,21 +101,6 @@ const CircleChart = ({ startTimeList }) => {
           .attr("stroke-width", 1)
           .attr("stroke-dasharray", "2.2");
       }
-
-      // 툴팁 생성
-      const tooltip = d3
-        .select("body")
-        .append("div")
-        .style("position", "absolute")
-        .style("background", "#000000")
-        .style("color", "#FFFFFF")
-        .style("padding", "5px")
-        .style("border-radius", "5px")
-        .style("pointer-events", "none")
-        .style("visibility", "hidden")
-        .style("font-size", "15px")
-        .style("top", "0px")
-        .style("left", "0px");
 
       // 데이터 tic 추가
       usageCount.forEach((count, idx) => {
@@ -141,62 +141,67 @@ const CircleChart = ({ startTimeList }) => {
             })
             .on("mouseout", function () {
               tooltip.style("visibility", "hidden");
-            })            
+            })
             .transition()
             .duration(1000)
             .attr("x2", x2)
             .attr("y2", y2);
         }
       });
-
-      // 범례 추가
-      const legend = d3
-        .select(svgRef.current)
-        .append("g")
-        .attr("transform", `translate(${centerX}, ${centerY})`); // 그래프 중앙에 배치
-
-      legend
-        .append("rect")
-        .attr("x", -60) // 중앙 기준으로 왼쪽으로 이동
-        .attr("y", radius + 10) // 그래프 아래쪽에 배치
-        .attr("width", 20)
-        .attr("height", 12)
-        .attr("fill", "#FF4500");
-
-      legend
-        .append("text")
-        .attr("x", -30) // 중앙 기준으로 약간 오른쪽으로 이동
-        .attr("y", radius + 22) // 그래프 아래쪽에 배치
-        .text("오전")
-        .style("font-size", "18px")
-        .attr("fill", "#FFFFFF");
-
-      legend
-        .append("rect")
-        .attr("x", 20) // 중앙 기준으로 오른쪽으로 이동
-        .attr("y", radius + 10) // 그래프 아래쪽에 배치
-        .attr("width", 20)
-        .attr("height", 12)
-        .attr("fill", "#3476D0");
-
-      legend
-        .append("text")
-        .attr("x", 50) // 중앙 기준으로 약간 오른쪽으로 이동
-        .attr("y", radius + 22) // 그래프 아래쪽에 배치
-        .text("오후")
-        .style("font-size", "18px")
-        .attr("fill", "#FFFFFF");
-
-      return tooltip;
     };
 
-    const amTooltip = drawChart(amUsageCount, -radius - 0.075 * vw, "AM"); // AM 데이터
-    const pmTooltip = drawChart(pmUsageCount, radius + 0.075 * vw, "PM");  // PM 데이터
+    drawChart(amUsageCount, -radius - 0.075 * vw, "AM");
+    drawChart(pmUsageCount, radius + 0.075 * vw, "PM");
+
+    // 범례 추가
+    const legend = svg.append("g").attr("class", "legend");
+
+    legend
+      .append("rect")
+      .attr("x", centerX - 60)
+      .attr("y", centerY + radius + 10)
+      .attr("width", 20)
+      .attr("height", 12)
+      .attr("fill", "#FF4500");
+
+    legend
+      .append("text")
+      .attr("x", centerX - 30)
+      .attr("y", centerY + radius + 22)
+      .text("오전")
+      .style("font-size", "18px")
+      .attr("fill", "#FFFFFF");
+
+    legend
+      .append("rect")
+      .attr("x", centerX + 20)
+      .attr("y", centerY + radius + 10)
+      .attr("width", 20)
+      .attr("height", 12)
+      .attr("fill", "#3476D0");
+
+    legend
+      .append("text")
+      .attr("x", centerX + 50)
+      .attr("y", centerY + radius + 22)
+      .text("오후")
+      .style("font-size", "18px")
+      .attr("fill", "#FFFFFF");
+  };
+
+  useEffect(() => {
+    renderChart();
+
+    const handleResize = () => {
+      d3.select(svgRef.current).selectAll("*").remove(); // 기존 차트만 초기화
+      renderChart(); // 차트 다시 그리기
+    };
+
+    window.addEventListener("resize", handleResize);
 
     return () => {
+      window.removeEventListener("resize", handleResize);
       d3.select(svgRef.current).selectAll("*").remove();
-      amTooltip.remove();
-      pmTooltip.remove();
     };
   }, [startTimeList]);
 
