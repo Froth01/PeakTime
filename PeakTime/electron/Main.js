@@ -34,7 +34,7 @@ if (!gotTheLock) {
 
   function createWindow() {
     // 일렉트론 크기
-    // Menu.setApplicationMenu(null); 메뉴바 삭제
+    Menu.setApplicationMenu(null); //메뉴바 삭제
 
     win = new BrowserWindow({
       width: 1920,
@@ -51,7 +51,7 @@ if (!gotTheLock) {
         nodeIntegration: false, // 보안 상 비활성화
         sandbox: true,
         enableRemoteModule: false,
-        // devTools: false, 개발자 도구 막기
+        devTools: false, //개발자 도구 막기
       },
     });
 
@@ -92,13 +92,14 @@ if (!gotTheLock) {
     // tray = new Tray(path.join(__dirname, "../Logo/logo-16x16.png")); // 빌드 환경에서 트레이 아이콘 경로 설정
     const contextMenu = Menu.buildFromTemplate([
       { label: "Show App", click: () => win.show() }, // 앱 보이기
+      { label: "hide App", click: () => win.hide() }, // 앱 숨기기
       {
         label: "Quit",
         click: () => {
           app.isQuitting = true;
           app.quit();
         },
-      }, // 앱 종료
+      },
     ]);
     tray.setToolTip("My Electron App");
     tray.setContextMenu(contextMenu);
@@ -195,24 +196,6 @@ if (!gotTheLock) {
     });
   });
 
-  // 메시지 이벤트 처리
-  ipcMain.on("websocket-message", (event, action) => {
-    if (wss && wss.clients) {
-      let count = 0;
-      wss.clients.forEach((client) => {
-        if (client.readyState === WebSocket.OPEN) {
-          client.send(action);
-          count += 1;
-        }
-      });
-      console.log(count);
-    }
-  });
-
-  ipcMain.on("set-start-hiking", (event, message) => {
-    lastWebSocketMessage = message;
-  });
-
   // 하이킹 정보 받기
   ipcMain.on("hikingInfo", async (event, data) => {
     try {
@@ -281,5 +264,10 @@ if (!gotTheLock) {
     } catch (error) {
       console.error("program error:", error);
     }
+  });
+
+  ipcMain.on("quit-app", () => {
+    app.isQuitting = true;
+    app.quit();
   });
 }
