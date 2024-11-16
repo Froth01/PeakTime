@@ -120,19 +120,21 @@ function UpdateChild() {
           confirmButtonColor: "#03C777",
           customClass: {
             popup: "custom-swal-popup",
-          }
+          },
         });
       })
-      .catch(() => Swal.fire({
-        title: "비밀번호 초기화 실패",
-        text: "비밀번호 초기화을 실패했습니다. 잠시 후 다시 시도해주세요.",
-        icon: "error",
-        confirmButtonText: "확인",
-        confirmButtonColor: "#03C777",
-        customClass: {
-          popup: "custom-swal-popup",
-        }
-      }));
+      .catch(() =>
+        Swal.fire({
+          title: "비밀번호 초기화 실패",
+          text: "비밀번호 초기화을 실패했습니다. 잠시 후 다시 시도해주세요.",
+          icon: "error",
+          confirmButtonText: "확인",
+          confirmButtonColor: "#03C777",
+          customClass: {
+            popup: "custom-swal-popup",
+          },
+        })
+      );
   };
 
   return (
@@ -143,7 +145,7 @@ function UpdateChild() {
 
       <div className="flex flex-col gap-3 justify-between w-[70%]">
         <div className="flex flex-col gap-3 text-start w-[40%]">
-          <label htmlFor="" className="text-white font-bold">
+          <label htmlFor="" className="text-white font-bold text-[22px]">
             아이디
           </label>
           <input
@@ -158,7 +160,7 @@ function UpdateChild() {
       <div className="flex flex-col gap-3 justify-between w-[70%]">
         <div className="flex justify-between w-full">
           <div className="flex flex-col gap-3 text-start w-[40%]">
-            <label htmlFor="" className="text-white font-bold">
+            <label htmlFor="" className="text-white font-bold text-[22px]">
               닉네임
             </label>
             <input
@@ -170,7 +172,10 @@ function UpdateChild() {
             />
           </div>
           <div className="flex flex-col gap-3 text-start w-[40%]">
-            <label htmlFor="groupId" className="text-white font-bold">
+            <label
+              htmlFor="groupId"
+              className="text-white font-bold text-[22px]"
+            >
               소속 그룹
             </label>
             <div

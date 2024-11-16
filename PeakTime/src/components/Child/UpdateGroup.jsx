@@ -228,7 +228,7 @@ function UpdateGroup() {
       <div className="flex justify-between w-[70%]">
         {/* title */}
         <div className="flex flex-col gap-3 text-start w-[40%]">
-          <label className="text-white font-bold">그룹명</label>
+          <label className="text-white font-bold text-[22px]">그룹명</label>
           <input
             id="title"
             name="title"
@@ -240,7 +240,7 @@ function UpdateGroup() {
 
         {/* presets */}
         <div className="flex flex-col gap-3 text-start w-[40%]">
-          <label className="text-white font-bold">프리셋</label>
+          <label className="text-white font-bold text-[22px]">프리셋</label>
           <div
             tabIndex={0}
             className={`relative h-[60%] rounded-lg bg-white border border-gray-300 px-3 py-2 cursor-pointer ${

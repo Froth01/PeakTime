@@ -209,8 +209,10 @@ function Toolbar() {
               className="bg-gray-100 hover:bg-white active:bg-gray-200 w-[10vh] h-[10vh] rounded-full flex items-start pt-6 justify-center text-4xl shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
             >
               <FaHiking />
+              <p className="absolute top-[65%] text-sm font-bold">
+                하이킹 내역
+              </p>
             </button>
-            <p className="absolute top-[65%] text-sm font-bold">하이킹 내역</p>
           </div>
         </Tooltip>
         <Tooltip
@@ -226,8 +228,8 @@ function Toolbar() {
               className="bg-gray-100 hover:bg-white active:bg-gray-200 w-[10vh] h-[10vh] rounded-full flex items-start pt-6 justify-center text-4xl shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
             >
               <HiOutlinePresentationChartLine />
+              <p className="absolute top-[65%] text-sm font-bold">전체 통계</p>
             </button>
-            <p className="absolute top-[65%] text-sm font-bold">전체 통계</p>
           </div>
         </Tooltip>
         <Tooltip
@@ -243,8 +245,8 @@ function Toolbar() {
               className="bg-gray-100 hover:bg-white active:bg-gray-200 w-[10vh] h-[10vh] rounded-full flex items-start pt-6 justify-center text-4xl shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
             >
               <MdStickyNote2 />
+              <p className="absolute top-[65%] text-sm font-bold">메모</p>
             </button>
-            <p className="absolute top-[65%] text-sm font-bold">메모</p>
           </div>
         </Tooltip>
         {localUser && localUser.isRoot && (
@@ -262,10 +264,10 @@ function Toolbar() {
                   className="bg-gray-100 hover:bg-white active:bg-gray-200 w-[10vh] h-[10vh] rounded-full flex items-start pt-6 justify-center text-4xl shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
                 >
                   <BiShieldQuarter />
+                  <p className="absolute top-[65%] text-sm font-bold">
+                    차단 관리
+                  </p>
                 </button>
-                <p className="absolute top-[65%] text-sm font-bold">
-                  차단 관리
-                </p>
               </div>
             </Tooltip>
             <Tooltip
@@ -281,10 +283,10 @@ function Toolbar() {
                   className="bg-gray-100 hover:bg-white active:bg-gray-200 w-[10vh] h-[10vh] rounded-full flex items-start pt-6 justify-center text-4xl shadow-[2px_4px_3px_rgba(0,0,0,0.5)] hover:!shadow-[5px_6px_3px_rgba(0,0,0,0.5)] active:!shadow-[inset_2px_4px_3px_rgba(0,0,0,0.5)] transition-all duration-200"
                 >
                   <FaHandsHoldingChild />
+                  <p className="absolute top-[65%] text-sm font-bold">
+                    서브계정 관리
+                  </p>
                 </button>
-                <p className="absolute top-[65%] text-sm font-bold">
-                  서브계정 관리
-                </p>
               </div>
             </Tooltip>
           </>

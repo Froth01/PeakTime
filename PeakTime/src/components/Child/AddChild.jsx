@@ -38,10 +38,7 @@ function AddChild() {
   const duplicatedMessage = () => {
     if (!idFormatIsOK)
       return (
-        <div
-          className="text-[#f40000] top-[65%]"
-          style={{ whiteSpace: "pre-line" }}
-        >
+        <div className="text-[#f40000]" style={{ whiteSpace: "pre-wrap" }}>
           {`* 5자 이상 15자 이하\n* 영문, 숫자 사용 가능`}
         </div>
       );
@@ -49,20 +46,21 @@ function AddChild() {
     switch (isDuplicate) {
       case "duplicated":
         return (
-          <div className="text-[#f40000] top-[65%]">
-            입력한 아이디는 이미 존재합니다.
+          <div className="text-[#f40000]" style={{ whiteSpace: "pre-wrap" }}>
+            {`입력한 아이디는 이미 존재합니다.\n `}
           </div>
         );
       case "checked":
         return (
-          <div className="text-[#03c777] top-[65%]">
-            사용 가능한 아이디입니다.
-          </div>
+          <div
+            className="text-[#03c777]"
+            style={{ whiteSpace: "pre-wrap" }}
+          >{`사용 가능한 아이디입니다.\n `}</div>
         );
       case "needToCheck":
         return (
-          <div className="text-[#f40000] top-[65%]">
-            아이디 중복 확인이 필요합니다.
+          <div className="text-[#f40000]" style={{ whiteSpace: "pre-wrap" }}>
+            {`아이디 중복 확인이 필요합니다.\n `}
           </div>
         );
       default:
@@ -161,7 +159,10 @@ function AddChild() {
       {/* 닉네임, 소속 그룹 */}
       <div className="flex justify-around w-[70%] h-[10vh] text-left">
         <div className="flex flex-col gap-3 w-[40%]">
-          <label htmlFor="childNickname" className="text-white font-bold">
+          <label
+            htmlFor="childNickname"
+            className="text-white font-bold text-[22px]"
+          >
             닉네임
           </label>
           <input
@@ -175,7 +176,7 @@ function AddChild() {
           {nicknameMessage()}
         </div>
         <div className="flex flex-col gap-3 w-[40%]">
-          <label htmlFor="groupId" className="text-white font-bold">
+          <label htmlFor="groupId" className="text-white font-bold text-[22px]">
             소속 그룹
           </label>
           <div
@@ -233,7 +234,10 @@ function AddChild() {
       <div className="flex flex-col justify-between w-[70%]">
         <div className="flex justify-around gap-3 text-start w-full">
           <div className="flex flex-col gap-3 w-[40%]">
-            <label htmlFor="childLoginId" className="text-white font-bold">
+            <label
+              htmlFor="childLoginId"
+              className="text-white font-bold text-[22px]"
+            >
               아이디
             </label>
             <input

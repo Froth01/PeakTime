@@ -8,7 +8,7 @@ import { IoIosArrowDown } from "react-icons/io";
 
 function AddGroup() {
   const { presetList, setGroupList, setContent } = useGroupStore();
-  
+
   // 그룹명, 프리셋 아이디
   const [title, setTitle] = useState(null);
   const [presetId, setPresetId] = useState(null);
@@ -16,7 +16,6 @@ function AddGroup() {
   // 드롭다운 관련
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
-
 
   // 생성하기 클릭
   const handleConfirm = () => {
@@ -55,8 +54,8 @@ function AddGroup() {
           default:
             Swal.fire(addGroupAlertMessage("fail"));
             break;
-      }
-    });
+        }
+      });
   };
 
   return (
@@ -80,7 +79,7 @@ function AddGroup() {
         <h2 className="text-white text-[30px] font-bold">새 그룹 생성</h2>
         <div className="flex justify-between w-[70%]">
           <div className="flex flex-col gap-3 text-start w-[40%]">
-            <label htmlFor="title" className="text-white font-bold">
+            <label htmlFor="title" className="text-white font-bold text-[22px]">
               그룹명
             </label>
             <input
@@ -92,7 +91,10 @@ function AddGroup() {
             />
           </div>
           <div className="flex flex-col gap-3 text-start w-[40%]">
-            <label htmlFor="presetId" className="text-white font-bold">
+            <label
+              htmlFor="presetId"
+              className="text-white font-bold text-[22px]"
+            >
               차단 프리셋 선택
             </label>
             <div
