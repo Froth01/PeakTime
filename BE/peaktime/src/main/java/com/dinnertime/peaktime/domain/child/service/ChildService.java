@@ -58,29 +58,19 @@ public class ChildService {
             throw new CustomException(ErrorCode.DUPLICATED_USER_LOGIN_ID);
         };
 
-        // 5. 비밀번호 형식 확인
-        if(!AuthUtil.checkFormatValidationPassword(requestDto.getChildPassword())){
-           throw new CustomException(ErrorCode.INVALID_PASSWORD_FORMAT);
-        }
-
-        // 6. 비밀번호, 비밀번호 확인 일치 확인
-        if(!requestDto.getChildPassword().equals(requestDto.getChildConfirmPassword())){
-            throw new CustomException(ErrorCode.NOT_EQUAL_PASSWORD);
-        }
-
-        // 7. 닉네임 형식 확인
+        // 5. 닉네임 형식 확인
         if(!AuthUtil.checkFormatValidationNickname(requestDto.getChildNickname())){
             throw new CustomException(ErrorCode.INVALID_NICKNAME_FORMAT);
         }
 
-        // 8. 비밀번호 암호화
-        String encodedPassword = passwordEncoder.encode(requestDto.getChildPassword());
+        // 6. 비밀번호 암호화
+        String encodedPassword = passwordEncoder.encode(initPassword);
 
-        // 9. 유저 테이블 저장
+        // 7. 유저 테이블 저장
         User user = User.createChildUser(requestDto.getChildLoginId(), encodedPassword, requestDto.getChildNickname());
         userRepository.save(user);
 
-        // 10. 유저 그룹 테이블 저장
+        // 8. 유저 그룹 테이블 저장
         UserGroup userGroup = UserGroup.createUserGroup(user, group);
         userGroupRepository.save(userGroup);
     }
