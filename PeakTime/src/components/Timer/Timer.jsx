@@ -109,7 +109,7 @@ function Timer() {
     // 시간 정수화
     const time = parseInt(inputTime, 10);
     // 입력 시간 유효성 검사
-    if (isNaN(time) || time <= 1) {
+    if (isNaN(time) || time <= 0) {
       Swal.fire({
         title: "올바른 시간을 입력하세요.",
         customClass: {
