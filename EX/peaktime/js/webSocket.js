@@ -17,6 +17,8 @@ function connectWebSocket() {
   socket.onopen = () => {
     console.log("WebSocket connected");
     reconnectAttempts = 0;
+    sendPingMessage();
+    chrome.alarms.create("keepAlive", { periodInMinutes: 0.3 }); // 1분마다 실행
   };
 
   // WebSocket 메시지 수신 이벤트
@@ -38,6 +40,20 @@ function connectWebSocket() {
     retryConnect(); // 연결 종료 시 재연결 시도
   };
 }
+
+function sendPingMessage() {
+  if (socket && socket.readyState === WebSocket.OPEN) {
+    socket.send("ping");
+    console.log("Ping sent to keep WebSocket alive.");
+  }
+}
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === "keepAlive") {
+    console.log("Alarm triggered. Keeping WebSocket alive.");
+    sendPingMessage();
+  }
+});
 
 // WebSocket 재연결 시도 함수
 function retryConnect() {
