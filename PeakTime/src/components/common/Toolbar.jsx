@@ -162,12 +162,15 @@ function Toolbar() {
   };
 
   // 브라우저 로그아웃
-  const browserLogout = () => {
+  const browserLogout = async () => {
+    await localStorage.removeItem("user");
+    await userActions.setUser(null);
     localStorage.removeItem("user");
     userActions.setUser(null);
     localStorage.removeItem("user");
     userActions.setUser(null);
-    localStorage.removeItem("user");
+
+    reload();
   };
 
   // 비밀번호 변경 모달창 띄우기
@@ -285,6 +288,15 @@ function Toolbar() {
     // Electron의 quit 메서드 호출
     if (window.electronAPI && window.electronAPI.quit) {
       window.electronAPI.quit();
+    } else {
+      console.error("Electron API is not available.");
+    }
+  };
+
+  const reload = () => {
+    // Electron의 quit 메서드 호출
+    if (window.electronAPI && window.electronAPI.quit) {
+      window.electronAPI.reload();
     } else {
       console.error("Electron API is not available.");
     }
@@ -427,12 +439,26 @@ function Toolbar() {
               <button onClick={changePasswordModal} className="text-left">
                 비밀번호 변경
               </button>
-              <hr className={`border-t my-1 border-gray-300 ${running ? 'hidden' : ''}`} />
-              <button onClick={logoutModal} className={`text-left ${running ? 'hidden' : ''}`}>
+              <hr
+                className={`border-t my-1 border-gray-300 ${
+                  running ? "hidden" : ""
+                }`}
+              />
+              <button
+                onClick={logoutModal}
+                className={`text-left ${running ? "hidden" : ""}`}
+              >
                 로그아웃
               </button>
-              <hr className={`border-t my-1 border-gray-300 ${running ? 'hidden' : ''}`} />
-              <button onClick={quitModal} className={`text-left ${running ? 'hidden' : ''}`}>
+              <hr
+                className={`border-t my-1 border-gray-300 ${
+                  running ? "hidden" : ""
+                }`}
+              />
+              <button
+                onClick={quitModal}
+                className={`text-left ${running ? "hidden" : ""}`}
+              >
                 종료
               </button>
             </div>

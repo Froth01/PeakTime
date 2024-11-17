@@ -42,11 +42,7 @@ if (!gotTheLock) {
 
   function createWindow() {
     // 일렉트론 크기
-<<<<<<< HEAD
-    //Menu.setApplicationMenu(null);// 메뉴바 삭제
-=======
     Menu.setApplicationMenu(null); // 메뉴바 삭제
->>>>>>> 6973259e169f452880ff9fa625cbfeafe806357c
 
     win = new BrowserWindow({
       width: 1920,
@@ -54,8 +50,8 @@ if (!gotTheLock) {
       webPreferences: {
         preload: path.join(
           __dirname,
-          // "resources",
-          // "build",
+          "resources",
+          "build",
           "electron",
           "preload.js"
         ),
@@ -63,7 +59,7 @@ if (!gotTheLock) {
         nodeIntegration: false, // 보안 상 비활성화
         sandbox: true,
         enableRemoteModule: false,
-        // devTools: false, //개발자 도구 막기
+        devTools: false, //개발자 도구 막기
       },
     });
 
@@ -224,20 +220,6 @@ if (!gotTheLock) {
       });
     });
 
-    // 메시지 이벤트 처리
-    ipcMain.on("websocket-message", (event, action) => {
-      if (wss && wss.clients) {
-        let count = 0;
-        wss.clients.forEach((client) => {
-          if (client.readyState === WebSocket.OPEN) {
-            client.send(action);
-            count += 1;
-          }
-        });
-        console.log(count);
-      }
-    });
-
     // 링크 열기
     ipcMain.on("open-link", (event, url) => {
       shell.openExternal(url); // 메인 프로세스에서 링크 열기
@@ -314,8 +296,15 @@ if (!gotTheLock) {
     });
 
     ipcMain.on("quit-app", () => {
+      wss.close();
       app.isQuitting = true;
       app.quit();
+    });
+
+    ipcMain.on("reload-window", () => {
+      if (win) {
+        win.reload();
+      }
     });
   });
 }

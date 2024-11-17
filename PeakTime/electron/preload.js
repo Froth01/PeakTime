@@ -67,4 +67,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
   quit: () => {
     ipcRenderer.send("quit-app");
   },
+
+  reloadWindow: () => {
+    ipcRenderer.send("reload-window");
+  },
 });

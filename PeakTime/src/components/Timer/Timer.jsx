@@ -30,11 +30,11 @@ function Timer() {
   const isRunningRef = useRef(isRunning);
   const hikingIdRef = useRef(startedHikingId);
 
-  const { presetList }= usePresetStore.getState();
+  const { presetList } = usePresetStore.getState();
 
   useEffect(() => {
-    if(presetList.length == 0) return;
-    
+    if (presetList.length == 0) return;
+
     setTimerPresetList(presetList);
     setSelectedOption(null);
   }, [presetList]);
@@ -109,7 +109,7 @@ function Timer() {
     // 시간 정수화
     const time = parseInt(inputTime, 10);
     // 입력 시간 유효성 검사
-    if (isNaN(time) || time <= 29) {
+    if (isNaN(time) || time <= 1) {
       Swal.fire({
         title: "올바른 시간을 입력하세요.",
         customClass: {
@@ -124,7 +124,7 @@ function Timer() {
     }
 
     // 프리셋 선택
-    if(user.isRoot && selectedOption == null){
+    if (user.isRoot && selectedOption == null) {
       Swal.fire({
         title: "적용할 프리셋을 선택하세요.",
         customClass: {
@@ -150,7 +150,6 @@ function Timer() {
       denyButtonText: "취소",
       preConfirm: async () => {
         try {
-
           // 시작 확인 후 카운트다운 모달 표시
           const countdownSwal = await Swal.fire({
             title: "곧 하이킹이 시작됩니다!",

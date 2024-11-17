@@ -126,3 +126,7 @@ function handleParsedMessage(parsedMessage) {
 document.addEventListener("quit", () => {
   window.electronAPI.quit();
 });
+
+document.addEventListener("reload", () => {
+  window.electronAPI.reloadWindow();
+});
