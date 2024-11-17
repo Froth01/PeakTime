@@ -246,7 +246,7 @@ function Toolbar() {
     if (getRootUserPassword) {
       check(getRootUserPassword);
     }
-  }
+  };
 
   const check = async (getRootUserPassword) => {
     // 로그아웃은 auth이지만 유일하게 access Token이 필요
@@ -279,7 +279,7 @@ function Toolbar() {
         confirmButtonText: "확인",
       });
     }
-  }
+  };
 
   const quit = () => {
     // Electron의 quit 메서드 호출
