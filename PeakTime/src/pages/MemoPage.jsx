@@ -1,12 +1,15 @@
 import Title from "../components/common/Title";
-import MemoList from "../components/Memo/MemoList"; // 메모 리스트
-import MemoDetail from "../components/Memo/MemoDetail"; // 메모 디테일
 import { useMemoStore } from "../stores/MemoStore";
 import { useEffect } from "react";
-import SummaryLoadingOverlay from "../components/Memo/SummaryLoadingOverlay";
+import ItemList from "../components/Memo/ItemList";
+import MemoDetailPrompt from "../components/Memo/MemoDetailPrompt";
+import MemoDetail from "../components/Memo/MemoDetail";
+import SummaryDetail from "../components/Memo/SummaryDetail";
+import LoadingOverlay from "../components/Memo/LoadingOverlay";
 
 function MemoPage() {
-  const { selected, isLoading, resetAll } = useMemoStore();
+  const { activeTab, selectedMemo, selectedSummary, isLoading, resetAll } =
+    useMemoStore();
 
   useEffect(() => {
     return () => {
@@ -19,11 +22,13 @@ function MemoPage() {
       <Title title={"메모 및 요약"} />
 
       <div className="h-[90vh] top-[10vh]">
-        <MemoList />
-        {selected && <MemoDetail />}
+        <ItemList />
+        {activeTab === "memo" && <MemoDetailPrompt />}
+        {activeTab === "memo" && selectedMemo && <MemoDetail />}
+        {activeTab === "summary" && selectedSummary && <SummaryDetail />}
       </div>
 
-      {isLoading && <SummaryLoadingOverlay />}
+      {isLoading && <LoadingOverlay />}
     </div>
   );
 }
