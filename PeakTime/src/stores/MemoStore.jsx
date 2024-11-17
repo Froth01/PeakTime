@@ -100,6 +100,7 @@ export const useMemoStore = create((set) => ({
       summaryPage: initialState.summaryPage,
       isSummaryLastPage: initialState.isSummaryLastPage,
     })),
+  resetInputTitle: () => set({ inputTitle: initialState.inputTitle }),
   resetInputText: () => set({ inputText: initialState.inputText }),
   resetKeyWords: () => set({ keywords: initialState.keywords }),
   resetSummaryData: () => set({ summaryData: initialState.summaryData }),

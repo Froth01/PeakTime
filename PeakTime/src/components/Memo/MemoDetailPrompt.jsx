@@ -27,6 +27,7 @@ function MemoDetailPrompt() {
     setSummaryCount,
     summaryCountLimit,
     setIsLoading,
+    resetInputTitle,
     resetInputText,
     resetKeyWords,
     resetSummaryContent,
@@ -327,6 +328,7 @@ function MemoDetailPrompt() {
             <button
               className="text-white font-bold px-5 py-2 rounded-xl bg-[#7C7C7C] hover:bg-[#5C5C5C]"
               onClick={() => {
+                resetInputTitle();
                 resetInputText();
                 resetKeyWords();
               }}
