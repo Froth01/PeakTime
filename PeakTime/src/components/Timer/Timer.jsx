@@ -40,14 +40,6 @@ function Timer() {
   }, [presetList]);
 
   useEffect(() => {
-    console.log("presetList : ", presetList);
-  }, [presetList]);
-
-  useEffect(() => {
-    console.log("timerPresetList : ", timerPresetList);
-  }, [timerPresetList]);
-
-  useEffect(() => {
     remainTimeRef.current = remainTime;
   }, [remainTime]);
 
