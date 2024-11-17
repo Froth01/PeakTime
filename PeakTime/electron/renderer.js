@@ -122,3 +122,7 @@ function handleParsedMessage(parsedMessage) {
     window.electronAPI.sendAddUrl(parsedMessage); // preload에서 electronAPi 설정한 곳으로 이동
   }
 }
+
+document.addEventListener("quit", () => {
+  window.electronAPI.quit();
+});
