@@ -1,3 +1,28 @@
+let ws;
+
+function connectWebSocket() {
+  ws = new WebSocket("ws://localhost:12345");
+
+  ws.onopen = () => {
+    console.log("WebSocket connected.");
+  };
+
+  ws.onmessage = (event) => {
+    console.log("Message from server:", event.data);
+  };
+
+  ws.onclose = () => {
+    console.log("WebSocket disconnected. Reconnecting...");
+    setTimeout(connectWebSocket, 1000); // 1초 후 재연결
+  };
+
+  ws.onerror = (error) => {
+    console.error("WebSocket error:", error);
+  };
+}
+
+connectWebSocket();
+
 // 익스텐션 설치 url 클릭
 document.addEventListener("extensionUrl", (event) => {
   console.log("link click event : ", event.detail);

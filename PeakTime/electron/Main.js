@@ -196,6 +196,7 @@ if (!gotTheLock) {
         console.log(`Received from client: ${message}`);
 
         if (message == "ping") {
+          win.webContents.send("websocket-on", { type: "connect" });
           return;
         }
 
