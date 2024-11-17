@@ -19,4 +19,4 @@ export const usePresetStore = create((set) => ({
   resetPreset: () => set({ presetList: [] }),
 }));
 
-export default usePresetStore;
+export default usePresetStore;  
