@@ -212,6 +212,73 @@ function Toolbar() {
     }
   };
 
+  // 종료 모달창 띄우기
+  const quitModal = async () => {
+    const { value: getRootUserPassword } = await Swal.fire({
+      title: "종료",
+      html: "종료를 위해 메인 계정의 비밀번호를 입력해주세요.",
+      customClass: {
+        popup: "custom-swal-popup",
+        input: "custom-swal-input",
+      },
+      icon: "question",
+      input: "password",
+      confirmButtonColor: "#03C777",
+      confirmButtonText: "확인",
+      inputAttributes: {
+        placeholder: "password",
+        style: "color: black;", // input 텍스트 색상
+      },
+    });
+
+    // 이후 처리되는 내용
+    if (getRootUserPassword) {
+      check(getRootUserPassword);
+    }
+  }
+
+  const check = async (getRootUserPassword) => {
+    // 로그아웃은 auth이지만 유일하게 access Token이 필요
+    // 로그아웃 api는 메인 계정 비밀번호를 검증하는 역할이므로 재사용 가능
+    const logoutData = {
+      rootUserPassword: getRootUserPassword,
+    };
+    try {
+      const { user } = useUserStore.getState();
+      const accessToken = user.accessToken;
+      await authApi.post("/logout", logoutData, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      // 성공하면 이어서 진행
+      quit();
+    } catch (error) {
+      // 실패하면 여기로 진입
+      console.error(error);
+      Swal.fire({
+        title: "비밀번호 불일치",
+        customClass: {
+          popup: "custom-swal-popup",
+        },
+        text: "비밀번호가 일치하지 않습니다.",
+        icon: "error",
+        confirmButtonColor: "#03C777",
+        confirmButtonText: "확인",
+      });
+    }
+  }
+
+  const quit = () => {
+    // Electron의 quit 메서드 호출
+    if (window.electronAPI && window.electronAPI.quit) {
+      window.electronAPI.quit();
+    } else {
+      console.error("Electron API is not available.");
+    }
+  };
+
   return (
     <div className="bg-[#66aadf] w-[8vw] h-[100vh] absolute left-0 z-[2] flex flex-col items-center justify-between">
       <div className="flex flex-col h-[70%] justify-around">
@@ -352,6 +419,10 @@ function Toolbar() {
               <hr className="border-t my-1 border-gray-300" />
               <button onClick={logoutModal} className="text-left">
                 로그아웃
+              </button>
+              <hr className="border-t my-1 border-gray-300" />
+              <button onClick={quitModal} className="text-left">
+                종료
               </button>
             </div>
           }
