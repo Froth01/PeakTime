@@ -5,6 +5,11 @@ const WEBSOCKET_URL = "ws://localhost:12345";
 let reconnectAttempts = 0;
 let socketConnected = false;
 
+chrome.runtime.onStartup.addListener(() => {
+  console.log("startup");
+  connectWebSocket();
+});
+
 function connectWebSocket() {
   socket = new WebSocket(WEBSOCKET_URL);
 
