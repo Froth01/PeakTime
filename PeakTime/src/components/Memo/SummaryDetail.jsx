@@ -8,8 +8,14 @@ import html2pdf from "html2pdf.js";
 import { useEffect, useState } from "react";
 
 function SummaryDetail() {
-  const { summaryData, setSummaryData, setSummaryList, resetSummaryContent, resetSummaryData, selectedSummary } =
-    useMemoStore();
+  const {
+    summaryData,
+    setSummaryData,
+    setSummaryList,
+    resetSummaryContent,
+    resetSummaryData,
+    selectedSummary,
+  } = useMemoStore();
   //   const { summaryId, title, content, createdAt } = summaryData;
 
   const [isFetching, setIsFetching] = useState(false);
@@ -158,33 +164,7 @@ function SummaryDetail() {
     } finally {
       setIsFetching(false);
     }
-  }; // setsummarycount 제외 
-
-  // 요약 삭제
-  const deleteSummary = async (summaryId) => {
-    try {
-      // 메모 삭제 delete 요청 보내기
-      const response = await summariesApi.delete(`/${summaryId}`);
-      console.log("summaryDeleteApi: ", response.data);
-
-      resetSummaryContent();
-      resetSummaryData();
-      fetchGetSummaryList();
-    } catch (error) {
-      console.error("error delete summary api", error);
-      Swal.fire({
-        title: `요약 삭제를 실패했습니다.`,
-        text: "요약 삭제를 실패했습니다. 잠시 후 다시 시도해주세요.",
-        customClass: {
-          popup: "custom-swal-popup",
-        },
-        icon: "warning",
-        confirmButtonText: "확인",
-        confirmButtonColor: "#7C7C7C",
-      });
-    }
-  };
-
+  }; // setsummarycount 제외
 
   return (
     <div className="absolute left-[43vw] w-[54vw] h-[84vh] my-[3vh] bg-[#333333] bg-opacity-70 rounded-lg p-5 flex flex-col items-center justify-between">
@@ -212,12 +192,6 @@ function SummaryDetail() {
           onClick={() => showMarkdownModal(summaryData.content)}
         >
           Markdown 미리보기 및 다운로드
-        </button>
-        <button
-          className="text-white font-bold px-5 py-2 rounded-xl bg-[#7C7C7C] hover:bg-[#5C5C5C]"
-          onClick={() => deleteSummary(summaryData.summaryId)}
-        >
-          삭제하기
         </button>
       </div>
     </div>
