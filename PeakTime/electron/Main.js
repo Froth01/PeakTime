@@ -174,10 +174,10 @@ if (!gotTheLock) {
     wss.on("connection", (ws) => {
       console.log("New client connected");
       if (win) {
-        console.log("mainwindow ok");
+        console.log("win ok");
         win.webContents.send("websocket-on", { type: "connect" });
       } else {
-        console.error("mainWindow가 정의되지 않았습니다.");
+        console.error("win가 정의되지 않았습니다.");
       }
       // 새 클라이언트에게 저장된 메시지 전송
       if (lastWebSocketMessage) {
@@ -187,6 +187,11 @@ if (!gotTheLock) {
       // 클라이언트로부터 메시지 수신
       ws.on("message", (message) => {
         console.log(`Received from client: ${message}`);
+
+        if (message == "ping") {
+          return;
+        }
+
         BrowserWindow.getAllWindows().forEach((win) => {
           win.webContents.send("websocket-message", message);
         });
@@ -195,10 +200,10 @@ if (!gotTheLock) {
       // 클라이언트 연결 종료
       ws.on("close", () => {
         console.log("Client disconnected");
-        if (mainWindow) {
-          mainWindow.webContents.send("websocket-on", { type: "disconnect" });
+        if (win) {
+          win.webContents.send("websocket-on", { type: "disconnect" });
         } else {
-          console.error("mainWindow가 정의되지 않았습니다.");
+          console.error("win가 정의되지 않았습니다.");
         }
       });
 
@@ -302,5 +307,4 @@ if (!gotTheLock) {
       app.quit();
     });
   });
-
 }
