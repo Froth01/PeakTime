@@ -81,7 +81,7 @@ const Mountain = () => {
     // cameraGui.add(camera.rotation, "z", -5, 5, 0.01).name("Z Rotation");
 
     // 배경 설정
-    new RGBELoader().load("/models/mountains/DJI_0077.hdr", (texture) => {
+    new RGBELoader().load("../build/models/mountains/DJI_0077.hdr", (texture) => {
       texture.mapping = THREE.EquirectangularReflectionMapping;
       scene.background = texture;
     });
@@ -89,7 +89,7 @@ const Mountain = () => {
     // FBX 모델 로드
     const loader = new FBXLoader();
     loader.load(
-      "/models/mountains/mountain.fbx", // FBX 파일 경로로 변경
+      "../build/models/mountains/mountain.fbx", // FBX 파일 경로로 변경
       (object) => {
         // 모델 로드 후 처리
         model = object; // 모델 저장
