@@ -39,6 +39,7 @@ export const useMemoStore = create((set) => ({
 
   activeTab: "memo",
   summaryCountLimit: 3, // 요약 최대한도 수
+  inputTitleLimit: 15,
   inputTextLimit: 1000,
   keywordInputLimit: 10, // 키워드 하나당 최대 글자 길이
   keywordsLimit: 3, // 최대 키워드 input 수
@@ -90,7 +91,7 @@ export const useMemoStore = create((set) => ({
       memoPage: initialState.memoPage,
       isMemoLastPage: initialState.isMemoLastPage,
     })),
-  resetSummaryContent: () => 
+  resetSummaryContent: () =>
     set((state) => ({
       ...state,
       summaryList: initialState.summaryList,

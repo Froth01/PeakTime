@@ -2,11 +2,12 @@ import Swal from "sweetalert2";
 import summariesApi from "../../api/summariesApi";
 import { TiDelete } from "react-icons/ti";
 import { useMemoStore } from "../../stores/MemoStore";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 
 function MemoDetailPrompt() {
   const {
     inputTitle,
+    inputTitleLimit,
     setInputTitle,
     inputText,
     setInputText,
@@ -40,10 +41,8 @@ function MemoDetailPrompt() {
 
   const handleInputTitleChange = (event) => {
     const text = event.target.value;
-    
-    // title 길이 제한이 있으면 추가
     setInputTitle(text);
-  }
+  };
 
   const handleInputChange = (event) => {
     const text = event.target.value;
@@ -86,7 +85,7 @@ function MemoDetailPrompt() {
     } finally {
       setIsFetching(false);
     }
-  }; // setsummarycount 제외  
+  }; // setsummarycount 제외
 
   // 키워드 추가 함수
   const addKeyword = () => {
@@ -140,7 +139,6 @@ function MemoDetailPrompt() {
     setKeywords(keywords.filter((item) => item !== keyword));
   };
 
-
   // 요약하기 모달 띄우기
   // 사이트, 프로그램 한 줄 추가 처리
   const openSummaryModal = (title, keywords) => {
@@ -163,7 +161,7 @@ function MemoDetailPrompt() {
         handleSummaryButton();
       }
     });
-  };  
+  };
 
   const handleSummaryButton = () => {
     // 1. GPT 사용 횟수가 3번 이상이면 요약을 진행할 수 없다는 알림 표시
@@ -212,7 +210,7 @@ function MemoDetailPrompt() {
 
       const response = await summariesApi.post(``, requestData);
       console.log("GPTPostApi: ", response.data);
-      
+
       Swal.fire({
         title: "요약 성공",
         customClass: {
@@ -223,7 +221,7 @@ function MemoDetailPrompt() {
         confirmButtonColor: "#03C777",
         confirmButtonText: "확인",
       });
-      
+
       setInputTitle("");
       setInputText("");
       setKeywords([]);
@@ -242,13 +240,13 @@ function MemoDetailPrompt() {
         text: "요약 요청 중 오류가 발생했습니다.",
         icon: "error",
         confirmButtonText: "확인",
-        confirmButtonColor: "#03C777"
+        confirmButtonColor: "#03C777",
       });
       console.error(error);
     } finally {
       setIsLoading(false);
     }
-  };  
+  };
 
   return (
     <div className="absolute bg-[#333333] bg-opacity-70 right-[3vw] w-[24vw] h-[84vh] my-[3vh] rounded-lg flex flex-col items-center justify-between p-5">
@@ -260,18 +258,19 @@ function MemoDetailPrompt() {
         <div className="h-full flex flex-col justify-between">
           <div className="flex flex-col justify-between h-[90%] mb-5">
             <div className="flex flex-col justify-between h-full">
-              <input 
+              <input
                 type="text"
                 value={inputTitle}
                 onChange={handleInputTitleChange}
-                placeholder="제목을 입력하세요."
+                maxLength={inputTitleLimit}
+                placeholder={`제목을 입력하세요. (최대 ${inputTitleLimit}자)`}
                 className="rounded-xl mb-3"
               />
               <textarea
                 type="text"
                 value={inputText}
                 onChange={handleInputChange}
-                placeholder="메모에서 요약하고 싶은 내용을 작성하세요. 메모에서 드래그한 내용을 붙여넣기가 가능합니다."
+                placeholder={`ChatGPT를 사용해 요약하고 싶은 내용을 작성하세요. 메모에서 드래그한 내용을 붙여넣기가 가능합니다. (최대 ${inputTextLimit}자, 일일 이용횟수 ${summaryCountLimit}회 제한)`}
                 className="h-[92%] rounded-xl p-2 w-full custom-scrollbar"
               />
               <div className="text-[#C5C5C5] text-start text-[15px] my-2">
@@ -285,7 +284,7 @@ function MemoDetailPrompt() {
                   type="text"
                   value={keywordInput}
                   onChange={handleKeywordInputChange}
-                  placeholder="추가 키워드를 입력하세요"
+                  placeholder="추가 키워드를 입력하세요."
                   className="border border-gray-300 p-2 w-full rounded-xl"
                 />
                 {/* 키워드 추가 버튼 (아이콘 형식) */}
@@ -318,7 +317,7 @@ function MemoDetailPrompt() {
             </div>
           </div>
 
-          <div className="w-full flex justify-center gap-x-3">
+          <div className="w-full flex justify-center gap-x-3 mb-3">
             <button
               className="bg-[#03c777] rounded-xl px-5 py-2 hover:bg-[#02a566] focus:ring-4 focus:ring-[#03c777] text-white font-bold"
               onClick={() => openSummaryModal(memoData.title, keywords)}
@@ -338,7 +337,7 @@ function MemoDetailPrompt() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default MemoDetailPrompt;

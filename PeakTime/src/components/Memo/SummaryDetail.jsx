@@ -141,31 +141,6 @@ function SummaryDetail() {
     html2pdf().from(element).set(options).save();
   };
 
-  const fetchGetSummaryList = async () => {
-    if (isFetching) return;
-
-    setIsFetching(true);
-
-    try {
-      // 요약 리스트 전체 조회 GET 요청을 보내기
-      const response = await summariesApi.get(``, {
-        params: { page: 0 }, // 0페이지로 명시적으로 지정
-      });
-      console.log("summariesGetApi: ", response.data);
-
-      const data = response.data.data;
-      const addSummaryList = data.summaryList;
-      const isLastPage = data.isLastPage;
-
-      setSummaryList(addSummaryList, isLastPage); // 상태를 업데이트하여 UI에 반영
-    } catch (error) {
-      console.error("Error fetching summaryList:", error);
-      throw error;
-    } finally {
-      setIsFetching(false);
-    }
-  }; // setsummarycount 제외
-
   return (
     <div className="absolute left-[43vw] w-[54vw] h-[84vh] my-[3vh] bg-[#333333] bg-opacity-70 rounded-lg p-5 flex flex-col items-center justify-between">
       <h2 className="w-full text-white text-[30px] font-bold pb-3 border-b mb-5">

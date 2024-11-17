@@ -1,4 +1,5 @@
 import Swal from "sweetalert2";
+import dayjs from "dayjs";
 import memosApi from "../../api/memosApi";
 import { useEffect, useState } from "react";
 import { useMemoStore } from "../../stores/MemoStore";
@@ -17,6 +18,11 @@ function MemoDetail() {
   } = useMemoStore();
 
   const [selectedText, setSelectedText] = useState(""); // 드래그 텍스트 저장
+
+  // 생성날짜 바로 보이게 처리
+  const formatDate = (date) => {
+    return dayjs(date).format("YY.MM.DD HH:mm:ss");
+  };
 
   // 특정 메모 정보 보기
   const readDetailMemoGet = async () => {
@@ -106,7 +112,6 @@ function MemoDetail() {
     }
   };
 
-
   return (
     <div className="absolute left-[42.5vw] my-[3vh] gap-x-[2vw] flex">
       <>
@@ -117,10 +122,17 @@ function MemoDetail() {
             </h2>
 
             <div className="flex flex-col justify-between h-full w-full gap-x-5 px-3">
+              <div className="flex w-full justify-between mb-3">
+                <h2 className="text-white text-[20px] font-bold">메모 정보</h2>
+                <div className="text-white">
+                  메모 일자: {formatDate(memoData.createdAt)}
+                </div>
+              </div>
+
               <div className="h-full flex flex-col justify-between">
                 <div
                   style={{ whiteSpace: "pre-line" }}
-                  className="min-h-[65vh] max-h-[65vh] text-left overflow-y-scroll p-3 bg-white custom-scrollbar mb-5"
+                  className="min-h-[60vh] max-h-[60vh] text-left overflow-y-scroll p-3 bg-white custom-scrollbar mb-5"
                   onMouseUp={(event) => {
                     event.stopPropagation(); // 이벤트 전파 막기
                     handleSelection();
@@ -129,7 +141,7 @@ function MemoDetail() {
                   {memoData.content}
                 </div>
 
-                <div className="flex justify-end gap-x-5">
+                <div className="flex justify-end gap-x-5 mb-3">
                   <button
                     onClick={() => copyButton()}
                     className="bg-[#03c777] rounded-xl px-5 py-2 hover:bg-[#02a566] focus:ring-4 focus:ring-[#03c777] text-white font-bold"
