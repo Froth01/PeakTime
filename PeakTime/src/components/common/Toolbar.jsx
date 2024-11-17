@@ -163,9 +163,10 @@ function Toolbar() {
 
   // 브라우저 로그아웃
   const browserLogout = () => {
-    userActions.setUser(null);
     localStorage.removeItem("user");
-    window.location.href = "/login";
+    userActions.setUser(null);
+    // window.location.href = "/login";
+
   };
 
   // 비밀번호 변경 모달창 띄우기
