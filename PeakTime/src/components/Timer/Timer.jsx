@@ -13,6 +13,7 @@ import { MdAccessTimeFilled } from "react-icons/md";
 import "../../styles/daily-report-custom-swal.css";
 import { useRunningStore } from "../../stores/RunningStore.jsx";
 import { useNavigate } from "react-router-dom";
+import { usePresetStore } from "../../stores/PresetStore.jsx";
 
 function Timer() {
   const { bg, bgActions } = useBackgroundStore();
@@ -24,10 +25,19 @@ function Timer() {
   const [isSelf, setIsSelf] = useState(true);
   const workerRef = useRef(null);
   const [startedHikingId, setStartedHikingId] = useState(null); // 시작한 hikingId 정보
-  const [presetList, setPresetList] = useState(null); // 프리셋 리스트
+  const [timerPresetList, setTimerPresetList] = useState(null); // 프리셋 리스트
   const remainTimeRef = useRef(remainTime);
   const isRunningRef = useRef(isRunning);
   const hikingIdRef = useRef(startedHikingId);
+
+  const { presetList }= usePresetStore.getState();
+
+  useEffect(() => {
+    if(presetList.length == 0) return;
+    
+    setTimerPresetList(presetList);
+    setSelectedOption(null);
+  }, [presetList]);
 
   useEffect(() => {
     remainTimeRef.current = remainTime;
@@ -112,6 +122,21 @@ function Timer() {
       });
       return;
     }
+
+    // 프리셋 선택
+    if(user.isRoot && selectedOption == null){
+      Swal.fire({
+        title: "적용할 프리셋을 선택하세요.",
+        customClass: {
+          popup: "custom-swal-popup",
+        },
+        icon: "error",
+        text: "하이킹을 시작하려면 프리셋을 선택해주세요",
+        confirmButtonColor: "#03c777",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
     // 진짜로 시작하기, api요청
     Swal.fire({
       title: `${formatTime(time * 60)} 길이의 하이킹을 \n 시작하시겠습니까?`,
@@ -125,6 +150,7 @@ function Timer() {
       denyButtonText: "취소",
       preConfirm: async () => {
         try {
+
           // 시작 확인 후 카운트다운 모달 표시
           const countdownSwal = await Swal.fire({
             title: "곧 하이킹이 시작됩니다!",
@@ -194,7 +220,7 @@ function Timer() {
               bubbles: true,
               detail: {
                 startedHikingId: responseStartHiking.data.data.hikingId,
-                selectedPreset: presetList[0],
+                selectedPreset: timerPresetList[0],
                 backUrl: hikingsApi.defaults.baseURL,
                 isRoot: user.isRoot ? "root" : "child",
               },
@@ -541,7 +567,7 @@ function Timer() {
     presetsApi
       .get("")
       .then((result) => {
-        setPresetList(result.data.data.presetList);
+        setTimerPresetList(result.data.data.presetList);
       })
       .catch();
 
@@ -552,8 +578,8 @@ function Timer() {
   }, []);
 
   useEffect(() => {
-    console.log("isRunning : " , isRunning)
-  }, [isRunning])
+    console.log("isRunning : ", isRunning);
+  }, [isRunning]);
 
   // 포기 버튼 누르기
   const handleGiveup = () => {
@@ -584,6 +610,7 @@ function Timer() {
             pauseTimer(); // 분 단위로 받은 시간을 초로 변환
             setRemainTime(null);
             setIsRunning(false);
+            setSelectedOption(null);
             runningActions.setRunning(false);
           }
         } catch (err) {
@@ -799,7 +826,7 @@ function Timer() {
                         className="absolute left-0 right-0 mt-3 bg-white border
                       border-gray-300 rounded-lg shadow-lg"
                       >
-                        {presetList.map((preset, index) => (
+                        {timerPresetList.map((preset, index) => (
                           <div key={preset.presetId}>
                             <li
                               onClick={() => {
@@ -810,7 +837,7 @@ function Timer() {
                             >
                               {preset.title}
                             </li>
-                            {index < presetList.length - 1 && (
+                            {index < timerPresetList.length - 1 && (
                               <hr className="border-gray-200" />
                             )}
                           </div>
