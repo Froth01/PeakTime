@@ -63,15 +63,15 @@ function MemoDetailPrompt() {
     setInputText(text);
   };
 
-  const fetchGetSummaryList = useCallback(async () => {
-    if (isSummaryLastPage || isFetching) return;
+  const fetchGetSummaryList = async () => {
+    if (isFetching) return;
 
     setIsFetching(true);
 
     try {
       // 요약 리스트 전체 조회 GET 요청을 보내기
       const response = await summariesApi.get(``, {
-        params: { page: summaryPage },
+        params: { page: 0 },
       });
       console.log("summariesGetApi: ", response.data);
 
@@ -86,7 +86,7 @@ function MemoDetailPrompt() {
     } finally {
       setIsFetching(false);
     }
-  }, [isSummaryLastPage, summaryPage, isFetching, setSummaryList]); // setsummarycount 제외  
+  }; // setsummarycount 제외  
 
   // 키워드 추가 함수
   const addKeyword = () => {
@@ -224,6 +224,7 @@ function MemoDetailPrompt() {
         confirmButtonText: "확인",
       });
       
+      setInputTitle("");
       setInputText("");
       setKeywords([]);
       setSummaryCount(response.data.data.summaryCount);

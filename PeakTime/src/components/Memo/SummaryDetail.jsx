@@ -5,12 +5,14 @@ import summariesApi from "../../api/summariesApi";
 import "../../styles/daily-report-custom-swal.css";
 import "../../styles/custom-scrollbar.css";
 import html2pdf from "html2pdf.js";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 function SummaryDetail() {
-  const { summaryData, setSummaryData, resetSummaryData, selectedSummary } =
+  const { summaryData, setSummaryData, setSummaryList, resetSummaryContent, resetSummaryData, selectedSummary } =
     useMemoStore();
   //   const { summaryId, title, content, createdAt } = summaryData;
+
+  const [isFetching, setIsFetching] = useState(false);
 
   // 특정 요약 상세 정보 보기
   const readDetailSummaryGet = async () => {
@@ -133,30 +135,89 @@ function SummaryDetail() {
     html2pdf().from(element).set(options).save();
   };
 
+  const fetchGetSummaryList = async () => {
+    if (isFetching) return;
+
+    setIsFetching(true);
+
+    try {
+      // 요약 리스트 전체 조회 GET 요청을 보내기
+      const response = await summariesApi.get(``, {
+        params: { page: 0 }, // 0페이지로 명시적으로 지정
+      });
+      console.log("summariesGetApi: ", response.data);
+
+      const data = response.data.data;
+      const addSummaryList = data.summaryList;
+      const isLastPage = data.isLastPage;
+
+      setSummaryList(addSummaryList, isLastPage); // 상태를 업데이트하여 UI에 반영
+    } catch (error) {
+      console.error("Error fetching summaryList:", error);
+      throw error;
+    } finally {
+      setIsFetching(false);
+    }
+  }; // setsummarycount 제외 
+
+  // 요약 삭제
+  const deleteSummary = async (summaryId) => {
+    try {
+      // 메모 삭제 delete 요청 보내기
+      const response = await summariesApi.delete(`/${summaryId}`);
+      console.log("summaryDeleteApi: ", response.data);
+
+      resetSummaryContent();
+      resetSummaryData();
+      fetchGetSummaryList();
+    } catch (error) {
+      console.error("error delete summary api", error);
+      Swal.fire({
+        title: `요약 삭제를 실패했습니다.`,
+        text: "요약 삭제를 실패했습니다. 잠시 후 다시 시도해주세요.",
+        customClass: {
+          popup: "custom-swal-popup",
+        },
+        icon: "warning",
+        confirmButtonText: "확인",
+        confirmButtonColor: "#7C7C7C",
+      });
+    }
+  };
+
+
   return (
     <div className="absolute left-[43vw] w-[54vw] h-[84vh] my-[3vh] bg-[#333333] bg-opacity-70 rounded-lg p-5 flex flex-col items-center justify-between">
       <h2 className="w-full text-white text-[30px] font-bold pb-3 border-b mb-5">
         {summaryData.title}
       </h2>
       <div className="flex h-full w-full gap-x-5 px-3">
-        <div className="flex flex-col justify-between h-full w-[60%]">
-          <h2 className="text-white text-[20px] font-bold mb-3">요약 정보</h2>
-          <div className="text-white">
-            최종 요약 일자: {formatDate(summaryData.createdAt)}
+        <div className="flex flex-col justify-between h-full w-full">
+          <div className="flex w-full justify-between mb-3">
+            <h2 className="text-white text-[20px] font-bold">요약 정보</h2>
+            <div className="text-white">
+              요약 일자: {formatDate(summaryData.createdAt)}
+            </div>
           </div>
           <div className="h-full flex flex-col justify-between">
-            <div className="min-h-[60vh] max-h-[60vh] text-left overflow-y-scroll p-3 bg-white custom-scrollbar mb-5">
+            <div className="min-h-[60vh] max-h-[60vh] text-left overflow-y-scroll p-3 bg-white custom-scrollbar">
               {summaryData.content}
             </div>
           </div>
         </div>
       </div>
-      <div className="w-full flex justify-center mt-3 gap-x-3">
+      <div className="w-full flex justify-center gap-x-3 mb-3">
         <button
           className="bg-[#03c777] rounded-xl px-5 py-2 hover:bg-[#02a566] focus:ring-4 focus:ring-[#03c777] text-white font-bold"
           onClick={() => showMarkdownModal(summaryData.content)}
         >
           Markdown 미리보기 및 다운로드
+        </button>
+        <button
+          className="text-white font-bold px-5 py-2 rounded-xl bg-[#7C7C7C] hover:bg-[#5C5C5C]"
+          onClick={() => deleteSummary(summaryData.summaryId)}
+        >
+          삭제하기
         </button>
       </div>
     </div>
