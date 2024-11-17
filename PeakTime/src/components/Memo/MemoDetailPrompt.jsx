@@ -253,7 +253,7 @@ function MemoDetailPrompt() {
     <div className="absolute bg-[#333333] bg-opacity-70 right-[3vw] w-[24vw] h-[84vh] my-[3vh] rounded-lg flex flex-col items-center justify-between p-5">
       <div className="flex flex-col justify-between w-full h-full">
         <h2 className="text-white text-[30px] font-bold pb-3 border-b mb-5">
-          요약 프롬프트 작성 도구
+          요약 문서 작성 도구
         </h2>
 
         <div className="h-full flex flex-col justify-between">
