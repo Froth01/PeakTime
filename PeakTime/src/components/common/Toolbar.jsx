@@ -425,12 +425,12 @@ function Toolbar() {
               <button onClick={changePasswordModal} className="text-left">
                 비밀번호 변경
               </button>
-              <hr className="border-t my-1 border-gray-300" />
-              <button onClick={logoutModal} className="text-left">
+              <hr className={`border-t my-1 border-gray-300 ${running ? 'hidden' : ''}`} />
+              <button onClick={logoutModal} className={`text-left ${running ? 'hidden' : ''}`}>
                 로그아웃
               </button>
-              <hr className="border-t my-1 border-gray-300" />
-              <button onClick={quitModal} className="text-left">
+              <hr className={`border-t my-1 border-gray-300 ${running ? 'hidden' : ''}`} />
+              <button onClick={quitModal} className={`text-left ${running ? 'hidden' : ''}`}>
                 종료
               </button>
             </div>

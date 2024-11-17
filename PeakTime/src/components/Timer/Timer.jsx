@@ -734,7 +734,7 @@ function Timer() {
         {isSmall && (
           <div
             className={`me-4 text-5xl font-bold text-${
-              isRunning ? "[#d10000]" : "white"
+              isRunning ? "[#f40000]" : "white"
             }`}
           >
             {isRunning

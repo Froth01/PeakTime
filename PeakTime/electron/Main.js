@@ -42,7 +42,7 @@ if (!gotTheLock) {
 
   function createWindow() {
     // 일렉트론 크기
-    Menu.setApplicationMenu(null);// 메뉴바 삭제
+    //Menu.setApplicationMenu(null);// 메뉴바 삭제
 
     win = new BrowserWindow({
       width: 1920,
@@ -50,8 +50,8 @@ if (!gotTheLock) {
       webPreferences: {
         preload: path.join(
           __dirname,
-          "resources",
-          "build",
+          // "resources",
+          // "build",
           "electron",
           "preload.js"
         ),
@@ -59,7 +59,7 @@ if (!gotTheLock) {
         nodeIntegration: false, // 보안 상 비활성화
         sandbox: true,
         enableRemoteModule: false,
-        devTools: false, //개발자 도구 막기
+        // devTools: false, //개발자 도구 막기
       },
     });
 
