@@ -42,7 +42,11 @@ if (!gotTheLock) {
 
   function createWindow() {
     // 일렉트론 크기
+<<<<<<< HEAD
     //Menu.setApplicationMenu(null);// 메뉴바 삭제
+=======
+    Menu.setApplicationMenu(null); // 메뉴바 삭제
+>>>>>>> 6973259e169f452880ff9fa625cbfeafe806357c
 
     win = new BrowserWindow({
       width: 1920,
@@ -96,8 +100,15 @@ if (!gotTheLock) {
   }
 
   function createTray() {
-    //tray = new Tray(path.join(__dirname, "/public/Logo/logo-16x16.png")); // 트레이 아이콘 경로 설정
-    tray = new Tray(path.join(__dirname, "../build/Logo/logo-16x16.png")); // 빌드 환경에서 트레이 아이콘 경로 설정
+    // tray = new Tray(path.join(__dirname, "/public/Logo/logo-16x16.png")); // 트레이 아이콘 경로 설정
+    const iconPath = path.join(
+      __dirname,
+      "resources",
+      "build",
+      "Logo",
+      "logo-16x16.png"
+    );
+    tray = new Tray(iconPath); // 빌드 환경에서 트레이 아이콘 경로 설정
     const contextMenu = Menu.buildFromTemplate([
       { label: "Show App", click: () => win.show() }, // 앱 보이기
       // {

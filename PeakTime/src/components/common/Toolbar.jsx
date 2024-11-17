@@ -163,9 +163,11 @@ function Toolbar() {
 
   // 브라우저 로그아웃
   const browserLogout = () => {
+    localStorage.removeItem("user");
     userActions.setUser(null);
     localStorage.removeItem("user");
-    window.location.href = "/login";
+    userActions.setUser(null);
+    localStorage.removeItem("user");
   };
 
   // 비밀번호 변경 모달창 띄우기
@@ -244,7 +246,7 @@ function Toolbar() {
     if (getRootUserPassword) {
       check(getRootUserPassword);
     }
-  }
+  };
 
   const check = async (getRootUserPassword) => {
     // 로그아웃은 auth이지만 유일하게 access Token이 필요
@@ -277,7 +279,7 @@ function Toolbar() {
         confirmButtonText: "확인",
       });
     }
-  }
+  };
 
   const quit = () => {
     // Electron의 quit 메서드 호출
