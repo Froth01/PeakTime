@@ -296,5 +296,11 @@ if (!gotTheLock) {
         console.error("program error:", error);
       }
     });
+
+    ipcMain.on("quit-app", () => {
+      app.isQuitting = true;
+      app.quit();
+    });
   });
+
 }

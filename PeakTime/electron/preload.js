@@ -63,4 +63,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
       console.log("이미 onAddUrl 리스너가 등록되어 있습니다.");
     }
   },
+
+  quit: () => {
+    ipcRenderer.send("quit-app");
+  },
 });

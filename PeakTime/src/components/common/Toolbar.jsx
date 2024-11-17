@@ -162,6 +162,15 @@ function Toolbar() {
     window.location.href = "/login";
   };
 
+  const quit = () => {
+    // Electron의 quit 메서드 호출
+    if (window.electronAPI && window.electronAPI.quit) {
+      window.electronAPI.quit();
+    } else {
+      console.error("Electron API is not available.");
+    }
+  };
+
   // 비밀번호 변경 모달창 띄우기
   const changePasswordModal = async () => {
     const { value: getPassword } = await Swal.fire({
@@ -352,6 +361,10 @@ function Toolbar() {
               <hr className="border-t my-1 border-gray-300" />
               <button onClick={logoutModal} className="text-left">
                 로그아웃
+              </button>
+              <hr className="border-t my-1 border-gray-300" />
+              <button onClick={quit} className="text-left">
+                종료
               </button>
             </div>
           }
