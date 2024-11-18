@@ -49,6 +49,16 @@ async function recordTime(url) {
     console.log(
       `Domain: ${domainName}, 누적 사용 시간: ${newUrlData.usingTime}초, 차단 여부: ${isBlock}`
     );
+
+    if (isBlock) {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs.length > 0) {
+          chrome.tabs.sendMessage(tabs[0].id, { action: "shutdown" });
+        } else {
+          console.error("활성 탭이 없습니다.");
+        }
+      });
+    }
   } catch (error) {
     console.warn(`Invalid URL: ${url}`, error);
   }
@@ -109,17 +119,6 @@ function startTracking() {
   isTracking = true;
   console.log("Tracking started");
 
-  // // 현재 활성 탭의 ID를 설정하고 URL 추적
-  // chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-  //   if (tabs.length > 0) {
-  //     currentTabId = tabs[0].id;
-  //     handleUrlChange(tabs[0].url);
-
-  //     // currentTabId가 설정된 후에 새로 고침 실행
-  //     chrome.tabs.reload(currentTabId);
-  //   }
-  // });
-
   // 활성화된 탭 변경 이벤트 리스너 추가
   chrome.tabs.onActivated.addListener(handleTabActivation);
 
@@ -148,33 +147,6 @@ function handleUrlChange(newUrl) {
     const shouldBlock = websiteList.some((urlPattern) =>
       fullUrl.includes(urlPattern)
     );
-    // console.log("Should block:", shouldBlock);
-
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs[0]) {
-        chrome.tabs.sendMessage(
-          tabs[0].id,
-          { action: "checkContentScript" },
-          (response) => {
-            if (chrome.runtime.lastError || !response) {
-              chrome.scripting.executeScript(
-                {
-                  target: { tabId: tabs[0].id },
-                  files: ["/js/contentScript.js"],
-                },
-                () => {
-                  if (shouldBlock) {
-                    chrome.tabs.sendMessage(tabs[0].id, { action: "shutdown" });
-                  }
-                }
-              );
-            } else if (shouldBlock) {
-              chrome.tabs.sendMessage(tabs[0].id, { action: "shutdown" });
-            }
-          }
-        );
-      }
-    });
   });
 }
 

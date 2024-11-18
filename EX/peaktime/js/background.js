@@ -33,6 +33,14 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         await chrome.storage.local.set({ websiteList });
         console.log("Website list updated:", websiteList);
 
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          if (tabs.length > 0) {
+            chrome.tabs.sendMessage(tabs[0].id, { action: "shutdown" });
+          } else {
+            console.error("활성 탭이 없습니다.");
+          }
+        });
+
         // presetId 값을 비동기적으로 가져오기
         const presetData = await chrome.storage.local.get("presetId");
         const presetId = presetData.presetId || null;

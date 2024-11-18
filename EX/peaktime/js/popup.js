@@ -28,8 +28,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const saveMemoButton = document.getElementById("save");
   // role 값을 가져와서 버튼 표시 여부 결정
   chrome.storage.local.get("role", (data) => {
-    console.log(data);
-
     // role이 "child"인 경우 버튼 숨기기
     if (data.role === "child" && addUrlButton) {
       addUrlButton.remove();
@@ -38,8 +36,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // 팝업이 열리면 저장된 텍스트 가져와서 textarea에 추가
   chrome.storage.local.get({ savedTexts: [] }, function (data) {
-    console.log(data);
-
     const savedTexts = Array.isArray(data.savedTexts)
       ? data.savedTexts
       : [data.savedTexts];
@@ -76,8 +72,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const url = tabs[0].url; // 현재 탭의 URL
         const urlObject = new URL(url); // URL 객체 생성
         const hostname = urlObject.hostname; // 도메인만 추출
-        const pathname = urlObject.pathname; // path 추출
-        const fullUrl = hostname + pathname;
         //버튼 클릭시 전체 url 보내기
         chrome.runtime.sendMessage({ action: "addUrl", url: hostname });
 
