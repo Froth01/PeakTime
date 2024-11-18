@@ -351,7 +351,7 @@ function Toolbar() {
         >
           <div className="absolute z-10 w-[32px] h-[32px]">
             <img
-              src="../../../public/assets/chrome.svg"
+              src="../../build/assets/chrome.svg"
               className="w-full h-full"
             />
           </div>

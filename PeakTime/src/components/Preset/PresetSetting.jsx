@@ -220,7 +220,7 @@ function PresetSetting({ onCancel, setUpdateTrigger }) {
         <div>
           <div className="flex justify-center mb-4">
             <img
-              src="../../../public/assets/chrome.svg"
+              src="../../build/assets/chrome.svg"
               className="mr-[0.5vw]"
             />
             <h3 className="text-[22px] font-bold">사이트 차단 목록</h3>
@@ -250,7 +250,7 @@ function PresetSetting({ onCancel, setUpdateTrigger }) {
         <div>
           <div className="flex justify-center items-center mb-4">
             <img
-              src="../../../public/Logo/logo-16x16.png"
+              src="../../build/Logo/logo-16x16.png"
               className="mr-[0.5vw] w-[1.5em] h-[1.5em]"
             />
             <h3 className="text-[22px] font-bold">프로그램 차단 목록</h3>
