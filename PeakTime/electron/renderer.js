@@ -153,5 +153,5 @@ document.addEventListener("quit", () => {
 });
 
 document.addEventListener("reload", () => {
-  window.electronAPI.reloadWindow();
+  window.electronAPI.reload();
 });

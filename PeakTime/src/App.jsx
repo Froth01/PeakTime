@@ -43,6 +43,7 @@ function App() {
   const { bg, bgActions } = useBackgroundStore();
 
   useEffect(() => {
+    console.log(user);
     if (!user) {
       if (localUser) {
         userActions.setUser(localUser);
