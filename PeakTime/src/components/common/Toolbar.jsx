@@ -13,6 +13,7 @@ import "../../styles/daily-report-custom-swal.css";
 import usersApi from "../../api/usersApi";
 import authApi from "../../api/authApi";
 import { useRunningStore } from "../../stores/RunningStore";
+import chromeIcon from "../../assets/chrome.svg";
 
 function Toolbar() {
   const navigate = useNavigate();
@@ -350,10 +351,7 @@ function Toolbar() {
           className="whitespace-nowrap font-bold text-2xl"
         >
           <div className="absolute z-10 w-[32px] h-[32px]">
-            <img
-              src="../../build/assets/chrome.svg"
-              className="w-full h-full"
-            />
+            <img src={chromeIcon} className="w-full h-full" />
           </div>
           <div className="relative flex justify-center">
             <button

@@ -9,6 +9,8 @@ import AddSite from "./AddSite";
 import AddProgram from "./AddProgram";
 import "../../styles/daily-report-custom-swal.css";
 import "../../styles/custom-scrollbar.css";
+import chromeIcon from "../../assets/chrome.svg";
+import icon from "../../assets/logo-16x16.png";
 
 function PresetSetting({ onCancel, setUpdateTrigger }) {
   const { selectedPreset, presetList } = usePresetStore();
@@ -219,10 +221,7 @@ function PresetSetting({ onCancel, setUpdateTrigger }) {
       <div className="grid gap-5 grid-cols-2 w-full">
         <div>
           <div className="flex justify-center mb-4">
-            <img
-              src="../../build/assets/chrome.svg"
-              className="mr-[0.5vw]"
-            />
+            <img src={chromeIcon} className="mr-[0.5vw]" />
             <h3 className="text-[22px] font-bold">사이트 차단 목록</h3>
           </div>
           <div className="h-[40vh] overflow-y-scroll border-2 border-[#66aadf] p-3 custom-scrollbar">
@@ -249,10 +248,7 @@ function PresetSetting({ onCancel, setUpdateTrigger }) {
         </div>
         <div>
           <div className="flex justify-center items-center mb-4">
-            <img
-              src="../../build/Logo/logo-16x16.png"
-              className="mr-[0.5vw] w-[1.5em] h-[1.5em]"
-            />
+            <img src={icon} className="mr-[0.5vw] w-[1.5em] h-[1.5em]" />
             <h3 className="text-[22px] font-bold">프로그램 차단 목록</h3>
           </div>
           <div className="h-[40vh] overflow-y-scroll border-2 border-[#66aadf] p-3 custom-scrollbar">
