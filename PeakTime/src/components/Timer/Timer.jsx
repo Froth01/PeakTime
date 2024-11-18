@@ -30,11 +30,11 @@ function Timer() {
   const isRunningRef = useRef(isRunning);
   const hikingIdRef = useRef(startedHikingId);
 
-  const { presetList }= usePresetStore.getState();
+  const { presetList } = usePresetStore.getState();
 
   useEffect(() => {
-    if(presetList.length == 0) return;
-    
+    if (presetList.length == 0) return;
+
     setTimerPresetList(presetList);
     setSelectedOption(null);
   }, [presetList]);
@@ -124,7 +124,7 @@ function Timer() {
     }
 
     // 프리셋 선택
-    if(user.isRoot && selectedOption == null){
+    if (user.isRoot && selectedOption == null) {
       Swal.fire({
         title: "적용할 프리셋을 선택하세요.",
         customClass: {
@@ -150,7 +150,6 @@ function Timer() {
       denyButtonText: "취소",
       preConfirm: async () => {
         try {
-
           // 시작 확인 후 카운트다운 모달 표시
           const countdownSwal = await Swal.fire({
             title: "곧 하이킹이 시작됩니다!",
@@ -852,15 +851,15 @@ function Timer() {
               )}
               <div className="flex w-full mt-3">
                 <div
-                  className={`flex justify-center items-center w-[4vh] h-[4vh] ms-5 rounded-full font-bold text-white text-2xl bg-${
-                    isConnected ? "[#03c777]" : "[#f40000]"
+                  className={`flex justify-center items-center w-[4vh] h-[4vh] ms-5 rounded-full font-bold text-white text-2xl ${
+                    isConnected ? "bg-[#03c777]" : "bg-[#ff7f00]"
                   }`}
                 >
                   {isConnected ? <FaCheck /> : <AiOutlineDisconnect />}
                 </div>
                 <div
-                  className={`flex items-center justify-center text-${
-                    isConnected ? "[#03c777]" : "[#f40000]"
+                  className={`flex items-center justify-center ${
+                    isConnected ? "text-[#03c777]" : "text-[#ff7f00]"
                   } text-xl ms-3 font-bold`}
                 >
                   {isConnected

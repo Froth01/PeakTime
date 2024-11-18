@@ -39,7 +39,7 @@ function HomePage() {
       <div
         id="connect"
         className={`flex justify-center items-center absolute top-0 left-[10%] mt-5 w-[8vh] h-[8vh] rounded-full font-bold text-white text-3xl bg-${
-          isConnectedHome ? "[#03c777]" : "[#f40000]"
+          isConnectedHome ? "[#03c777]" : "[#ff7f00]"
         }`}
       >
         {isConnectedHome ? <FaCheck /> : <AiOutlineDisconnect />}
@@ -55,7 +55,7 @@ function HomePage() {
           </>
         ) : (
           <>
-            <span className="text-[#f40000] text-3xl">
+            <span className="text-[#ff7f00] text-3xl">
               확장프로그램과 연결이 필요합니다! <br />
               <br />
             </span>
