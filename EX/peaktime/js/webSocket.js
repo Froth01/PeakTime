@@ -18,7 +18,7 @@ function connectWebSocket() {
     console.log("WebSocket connected");
     reconnectAttempts = 0;
     sendPingMessage();
-    chrome.alarms.create("keepAlive", { periodInMinutes: 0.3 }); // 1분마다 실행
+    chrome.alarms.create("keepAlive", { periodInMinutes: 0.2 }); // 1분마다 실행
   };
 
   // WebSocket 메시지 수신 이벤트

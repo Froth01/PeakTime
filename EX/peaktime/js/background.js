@@ -54,17 +54,6 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
         console.log("response", response);
 
-        chrome.tabs.query(
-          { active: true, currentWindow: true },
-          function (tabs) {
-            if (tabs.length > 0) {
-              chrome.tabs.sendMessage(tabs[0].id, { action: "shutdown" });
-            } else {
-              console.error("No active tab found.");
-            }
-          }
-        );
-
         // 비동기 작업이 완료되었음을 응답으로 알림
         sendResponse({ success: true });
       } catch (error) {

@@ -1,7 +1,7 @@
 {
   "name": "peaktime",
   "description": "피크타임",
-  "version": "2.0",
+  "version": "3.0",
     "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",

@@ -126,6 +126,20 @@ function startTracking() {
   chrome.tabs.onUpdated.addListener(handleTabUpdate);
 }
 
+// 추적 시작 (특정 이벤트 발생 시)
+function startTracking() {
+  if (isTracking) return;
+
+  currentUrl = null;
+  startTime = Date.now();
+  isTracking = true;
+  console.log(`Tracking started`);
+
+  // 이벤트 리스너 추가
+  chrome.tabs.onUpdated.addListener(handleTabUpdate);
+  chrome.tabs.onActivated.addListener(handleTabActivation);
+}
+
 // URL이 변경될 때마다 호출
 function handleUrlChange(newUrl) {
   const urlObject = new URL(newUrl);
@@ -147,6 +161,33 @@ function handleUrlChange(newUrl) {
     const shouldBlock = websiteList.some((urlPattern) =>
       fullUrl.includes(urlPattern)
     );
+    console.log("Should block:", shouldBlock);
+
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs[0]) {
+        chrome.tabs.sendMessage(
+          tabs[0].id,
+          { action: "checkContentScript" },
+          (response) => {
+            if (chrome.runtime.lastError || !response) {
+              chrome.scripting.executeScript(
+                {
+                  target: { tabId: tabs[0].id },
+                  files: ["/js/contentScript.js"],
+                },
+                () => {
+                  if (shouldBlock) {
+                    chrome.tabs.sendMessage(tabs[0].id, { action: "shutdown" });
+                  }
+                }
+              );
+            } else if (shouldBlock) {
+              chrome.tabs.sendMessage(tabs[0].id, { action: "shutdown" });
+            }
+          }
+        );
+      }
+    });
   });
 }
 
@@ -172,4 +213,17 @@ function getCurrentTabUrl(callback) {
     }
   });
 }
+
+// Storage 변경 사항을 감지하고 업데이트된 차단 URL 목록을 반영
+chrome.storage.onChanged.addListener((changes, namespace) => {
+  if (changes.websiteList) {
+    console.log("차단 URL 목록이 변경되었습니다.");
+    chrome.tabs.query({}, (tabs) => {
+      tabs.forEach((tab) => {
+        handleUrlChange(tab.url); // 각 열린 탭에서 URL 차단을 적용
+      });
+    });
+  }
+});
+
 export { startTracking, stopAndClearTracking };
