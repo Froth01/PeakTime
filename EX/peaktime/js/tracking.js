@@ -112,20 +112,6 @@ function removeListeners() {
 }
 
 let currentTabId = "";
-function startTracking() {
-  if (isTracking) return;
-
-  startTime = Date.now();
-  isTracking = true;
-  console.log("Tracking started");
-
-  // 활성화된 탭 변경 이벤트 리스너 추가
-  chrome.tabs.onActivated.addListener(handleTabActivation);
-
-  // 현재 활성 탭에 대해서만 업데이트 이벤트 리스너 추가
-  chrome.tabs.onUpdated.addListener(handleTabUpdate);
-}
-
 // 추적 시작 (특정 이벤트 발생 시)
 function startTracking() {
   if (isTracking) return;
