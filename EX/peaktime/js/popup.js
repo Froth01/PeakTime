@@ -79,13 +79,13 @@ document.addEventListener("DOMContentLoaded", function () {
         const pathname = urlObject.pathname; // path 추출
         const fullUrl = hostname + pathname;
         //버튼 클릭시 전체 url 보내기
-        chrome.runtime.sendMessage({ action: "addUrl", url: fullUrl });
+        chrome.runtime.sendMessage({ action: "addUrl", url: hostname });
 
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
           if (tabs.length > 0) {
             chrome.tabs.sendMessage(tabs[0].id, {
               action: "showSaveUrlModal",
-              currentUrl: url,
+              currentUrl: hostname,
             });
           } else {
             console.error("활성 탭이 없습니다.");
