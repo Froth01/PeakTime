@@ -141,8 +141,11 @@ public class HikingService {
         //디테일 조회
         HikingDetailQueryDto hikingDetail = hikingRepository.getHikingDetail(hikingId);
 
+        Hiking hiking = hikingRepository.findByHikingId(hikingId).orElseThrow(
+                () -> new CustomException(ErrorCode.HIKING_NOT_FOUND)
+        );
         //없으면 null 반환
-        if(hikingDetail==null) return null;
+        if(hikingDetail==null) return HikingDetailResponseDto.noHikingDetail(hiking);
 
         List<StatisticContent> visitedSiteList = contentRepository.getTopUsingInfoList("site", hikingId);
         List<StatisticContent> visitedProgramList = contentRepository.getTopUsingInfoList("program", hikingId);
@@ -150,7 +153,6 @@ public class HikingService {
         hikingDetail.setVisitedSiteList(visitedSiteList);
         hikingDetail.setVisitedProgramList(visitedProgramList);
 
-        log.info(hikingDetail.toString());
 
         return HikingDetailResponseDto.createHikingDetailResponseDto(hikingDetail);
 
