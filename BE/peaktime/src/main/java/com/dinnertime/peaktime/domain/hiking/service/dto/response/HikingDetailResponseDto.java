@@ -1,5 +1,6 @@
 package com.dinnertime.peaktime.domain.hiking.service.dto.response;
 
+import com.dinnertime.peaktime.domain.hiking.entity.Hiking;
 import com.dinnertime.peaktime.domain.hiking.service.dto.query.HikingDetailQueryDto;
 import com.dinnertime.peaktime.domain.statistic.entity.StatisticContent;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -7,6 +8,7 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @ToString
@@ -54,4 +56,17 @@ public class HikingDetailResponseDto {
                 .visitedProgramList(hikingDetailQueryDto.getVisitedProgramList())
                 .build();
     }
+
+    public static HikingDetailResponseDto noHikingDetail(Hiking hiking) {
+                return HikingDetailResponseDto.builder()
+                .startTime(hiking.getStartTime())
+                .endTime(hiking.getEndTime())
+                .realEndTime(hiking.getRealEndTime())
+                .blockedSiteCount(0)
+                .blockedProgramCount(0)
+                .visitedSiteList(new ArrayList<>())
+                .visitedProgramList(new ArrayList<>())
+                .build();
+    }
+
 }
