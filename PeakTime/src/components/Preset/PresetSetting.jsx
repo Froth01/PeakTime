@@ -207,7 +207,7 @@ function PresetSetting({ onCancel, setUpdateTrigger }) {
       </h2>
 
       <div className="flex flex-col gap-3 text-start">
-        <label className="text-[20px] text-white font-bold">프리셋명</label>
+        <label className="text-[22px] text-white font-bold">프리셋명</label>
         <input
           type="text"
           value={title}
@@ -218,7 +218,13 @@ function PresetSetting({ onCancel, setUpdateTrigger }) {
 
       <div className="grid gap-5 grid-cols-2 w-full">
         <div>
-          <h3 className="text-[20px] font-bold mb-4">사이트 차단 목록</h3>
+          <div className="flex justify-center mb-4">
+            <img
+              src="../../../public/assets/chrome.svg"
+              className="mr-[0.5vw]"
+            />
+            <h3 className="text-[22px] font-bold">사이트 차단 목록</h3>
+          </div>
           <div className="h-[40vh] overflow-y-scroll border-2 border-[#66aadf] p-3 custom-scrollbar">
             {blockWebsiteArray.map((site, idx) => (
               <li key={idx} className="flex items-center text-[20px] gap-3">
@@ -242,7 +248,13 @@ function PresetSetting({ onCancel, setUpdateTrigger }) {
           </div>
         </div>
         <div>
-          <h3 className="text-[20px] font-bold mb-4">프로그램 차단 목록</h3>
+          <div className="flex justify-center items-center mb-4">
+            <img
+              src="../../../public/Logo/logo-16x16.png"
+              className="mr-[0.5vw] w-[1.5em] h-[1.5em]"
+            />
+            <h3 className="text-[22px] font-bold">프로그램 차단 목록</h3>
+          </div>
           <div className="h-[40vh] overflow-y-scroll border-2 border-[#66aadf] p-3 custom-scrollbar">
             {blockProgramArray.map((program, idx) => (
               <li key={idx} className="flex items-center text-[20px] gap-3">

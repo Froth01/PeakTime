@@ -851,15 +851,15 @@ function Timer() {
               )}
               <div className="flex w-full mt-3">
                 <div
-                  className={`flex justify-center items-center w-[4vh] h-[4vh] ms-5 rounded-full font-bold text-white text-2xl bg-${
-                    isConnected ? "[#03c777]" : "[#f40000]"
+                  className={`flex justify-center items-center w-[4vh] h-[4vh] ms-5 rounded-full font-bold text-white text-2xl ${
+                    isConnected ? "bg-[#03c777]" : "bg-[#ff7f00]"
                   }`}
                 >
                   {isConnected ? <FaCheck /> : <AiOutlineDisconnect />}
                 </div>
                 <div
-                  className={`flex items-center justify-center text-${
-                    isConnected ? "[#03c777]" : "[#f40000]"
+                  className={`flex items-center justify-center ${
+                    isConnected ? "text-[#03c777]" : "text-[#ff7f00]"
                   } text-xl ms-3 font-bold`}
                 >
                   {isConnected

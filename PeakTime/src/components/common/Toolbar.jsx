@@ -239,6 +239,9 @@ function Toolbar() {
       input: "password",
       confirmButtonColor: "#03C777",
       confirmButtonText: "확인",
+      showCancelButton: true,
+      cancelButtonText: "취소",
+      cancelButtonColor: "#F40000",
       inputAttributes: {
         placeholder: "password",
         style: "color: black;", // input 텍스트 색상
@@ -346,6 +349,12 @@ function Toolbar() {
           placement="right"
           className="whitespace-nowrap font-bold text-2xl"
         >
+          <div className="absolute z-10 w-[32px] h-[32px]">
+            <img
+              src="../../../public/assets/chrome.svg"
+              className="w-full h-full"
+            />
+          </div>
           <div className="relative flex justify-center">
             <button
               onClick={() => {
