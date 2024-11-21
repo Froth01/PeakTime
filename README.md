@@ -13,7 +13,7 @@
 - 루트계정 메인
 <br>
 ![01-root-mainPage.gif](./readmeImg/gif/01-root-mainPage.gif)
-<br>
+
 - 서브계정 메인
 <br>
 ![02-sub-mainPage.gif](./readmeImg/gif/02-sub-mainPage.gif)
@@ -23,7 +23,7 @@
 - 하이킹 시작 후 사이트, 프로그램 차단 기능
 <br>
   ![03-hiking-start-block.gif](./readmeImg/gif/03-hiking-start-block.gif)
-<br>
+
 - 종료
 <br>
   ![04-hiking-finish.gif](./readmeImg/gif/04-hiking-finish.gif)
@@ -45,7 +45,7 @@
 - 메모 작성 및 확인
 <br>
   ![07-memo.gif](./readmeImg/gif/07-memo.gif)
-  <br>
+
 - 요약 작성 및 확인
 <br>
   ![08-summary.gif](./readmeImg/gif/08-summary.gif)
