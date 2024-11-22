@@ -49,6 +49,9 @@
 - 서브계정 생성 및 차단 예약 타이머
   ![10-sub-setting.gif](./readmeImg/gif/10-sub-setting.gif)
 
+- 서브계정 타이머 예약 기반 자동 차단
+  ![11-sub-timer.gif](./readmeImg/gif/11-sub-timer.gif)
+
 # 주요 기능
 
 ### 서비스 소개
