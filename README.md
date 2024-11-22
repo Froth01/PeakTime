@@ -11,58 +11,59 @@
 ### ■ 메인 페이지
 
 - 루트계정 메인
-<br>
-![01-root-mainPage.gif](./readmeImg/gif/01-root-mainPage.gif)
+  <br>
+  ![01-root-mainPage.gif](./readmeImg/gif/01-root-mainPage.gif)
 
 - 서브계정 메인
-<br>
-![02-sub-mainPage.gif](./readmeImg/gif/02-sub-mainPage.gif)
+  <br>
+  ![02-sub-mainPage.gif](./readmeImg/gif/02-sub-mainPage.gif)
 
 ### ■ 하이킹 시작, 종료
 
 - 하이킹 시작 후 사이트, 프로그램 차단 기능
-<br>
+  <br>
   ![03-hiking-start-block.gif](./readmeImg/gif/03-hiking-start-block.gif)
 
 - 종료
-<br>
+  <br>
   ![04-hiking-finish.gif](./readmeImg/gif/04-hiking-finish.gif)
 
 ### ■ 월간 하이킹 내역 페이지
 
 - 캘린더 - 일자 클릭 - 상세
-<br>
+  <br>
   ![05-monthly-report.gif](./readmeImg/gif/05-monthly-report.gif)
 
 ### ■ 전체 통계 페이지
 
 - root 전체 통계
-<br>
+  <br>
   ![06-stats.gif](./readmeImg/gif/06-stats.gif)
 
 ### ■ 메모 및 요약 페이지
 
 - 메모 작성 및 확인
-<br>
+  <br>
   ![07-memo.gif](./readmeImg/gif/07-memo.gif)
 
 - 요약 작성 및 확인
-<br>
+  <br>
   ![08-summary.gif](./readmeImg/gif/08-summary.gif)
 
 ### ■ 차단 프리셋 설정 페이지
 
 - 사이트, 프로그램 추가 입력
-<br>
+  <br>
   ![09-presetList.gif](./readmeImg/gif/09-presetList.gif)
 
 ### ■ 서브계정 관리 페이지
 
 - 서브계정 생성 및 차단 예약 타이머
-<br>
+  <br>
   ![10-sub-setting.gif](./readmeImg/gif/10-sub-setting.gif)
 
 - 서브계정 타이머 예약 기반 자동 차단
+  <br>
   ![11-sub-timer.gif](./readmeImg/gif/11-sub-timer.gif)
 
 # 주요 기능
